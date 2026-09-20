@@ -1,0 +1,93 @@
+/* ============ 资料分类：学术文献列表 ============ */
+/* 单栏居中、纸面质感、衬线标题、两端对齐正文，营造文献目录式的严肃排版 */
+.works-grid.acad-list {
+  display: flex; flex-direction: column; gap: 16px;
+  max-width: 860px; margin: 24px auto 0;
+}
+.acad-item {
+  position: relative;
+  display: flex; gap: 20px; align-items: flex-start;
+  padding: 22px 26px;
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(110,125,150,.16);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: 4px;
+  box-shadow: 0 3px 12px rgba(100,120,140,.07);
+  transition: border-color .3s, box-shadow .3s, transform .3s var(--ease-out);
+}
+.acad-item:hover {
+  border-left-color: var(--accent-mint);
+  box-shadow: 0 8px 22px rgba(100,120,140,.13);
+  transform: translateY(-2px);
+}
+/* 编号：衬线数字 + 底部细线，参考文献样式 */
+.acad-index {
+  flex: 0 0 46px; text-align: center; position: relative;
+  padding-top: 2px;
+  font-family: 'Noto Serif SC', serif; font-weight: 700; font-size: 1.35rem;
+  color: rgba(90,110,135,.45);
+}
+.acad-index::after {
+  content: ''; position: absolute; left: 7px; right: 7px; bottom: -8px;
+  height: 1px; background: rgba(110,125,150,.3);
+}
+.acad-body { flex: 1 1 auto; min-width: 0; }
+.acad-head {
+  display: flex; align-items: baseline; gap: 14px;
+  padding-bottom: 8px; margin-bottom: 10px;
+  border-bottom: 1px solid rgba(110,125,150,.14);
+}
+.acad-title {
+  font-family: 'Noto Serif SC', serif; font-weight: 700;
+  font-size: 1.12rem; line-height: 1.45; color: var(--text);
+}
+.acad-year {
+  margin-left: auto; flex: 0 0 auto;
+  font-family: 'Noto Serif SC', serif; font-size: .82rem;
+  color: var(--text-soft); letter-spacing: .06em;
+}
+/* 正文：两端对齐，行距放宽，读起来像文献摘要 */
+.acad-desc {
+  margin: 0 0 12px; color: var(--text);
+  font-size: .88rem; line-height: 1.9; text-align: justify;
+}
+.acad-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.acad-meta .cc-tag {
+  border-radius: 3px; padding: 2px 9px;
+  background: rgba(120,140,170,.1); border-color: rgba(120,140,170,.22); color: var(--text-soft);
+}
+.cc-tag.acad-src {
+  background: rgba(127,180,232,.14); border-color: rgba(127,180,232,.3);
+  color: #3f72a8; font-weight: 600;
+}
+/* 右侧操作栏：常显，竖向排列，细线分隔 */
+.acad-side {
+  flex: 0 0 auto; display: flex; flex-direction: column; gap: 8px;
+  padding-left: 18px; border-left: 1px solid rgba(110,125,150,.14);
+}
+.acad-side .cc-star {
+  width: auto; height: auto; border: none; background: none; backdrop-filter: none;
+  opacity: 1; transform: none; cursor: pointer;
+  font-size: 1rem; text-align: center; color: var(--text-soft);
+  transition: color .25s, transform .2s;
+}
+.acad-side .cc-star:hover, .acad-side .cc-star.on { color: #b98a1e; transform: scale(1.12); }
+.acad-side .cc-ov-copy, .acad-side .cc-ov-link, .acad-side .cc-del {
+  display: block; white-space: nowrap; cursor: pointer; text-decoration: none;
+  font-family: var(--font-display); font-weight: 600; font-size: .76rem;
+  color: #3f72a8; text-align: center; padding: 5px 10px;
+  background: rgba(127,180,232,.1); border: 1px solid rgba(127,180,232,.25); border-radius: 3px;
+  transition: background .25s, color .25s, transform .2s;
+}
+.acad-side .cc-ov-copy:hover, .acad-side .cc-ov-link:hover { background: rgba(127,180,232,.2); transform: translateY(-1px); }
+.acad-side .cc-del { color: #a85a5a; background: rgba(200,120,120,.08); border-color: rgba(200,120,120,.25); }
+.acad-side .cc-del:hover { background: rgba(200,120,120,.18); }
+@media (max-width: 680px) {
+  .acad-item { flex-direction: column; gap: 12px; padding: 18px; }
+  .acad-side {
+    flex-direction: row; align-items: center; gap: 10px;
+    padding-left: 0; padding-top: 12px; border-left: none;
+    border-top: 1px solid rgba(110,125,150,.14);
+  }
+}
+

@@ -1,0 +1,46 @@
+/* ============ 语句分类：紧凑引语卡墙 ============ */
+/* 纯文本高密度容器：CSS columns 瀑布流，引文即主视觉 */
+.works-grid.quote-wall { display: block; columns: 3; column-gap: 16px; }
+.quote-card {
+  position: relative; display: block; break-inside: avoid; margin-bottom: 16px;
+  padding: 24px 20px 14px; cursor: pointer;
+}
+/* 装饰引号：低透明度衬线字符，不参与交互 */
+.quote-card .qc-mark {
+  position: absolute; top: 4px; left: 12px;
+  font-family: 'Noto Serif SC', serif; font-size: 2.6rem; line-height: 1;
+  color: rgba(176,90,114,.16); pointer-events: none;
+}
+.quote-card .qc-text {
+  position: relative;
+  margin: 0 0 12px; color: var(--text);
+  font-family: 'Noto Serif SC', serif; font-size: .98rem; line-height: 1.95;
+}
+.quote-card .qc-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.quote-card .qc-tags .cc-tag { padding: 1px 8px; font-size: .68rem; opacity: .85; }
+.quote-card .qc-foot {
+  display: flex; align-items: center; gap: 8px;
+  padding-top: 9px; border-top: 1px solid rgba(110,125,150,.14);
+}
+.quote-card .qc-src {
+  flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: 'Noto Serif SC', serif; font-size: .8rem; color: var(--text-soft);
+}
+.quote-card .qc-year { flex: 0 0 auto; font-size: .72rem; color: var(--text-soft); opacity: .7; }
+.quote-card .cc-star, .quote-card .cc-del {
+  flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer;
+  background: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.8);
+  font-size: .78rem; line-height: 1; color: var(--text-soft);
+  transition: color .25s, background .25s, transform .2s var(--ease-out);
+}
+.quote-card .cc-star.on, .book-card .cc-star.on { color: #b98a1e; }
+@media (hover: hover) and (pointer: fine) {
+  .quote-card:hover, .book-card:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(120,150,165,.2); }
+  .quote-card .cc-star:hover, .quote-card .cc-del:hover,
+  .book-card .cc-star:hover, .book-card .cc-del:hover { transform: scale(1.12); }
+}
+.quote-card .cc-del:hover, .book-card .cc-del:hover { color: #a85a5a; background: rgba(200,120,120,.12); }
+@media (max-width: 1024px) { .works-grid.quote-wall { columns: 2; } }
+@media (max-width: 640px) { .works-grid.quote-wall { columns: 1; } }
+

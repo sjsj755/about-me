@@ -1,0 +1,136 @@
+/* ============ 日历组件（再次缩小） ============ */
+.calendar { width: min(300px, 100%); padding: 13px 14px; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cal-label { font-family: var(--font-display); font-weight: 700; font-size: 0.88rem; }
+.cal-nav {
+  width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,.5); color: var(--text); font-size: 1rem; cursor: pointer;
+  transition: background .3s, transform .2s;
+}
+.cal-nav:hover { background: rgba(255,255,255,.85); transform: scale(1.08); }
+.cal-week {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+  margin-bottom: 4px; text-align: center;
+  color: var(--text-soft); font-size: 0.7rem; font-weight: 600;
+}
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-day {
+  aspect-ratio: 1; display: grid; place-items: center;
+  font-size: 0.75rem; border-radius: 8px; color: var(--text);
+  transition: background .2s, color .2s, transform .15s; cursor: pointer;
+}
+.cal-day:hover { background: rgba(255,255,255,.7); transform: scale(1.08); }
+.cal-day.empty { pointer-events: none; }
+.cal-day.today {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
+  color: #fff; font-weight: 700;
+}
+
+/* 农历小字（初一显示月名 / 节气 / 日子） */
+.cal-lunar { font-size: .46rem; line-height: 1; color: var(--text-soft); margin-top: 1px; }
+.cal-day.today .cal-lunar { color: rgba(255,255,255,.9); }
+@media (max-width: 480px) { .cal-lunar { display: none; } }
+
+/* 日期标记小圆点 */
+.cal-day { position: relative; }
+.cal-dot {
+  position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%);
+  width: 4px; height: 4px; border-radius: 50%; pointer-events: none;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.55);
+}
+.cal-dot.blue { background: var(--accent-blue); }
+.cal-dot.pink { background: #e0697f; }
+.cal-dot.mint { background: #3cbfa0; }
+.cal-day.today .cal-dot { box-shadow: none; }
+/* 日期图标徽标（右上角小 emoji） */
+.cal-emoji {
+  position: absolute; top: 1px; right: 2px;
+  font-size: .6rem; line-height: 1; pointer-events: none;
+}
+
+/* 日历标记弹层（复用 .collect-modal 骨架） */
+.collect-modal-inner.cal-modal { width: min(320px, 100%); padding: 22px 22px 20px; }
+.cal-input {
+  width: 100%; border: 1px solid var(--glass-border); border-radius: 10px;
+  background: rgba(255,255,255,.75); padding: 10px 12px;
+  font: inherit; font-size: 16px; color: var(--text); /* 16px 防移动端聚焦缩放 */
+  resize: none; outline: none; transition: border-color .2s;
+}
+.cal-input:focus { border-color: var(--accent-blue); }
+.cal-colors { display: flex; gap: 10px; margin-top: 12px; }
+/* 图标选择行 */
+.cal-icons { display: flex; gap: 6px; margin-top: 12px; }
+.cal-ico {
+  width: 27px; height: 27px; border-radius: 8px; padding: 0;
+  border: 1px solid var(--glass-border); background: rgba(255,255,255,.6);
+  font-size: .82rem; line-height: 1; cursor: pointer;
+  display: grid; place-items: center;
+  transition: transform .2s var(--ease-spring), border-color .2s, background .2s;
+}
+.cal-ico:hover { transform: translateY(-2px); }
+.cal-ico.active { border-color: var(--accent-blue); background: rgba(255,255,255,.95); }
+.cal-ico-none { font-size: .55rem; color: var(--text-soft); }
+.cal-color {
+  width: 22px; height: 22px; border-radius: 50%; padding: 0;
+  border: 2px solid transparent; cursor: pointer;
+  transition: transform .2s var(--ease-spring), border-color .2s;
+}
+.cal-color.active { border-color: var(--text-soft); transform: scale(1.12); }
+.cal-color.is-blue { background: var(--accent-blue); }
+.cal-color.is-pink { background: var(--accent-pink); }
+.cal-color.is-mint { background: var(--accent-mint); }
+/* 重复方式（仅今年 / 每年公历 / 每年农历） */
+.cal-repeat { display: flex; gap: 6px; margin-top: 10px; }
+.cal-rp {
+  flex: 1; padding: 7px 0; border-radius: 8px;
+  border: 1px solid var(--glass-border); background: rgba(255,255,255,.6);
+  font-family: inherit; font-size: .72rem; color: var(--text-soft); cursor: pointer;
+  transition: border-color .2s, color .2s, background .2s, transform .2s var(--ease-spring);
+}
+.cal-rp:hover { transform: translateY(-1px); }
+.cal-rp.active {
+  border-color: var(--accent-blue); color: var(--text);
+  background: rgba(255,255,255,.95); font-weight: 600;
+}
+.cal-modal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+.cal-del {
+  border: none; background: none; color: var(--text-soft);
+  font-size: .82rem; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px;
+  transition: color .2s;
+}
+.cal-del:hover { color: #c0566d; }
+.cal-save {
+  border: none; border-radius: 40px; padding: 8px 24px;
+  font-family: var(--font-display); font-weight: 600; font-size: .85rem;
+  color: #fff; cursor: pointer;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
+  box-shadow: 0 8px 18px rgba(140,190,220,.4);
+  transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out);
+}
+.cal-save:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(140,190,220,.5); }
+.cal-save:active { transform: scale(.96); }
+
+.btn {
+  padding: 13px 30px; border-radius: 50px; font-family: var(--font-display);
+  font-weight: 600; font-size: 0.98rem; border: 1px solid transparent;
+  cursor: pointer; transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out);
+}
+.btn-primary {
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
+  color: #fff; box-shadow: 0 10px 24px rgba(140,190,220,.4);
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(140,190,220,.5); }
+.btn-primary:active { transform: translateY(-1px) scale(.97); }
+.btn-ghost {
+  background: var(--glass-bg); border-color: var(--glass-border); color: var(--text);
+  backdrop-filter: blur(10px);
+}
+.btn-ghost:hover { transform: translateY(-3px); background: rgba(255,255,255,.6); }
+.btn-ghost:active { transform: translateY(-1px) scale(.97); }
+
+.scroll-hint { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); text-align: center; color: var(--text-soft); font-size: 0.8rem; }
+.scroll-hint .mouse { width: 24px; height: 38px; border: 2px solid var(--text-soft); border-radius: 14px; margin: 8px auto 0; position: relative; }
+.scroll-hint .mouse span { position: absolute; top: 6px; left: 50%; width: 4px; height: 8px; transform: translateX(-50%); background: var(--accent-blue); border-radius: 4px; animation: wheel 1.6s infinite; }
+@keyframes wheel { 0% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, 14px); } }
+

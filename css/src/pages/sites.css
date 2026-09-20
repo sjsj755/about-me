@@ -1,0 +1,70 @@
+/* ============ 站点集 · 简洁链接卡 ============ */
+/* 网格：紧凑等宽卡，宽度自适应列数 */
+.sites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+/* 整卡即链接：名称 + 一句话描述 + 跳转 */
+.site-card {
+  display: flex; align-items: flex-start; gap: 13px;
+  padding: 16px 16px 14px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  box-shadow: var(--shadow);
+  text-decoration: none; color: inherit; cursor: pointer;
+  transition: transform .2s var(--ease-out), box-shadow .25s var(--ease-out), border-color .25s var(--ease-out);
+}
+.site-card:active { transform: scale(.98); }
+/* 首字母渐变小片：代替真实 favicon，零外网请求 */
+.site-tile {
+  flex: none; width: 44px; height: 44px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: #fff;
+  text-shadow: 0 1px 3px rgba(60,90,120,.3);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+}
+.site-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.site-title {
+  font-family: var(--font-display); font-weight: 700; font-size: .98rem; line-height: 1.35;
+  transition: color .2s ease;
+}
+.site-desc {
+  margin-top: 3px; color: var(--text-soft); font-size: .8rem; line-height: 1.6;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.site-foot { display: flex; align-items: center; gap: 8px; margin-top: 7px; }
+.site-foot .cc-tag { flex: none; }
+/* 域名：等宽字体、柔和色，提示链接去向 */
+.site-domain {
+  flex: 1 1 auto; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: 'Quicksand', monospace; font-size: .72rem; color: var(--text-soft);
+  letter-spacing: .02em;
+}
+/* 跳转箭头：悬停时轻微位移示意"出去" */
+.site-go {
+  flex: none; align-self: center; color: var(--text-soft); font-size: .95rem;
+  transition: transform .2s var(--ease-out), color .2s ease;
+}
+/* hover 只在精确指针设备启用，避免触屏误触发；只动 transform/shadow，无布局位移 */
+@media (hover: hover) and (pointer: fine) {
+  .site-card:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(120,150,165,.25); border-color: rgba(255,255,255,.95); }
+  .site-card:hover .site-title { color: var(--accent-blue); }
+  .site-card:hover .site-go { transform: translate(2px, -2px); color: var(--accent-blue); }
+}
+.site-card:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
+/* 移动端：单列紧凑排布 */
+@media (max-width: 480px) {
+  .sites-grid { grid-template-columns: 1fr; gap: 11px; }
+  .site-card { padding: 14px; gap: 11px; }
+}
+/* 动效降级：系统"减少动态"偏好下去除位移过渡，保留颜色反馈 */
+@media (prefers-reduced-motion: reduce) {
+  .site-card, .site-go, .site-title { transition: none; }
+  .site-card:hover, .site-card:active { transform: none; }
+}

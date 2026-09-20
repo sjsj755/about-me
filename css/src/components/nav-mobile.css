@@ -1,0 +1,28 @@
+/* ============ 移动端导航 ============ */
+@media (max-width: 768px) {
+  .hamburger { display: flex; }
+  .nav-links {
+    position: fixed; top: 78px; right: 4%;
+    flex-direction: column; gap: 0; background: rgba(255,255,255,.9);
+    backdrop-filter: blur(18px); border-radius: 18px; padding: 12px;
+    box-shadow: var(--shadow); opacity: 0; pointer-events: none; transform: translateY(-10px); transition: .3s;
+  }
+  .nav-links.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .nav-links a { padding: 12px 16px; border-radius: 10px; }
+  .works-grid { grid-template-columns: 1fr; }
+  .work-card { grid-row: span auto; }
+  .work-card.wide { grid-column: span 1; }
+  .work-card.tall .work-thumb,
+  .work-card .work-thumb,
+  .work-card.wide .work-thumb { height: 150px; }
+  .about-grid { grid-template-columns: 1fr; }
+  .contact-panel { padding: 28px 24px; }
+  .portal-cards, .portal-merged { grid-template-columns: 1fr; gap: 0; }
+  .portal-merged .portal-link + .portal-link { border-top: 1px solid var(--glass-border); }
+  .portal-link { padding: 16px 20px; }
+  .portal-stage { flex-direction: column; gap: 22px; }
+  .mascot-frame { width: 200px; height: 200px; }
+  .calendar { padding: 8px 9px; }
+  .about-hero { flex-direction: column; text-align: center; }
+}
+

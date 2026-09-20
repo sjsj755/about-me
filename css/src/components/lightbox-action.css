@@ -1,0 +1,15 @@
+/* ============ 灯箱「查看在线项目」主按钮 ============ */
+.lightbox-info .lb-visit {
+  display: inline-flex; align-items: center; gap: 6px;
+  align-self: flex-start; margin-top: 4px;
+  padding: 10px 20px; border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
+  color: #fff; font-size: 0.9rem; font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(96,165,220,.28);
+  transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out), filter .25s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .lightbox-info .lb-visit:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(96,165,220,.4); filter: brightness(1.05); }
+}
+

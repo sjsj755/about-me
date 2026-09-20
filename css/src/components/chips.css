@@ -1,0 +1,20 @@
+/* ============ 作品集筛选胶囊（方案三） ============ */
+.works-filter {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-bottom: 16px;
+}
+.filter-chip {
+  padding: 8px 18px; border-radius: 40px; cursor: pointer;
+  font-family: var(--font-display); font-weight: 600; font-size: 0.85rem;
+  color: var(--text-soft); background: rgba(255,255,255,.5);
+  border: 1px solid rgba(255,255,255,.7);
+  transition: background .3s var(--ease-out), color .3s var(--ease-out), transform .2s var(--ease-out);
+}
+.filter-chip:active { transform: scale(.95); }
+.filter-chip.active {
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
+  color: #fff; border-color: transparent;
+}
+/* 作品计数 */
+.works-count { margin-top: 8px; color: var(--text-soft); font-size: 0.9rem; }
+

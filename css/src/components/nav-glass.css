@@ -1,0 +1,33 @@
+/* ============ 导航玻璃 ============ */
+.glass-nav {
+  /* env() 在支持沉浸式（鸿蒙 ArkWeb / iOS）时避让挖孔，桌面与常规安卓为 0 */
+  position: fixed; top: calc(18px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%);
+  width: min(1080px, 92%); z-index: 100;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border-radius: 60px;
+  padding: 12px 26px;
+  box-shadow: var(--shadow);
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; }
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; }
+.nav-links { display: flex; gap: 30px; font-size: 0.95rem; }
+.nav-links a { position: relative; color: var(--text-soft); font-weight: 500; transition: color .3s; }
+.nav-links a.active { color: var(--text); font-weight: 700; }
+.nav-links a.active::after { width: 100%; }
+.nav-links a::after {
+  content: ""; position: absolute; left: 0; bottom: -4px; height: 2px; width: 0;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
+  transition: width .3s; border-radius: 2px;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-links a:hover::after { width: 100%; }
+
+.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+.hamburger span { width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: .3s; }
+
+/* 导航滚动态 */
+.glass-nav.scrolled { background: rgba(255,255,255,.62); }
+

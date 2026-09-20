@@ -1,0 +1,103 @@
+/* ============ 中央：方形小人（主要视觉切入点） ============ */
+.mascot-stage {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 12px;
+  position: relative; z-index: 3;
+}
+.mascot-frame {
+  width: 230px; height: 230px; /* 方形 */
+  border-radius: 28px; padding: 10px;
+  display: grid; place-items: center;
+  overflow: hidden;
+  /* 透明化方框背景 */
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  /* 3D 视角支持：父容器提供透视，子元素做按压形变 */
+  perspective: 600px;
+  transform-style: preserve-3d;
+}
+.mascot-inner {
+  width: 100%; height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.mascot-img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block;
+}
+/* 高光层：位置随鼠标移动，模拟光线随按压角度变化 */
+.mascot-shine {
+  position: absolute; inset: 0;
+  border-radius: 20px;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--shx, 50%) var(--shy, 30%),
+    rgba(255,255,255,.5), rgba(255,255,255,0) 45%);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.mascot-frame.is-active .mascot-shine { opacity: 1; }
+
+/* 鼓励话语气泡 */
+.encourage-bubble {
+  position: relative;
+  background: rgba(255,255,255,.7); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  border-radius: 14px; padding: 9px 14px;
+  font-size: 0.85rem; line-height: 1.5; color: var(--text);
+  box-shadow: var(--shadow);
+  cursor: pointer; user-select: none; text-align: center;
+  /* 固定尺寸：换句时文字在框内换行，三列布局零重排（防闪烁关键） */
+  width: min(280px, 100%);
+  min-height: calc(2.55rem + 18px);
+  transition: opacity .24s var(--ease-out), filter .24s var(--ease-out);
+}
+/* 退场：轻模糊交叉淡化（blur 让两句话融为一次变形而非两个物体交叠） */
+.encourage-bubble.is-swapping {
+  opacity: 0;
+  filter: blur(2px);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .encourage-bubble { transition: none; }
+}
+.encourage-bubble::after {
+  content: ""; position: absolute; bottom: -7px; left: 50%; transform: translateX(-50%);
+  border: 6px solid transparent; border-top-color: rgba(255,255,255,.7);
+}
+
+/* 鼓励语上方：相片跳转小组件（独立居中） */
+.encourage-photo-wrap {
+  display: flex; justify-content: center;
+  animation: floatY 5.5s ease-in-out infinite;
+}
+.encourage-photo {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 18px; border-radius: 40px;
+  background: rgba(255,255,255,.7);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  color: var(--text); font-family: var(--font-display);
+  font-size: 0.95rem; font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out);
+}
+.encourage-photo:hover { transform: translateY(-3px); box-shadow: 0 12px 22px rgba(120,150,165,.3); }
+.encourage-photo:active { transform: scale(.95); }
+.encourage-photo-icon {
+  display: grid; place-items: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
+  font-size: 0.95rem; color: #fff;
+  flex-shrink: 0;
+  transition: transform .25s var(--ease-spring);
+}
+.encourage-photo:hover .encourage-photo-icon { transform: rotate(-8deg) scale(1.1); }
+.encourage-photo-text { white-space: nowrap; }
+

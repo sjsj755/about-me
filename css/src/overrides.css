@@ -1,0 +1,13 @@
+/* ============ 移动端补充适配（安卓 / 鸿蒙） ============ */
+/* 小屏手机（<381px）：弹窗收紧，避免贴边 */
+@media (max-width: 380px) {
+  .collect-modal { padding: 12px; }
+  .collect-modal-inner,
+  .collect-modal-inner.cal-modal { padding: 18px 16px; }
+}
+
+/* 折叠屏展开态 / 窄窗口（鸿蒙 Mate X 展开约 720-900px）：两列档位 */
+@media (min-width: 769px) and (max-width: 1100px) {
+  .works-grid { grid-template-columns: repeat(2, 1fr); }
+}
+

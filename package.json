@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:css": "node tools/build-css.js",
+    "check:css": "node tools/build-css.js --check",
+    "test": "playwright test"
   },
   "keywords": [],
   "author": "",

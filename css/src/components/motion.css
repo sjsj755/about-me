@@ -1,0 +1,24 @@
+/* ============ 入场动画初始态（JS 控制） ============ */
+.reveal { opacity: 0; transform: translateY(30px); }
+/* 外部 SDK（GSAP）不可达时由 main.js 给 <html> 打上 no-gsap：
+   此时无人解除上面的初始态，必须在此还原，否则内容永久不可见。 */
+html.no-gsap .reveal { opacity: 1; transform: none; }
+
+/* ============ 悬停动画门控（skill：触屏误触，仅在精指针设备启用 transform 悬停） ============ */
+@media (hover: hover) and (pointer: fine) {
+  .about-chip:hover { transform: translateY(-3px); box-shadow: 0 18px 34px rgba(120,150,165,.3); }
+  .skill:hover { background: var(--accent-mint); color: #fff; transform: translateY(-3px); }
+  .work-card:hover { transform: rotate(0deg) translateY(-8px); box-shadow: 0 28px 46px rgba(120,150,165,.3); }
+  .portal-link:hover { background: rgba(255,255,255,.5); }
+  .portal-icon:hover { transform: scale(1.12); }
+  .encourage-photo:hover { transform: translateY(-3px); box-shadow: 0 12px 22px rgba(120,150,165,.3); }
+  .encourage-photo:hover .encourage-photo-icon { transform: rotate(-8deg) scale(1.1); }
+  .cal-nav:hover { background: rgba(255,255,255,.85); transform: scale(1.08); }
+  .cal-day:hover { background: rgba(255,255,255,.7); transform: scale(1.08); }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a:hover::after { width: 100%; }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(140,190,220,.5); }
+  .btn-ghost:hover { transform: translateY(-3px); background: rgba(255,255,255,.6); }
+  .filter-chip:hover { background: rgba(255,255,255,.7); color: var(--text); }
+}
+

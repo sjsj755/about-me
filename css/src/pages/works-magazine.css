@@ -1,0 +1,59 @@
+/* ============ 杂志画廊瀑布流（方案 B：仅 works 页 .magazine，隔离自 photos/collect 复用样式） ============ */
+.works-grid.magazine {
+  display: block;
+  columns: 3 240px;   /* 列宽下限 240px，窄屏自动降为 2 列 / 1 列 */
+  column-gap: 20px;
+}
+.works-grid.magazine .work-card {
+  break-inside: avoid;
+  display: block;
+  margin: 0 0 20px;
+  transform: none;    /* 方案 B：卡体不动，只动封面图，去除照片墙随机倾斜 */
+  cursor: pointer;
+}
+.works-grid.magazine .work-card:hover { transform: none; }
+/* 中和旧的全局 hover 缩放（该规则未做指针设备门控），门控版本在下方媒体查询内 */
+.works-grid.magazine .work-card:hover .work-thumb { transform: none; }
+
+/* 封面：比例由数据驱动（--ratio），真瀑布流高低错落 */
+.works-grid.magazine .work-media {
+  position: relative;
+  aspect-ratio: var(--ratio, 4 / 3);
+  overflow: hidden;
+  border-radius: inherit;
+}
+.works-grid.magazine .work-media .work-thumb {
+  position: absolute; inset: 0;
+  height: 100%;
+  transition: transform .45s cubic-bezier(.23, 1, .32, 1);
+}
+.works-grid.magazine .work-overlay { z-index: 2; }
+
+/* 图注：画廊编号 + 标题 + meta（编号随作品全局序号，筛选后保持稳定） */
+.works-grid.magazine .work-caption {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 12px 4px 2px;
+}
+.works-grid.magazine .wc-idx {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: .78rem; letter-spacing: .06em;
+  color: var(--accent-blue);
+}
+.works-grid.magazine .work-caption h3 {
+  font-family: var(--font-display); font-size: 1.05rem; line-height: 1.3;
+  transition: color .2s ease;
+}
+.works-grid.magazine .work-caption p { color: var(--text-soft); font-size: .78rem; margin-top: 2px; }
+.works-grid.magazine .work-card:hover .work-caption h3 { color: var(--accent-blue); }
+
+/* hover 只缩放封面图，仅在精确指针设备启用（避免触屏误触发） */
+@media (hover: hover) and (pointer: fine) {
+  .works-grid.magazine .work-card:hover .work-thumb { transform: scale(1.05); }
+}
+
+/* 动效降级：系统"减少动态"偏好下去除位移过渡 */
+@media (prefers-reduced-motion: reduce) {
+  .works-grid.magazine .work-thumb,
+  .works-grid.magazine .work-caption { transition: none; }
+}
+

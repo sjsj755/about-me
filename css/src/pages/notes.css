@@ -1,0 +1,25 @@
+/* ============ 笔记本 · 学习笔记 ============ */
+/* 行高改为由内容决定：.works-grid 的 20px 隐式行是为 .work-card 的 grid-row: span 设计的，
+   笔记卡没有 span，若沿用会让卡片溢出所在行、网格高度塌陷成 20px，
+   导致提示文案与页脚叠到卡片上（页脚在上层会吃掉卡片点击）。 */
+#notesGrid { grid-auto-rows: auto; }
+.note-card {
+  padding: 24px 26px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.note-title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 1.05rem; color: var(--text);
+}
+.note-body {
+  font-size: .88rem; color: var(--text-soft); line-height: 1.75;
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.note-meta { display: flex; align-items: center; gap: 8px; margin-top: auto; }
+.note-date { font-size: .78rem; color: var(--text-soft); }
+.note-del {
+  margin-left: auto; cursor: pointer; font-size: .8rem; color: var(--text-soft);
+  padding: 3px 10px; border-radius: 10px;
+  transition: color .2s, background .2s;
+}
+.note-del:hover { color: #c0392b; background: rgba(192,57,43,.08); }
