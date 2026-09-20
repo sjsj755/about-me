@@ -93,12 +93,13 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
-  <!-- 页面逻辑：适配层（fx）→ 数据（notes-data）→ 公共工具（ui）→ 页面模块（notes），defer 保证按序执行 -->
+  <!-- 页面逻辑：适配层（fx）→ 公共工具（ui）→ 共享脚本（main）→ 数据（notes-data）→ 页面模块（notes），defer 保证按序执行 -->
+  <!-- ui.js 必须早于 main.js：main.js 内的 UI.* 调用依赖它 -->
   <script src="js/fx.js" defer></script>
   <script src="js/links.js" defer></script>
+  <script src="js/ui.js" defer></script>
   <script src="js/main.js" defer></script>
   <script src="js/notes-data.js" defer></script>
-  <script src="js/ui.js" defer></script>
   <script src="js/notes.js" defer></script>
 </body>
 </html>

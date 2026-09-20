@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build:css": "node tools/build-css.js",
+    "check": "node tools/check.js",
     "check:css": "node tools/build-css.js --check",
     "test": "playwright test"
   },

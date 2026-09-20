@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -95,11 +95,12 @@
   <!-- SDK 适配层：必须在 main.js 与各页面模块之前 -->
   <script src="js/fx.js?v=20260921" defer></script>
   <script src="js/links.js?v=20260921" defer></script>
+  <!-- 共享工具层：必须早于 main.js，main.js 内的 UI.* 调用依赖它 -->
+  <script src="js/ui.js?v=20260921" defer></script>
   <script src="js/main.js?v=20260921" defer></script>
   <!-- 内容数据：与本页逻辑解耦，补充条目只改 js/collect-data.js -->
   <script src="js/collect-data.js?v=20260921"></script>
-  <!-- 共享工具层 + 芸香集页面逻辑 -->
-  <script src="js/ui.js?v=20260921" defer></script>
+  <!-- 芸香集页面逻辑 -->
   <script src="js/collect.js?v=20260921" defer></script>
 
 </body>

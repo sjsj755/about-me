@@ -608,12 +608,13 @@ if (contactForm) {
   const MARK_KEY = 'calendar_marks_v1';
   const pad = (n) => String(n).padStart(2, '0');
 
+  // 读写统一走 js/ui.js：同一职责不允许存在第二套实现。
+  // UI.loadJSON 在缺失/损坏时返回 null，而本组件要的是空对象，故补一层 || {}。
   function loadMarks() {
-    try { return JSON.parse(localStorage.getItem(MARK_KEY)) || {}; }
-    catch { return {}; }
+    return UI.loadJSON(MARK_KEY) || {};
   }
   function persistMarks() {
-    try { localStorage.setItem(MARK_KEY, JSON.stringify(marks)); } catch {}
+    UI.saveJSON(MARK_KEY, marks);
   }
   let marks = loadMarks();
 

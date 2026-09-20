@@ -16,7 +16,7 @@
 
 ## 技术栈
 
-- **原生 HTML / CSS / JavaScript**：无框架、无构建步骤，直接由静态服务器托管
+- **原生 HTML / CSS / JavaScript**：无框架，浏览器直接运行；CSS 有一个编译期拼接步骤（见下方「构建与校验」）
 - **GSAP + ScrollTrigger 3.12.5**：滚动动效与入场动画
 - **Lenis 1.1.14**：平滑滚动
 - **solarlunar**：日历农历换算
@@ -25,6 +25,20 @@
 
 外部 SDK 全部通过 CDN（jsdelivr）加载，并由 `js/fx.js` 统一封装为适配层：CDN 不可达时业务模块自动降级为「无动画但内容完整可见」，避免整页空白。
 
+## 构建与校验
+
+CSS 按 `css/manifest.json` 声明的顺序在编译期拼接为单个产物，**不使用 `@import`**（避免请求瀑布）：
+
+```bash
+npm run build:css   # 由 css/src/** 生成 css/dist/shared.css
+npm run check       # 门禁：JS 语法校验 + CSS 结构与产物一致性校验
+npm run test        # Playwright 端到端测试
+```
+
+- 样式源码在 `css/src/`，产物 `css/dist/` **已入库**，各页只加载 `css/dist/shared.css`
+- 改样式请改 `css/src/**` 再跑 `npm run build:css`；直接改 `css/dist/` 会被 `npm run check` 拦下
+- `manifest.json` 的数组顺序**就是级联顺序**，新增源文件必须登记，否则构建会以 `E-UNUSED` 中止
+
 ## 目录结构
 
 ```
@@ -32,7 +46,9 @@
 ├── index.html / works.html / collect.html / sites.html
 ├── notes.html / photos.html / about.html      各页面
 ├── css/
-│   └── style.css                              全站样式
+│   ├── manifest.json                          源文件与产物的映射（级联顺序的唯一来源）
+│   ├── src/                                   样式源码：tokens / base / components / pages / overrides
+│   └── dist/shared.css                        构建产物，全站唯一加载的样式文件
 ├── js/
 │   ├── fx.js                                  动效 SDK 适配层（GSAP / Lenis / solarlunar）
 │   ├── ui.js                                  公共工具（localStorage 安全读写、弹窗等）
@@ -42,8 +58,9 @@
 │   ├── collect.js / notes.js / sites.js       对应页面的交互逻辑
 │   └── vendor/solarlunar.min.js               第三方库
 ├── images/                                    图片资源
-├── tests/                                     端到端测试（未随仓库发布）
-└── deploy/                                    Nginx 部署配置（未随仓库发布）
+├── tools/                                     CSS 构建与门禁校验脚本
+├── tests/                                     端到端测试
+└── deploy/                                    Nginx 部署配置（未入库）
 ```
 
 数据与逻辑分离：`*-data.js` 只存放内容，页面逻辑不内联内容；用户自建条目写入 localStorage，与内置数据互不干扰。
@@ -62,7 +79,7 @@ npx serve -l 4173
 
 ## 本地测试
 
-端到端测试位于 `tests/`，未随仓库发布，仅在本地开发时使用。
+端到端测试位于 `tests/`，覆盖 7 个页面与弹窗、灯箱、SDK 降级等关键路径。
 
 ```bash
 npm install
