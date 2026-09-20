@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#dceef5">
+  <title>相片 · Photos</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=20260913b">
+</head>
+<body class="works-page">
+
+  <!-- 漂浮光斑背景 -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <div class="bg-orb orb-4"></div>
+  <div class="bg-grain"></div>
+
+  <!-- 自定义光标 -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- 左上角迷你导航 -->
+  <nav class="mini-nav" aria-label="页面导航">
+    <a href="index.html"><span class="mn-dot"></span><span class="mn-label">首页</span></a>
+    <a href="works.html"><span class="mn-dot"></span><span class="mn-label">作品集</span></a>
+    <a href="collect.html"><span class="mn-dot"></span><span class="mn-label">芸香集</span></a>
+    <a href="sites.html"><span class="mn-dot"></span><span class="mn-label">站点集</span></a>
+    <a href="photos.html"><span class="mn-dot"></span><span class="mn-label">相片</span></a>
+    <a href="notes.html"><span class="mn-dot"></span><span class="mn-label">笔记本</span></a>
+    <a href="about.html"><span class="mn-dot"></span><span class="mn-label">关于我</span></a>
+  </nav>
+
+  <!-- 相片 -->
+  <section id="photos" class="works works-page-section">
+    <div class="section-head works-head">
+      <div class="works-title-box">
+        <span class="section-tag reveal">Photos</span>
+        <h2 class="section-title reveal">相片集</h2>
+      </div>
+    </div>
+    <!-- 由 JS 数据渲染的相片网格（数据源：js/photos-data.js） -->
+    <div class="works-grid" id="photosGrid"></div>
+    <footer class="site-footer">
+      <p>© 2026 你的名字 · 用镜头，记录生活的每一个瞬间</p>
+    </footer>
+  </section>
+
+  <!-- 相片小灯箱（点击卡片预览） -->
+  <div class="photo-lightbox" id="photoLightbox" role="dialog" aria-modal="true" aria-label="相片预览" data-lenis-prevent>
+    <button class="pl-close" id="plClose" aria-label="关闭">×</button>
+    <button class="pl-nav pl-prev" id="plPrev" aria-label="上一张">‹</button>
+    <button class="pl-nav pl-next" id="plNext" aria-label="下一张">›</button>
+    <figure class="pl-stage">
+      <div class="pl-img" id="plImg"></div>
+      <figcaption class="pl-caption">
+        <h3 id="plTitle"></h3>
+        <p id="plDesc"></p>
+        <span class="pl-count" id="plCount"></span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <!-- GSAP + Lenis -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+  <!-- SDK 适配层：必须在 main.js 与各页面模块之前 -->
+  <script src="js/fx.js?v=20260913b" defer></script>
+  <script src="js/links.js?v=20260913b" defer></script>
+  <script src="js/photos-data.js?v=20260913b" defer></script>
+  <!-- 共享工具层（弹窗开关 / 关闭途径） -->
+  <script src="js/ui.js?v=20260913b" defer></script>
+  <script src="js/main.js?v=20260913b" defer></script>
+</body>
+</html>

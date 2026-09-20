@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#dceef5">
+  <title>笔记本 · Notes</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="works-page">
+
+  <!-- 漂浮光斑背景 -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <div class="bg-orb orb-4"></div>
+  <div class="bg-grain"></div>
+
+  <!-- 自定义光标 -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- 左上角迷你导航 -->
+  <nav class="mini-nav" aria-label="页面导航">
+    <a href="index.html"><span class="mn-dot"></span><span class="mn-label">首页</span></a>
+    <a href="works.html"><span class="mn-dot"></span><span class="mn-label">作品集</span></a>
+    <a href="collect.html"><span class="mn-dot"></span><span class="mn-label">芸香集</span></a>
+    <a href="sites.html"><span class="mn-dot"></span><span class="mn-label">站点集</span></a>
+    <a href="notes.html"><span class="mn-dot"></span><span class="mn-label">笔记本</span></a>
+    <a href="photos.html"><span class="mn-dot"></span><span class="mn-label">相片</span></a>
+    <a href="about.html"><span class="mn-dot"></span><span class="mn-label">关于我</span></a>
+  </nav>
+
+  <!-- 笔记本：学习笔记 -->
+  <section id="notes" class="works collect-page-section">
+    <div class="section-head collect-head">
+      <div class="collect-head-text">
+        <span class="section-tag reveal">Notes</span>
+        <h2 class="section-title reveal">笔记本</h2>
+        <p class="collect-desc reveal">学习路上记下的每一条笔记，都安放在这里。</p>
+      </div>
+      <div class="collect-actions reveal">
+        <button class="collect-btn primary" id="addBtn">＋ 写笔记</button>
+      </div>
+    </div>
+
+    <!-- 笔记卡片（JS 渲染） -->
+    <div class="works-grid" id="notesGrid"></div>
+
+    <p class="collect-hint reveal" id="notesHint"></p>
+
+    <footer class="site-footer">
+      <p>© 2026 你的名字 · 用清新与玻璃，收拢每一处值得留下的痕迹</p>
+    </footer>
+  </section>
+
+  <!-- 弹窗：写笔记 -->
+  <div class="collect-modal" id="addModal" role="dialog" aria-modal="true" aria-label="写笔记" data-lenis-prevent>
+    <div class="collect-modal-inner">
+      <button class="cm-close" data-close="addModal" aria-label="关闭">×</button>
+      <h3 class="cm-title">写笔记</h3>
+      <p class="cm-sub">记下今天的所学所得，自动保存到本地。</p>
+      <form id="addForm">
+        <div class="cm-field">
+          <span>标题</span>
+          <input type="text" id="fTitle" placeholder="这篇笔记是关于什么" required>
+        </div>
+        <div class="cm-field">
+          <span>内容</span>
+          <textarea id="fDesc" placeholder="今天学到的知识点、踩过的坑、想记住的东西…" required></textarea>
+        </div>
+        <div class="cm-actions">
+          <button type="button" class="collect-btn" data-close="addModal">取消</button>
+          <button type="submit" class="collect-btn primary">保存笔记</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 灯箱：笔记详情（点击卡片打开） -->
+  <div class="collect-modal" id="detailModal" role="dialog" aria-modal="true" aria-label="笔记详情" data-lenis-prevent>
+    <div class="collect-modal-inner detail">
+      <button class="cm-close" data-close="detailModal" aria-label="关闭">×</button>
+      <div id="detailBody"></div>
+    </div>
+  </div>
+
+  <!-- GSAP + Lenis -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+  <!-- 页面逻辑：适配层（fx）→ 数据（notes-data）→ 公共工具（ui）→ 页面模块（notes），defer 保证按序执行 -->
+  <script src="js/fx.js" defer></script>
+  <script src="js/links.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <script src="js/notes-data.js" defer></script>
+  <script src="js/ui.js" defer></script>
+  <script src="js/notes.js" defer></script>
+</body>
+</html>

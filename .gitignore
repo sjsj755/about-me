@@ -1,0 +1,28 @@
+# 依赖
+node_modules/
+
+# 测试产物
+tests/
+playwright-report/
+test-results/
+
+# IDE / 工具配置
+.trae/
+.vscode/
+
+# 部署配置（含域名与本地路径，不入库）
+deploy/
+
+# 隐私文件（个人简历及渲染产物，不入库）
+*简历*
+_resume_p*.png
+_render_check.pdf
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 日志与临时文件
+*.log
+npm-debug.log*

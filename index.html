@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#dceef5">
+  <title>我的作品集 · Portfolio</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=20260910">
+</head>
+<body class="home-portal">
+
+  <!-- 漂浮光斑背景 -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <div class="bg-orb orb-4"></div>
+  <div class="bg-grain"></div>
+
+  <!-- 自定义光标 -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- 鼠标轨迹粒子层 -->
+  <canvas id="trailCanvas"></canvas>
+
+  <!-- 门户：中央小人 + 周边环绕 -->
+  <section id="home" class="portal-hero">
+    <div class="portal-stage reveal">
+      <!-- 左栏：作品集 + 芸香集 + 关于我 -->
+      <div class="portal-merged glass-panel">
+        <a href="works.html" class="portal-link">
+          <span class="portal-icon">✦</span>
+          <h3>作品集</h3>
+          <span class="portal-arrow">→</span>
+        </a>
+        <a href="collect.html" class="portal-link">
+          <span class="portal-icon">🌿</span>
+          <h3>芸香集</h3>
+          <span class="portal-arrow">→</span>
+        </a>
+        <a href="sites.html" class="portal-link">
+          <span class="portal-icon">🔗</span>
+          <h3>站点集</h3>
+          <span class="portal-arrow">→</span>
+        </a>
+        <a href="notes.html" class="portal-link">
+          <span class="portal-icon">📝</span>
+          <h3>笔记本</h3>
+          <span class="portal-arrow">→</span>
+        </a>
+        <a href="about.html" class="portal-link">
+          <span class="portal-icon">◉</span>
+          <h3>关于我</h3>
+          <span class="portal-arrow">→</span>
+        </a>
+      </div>
+
+      <!-- 中央：小人（最下方）+ 鼓励话语（上方） -->
+      <div class="mascot-stage">
+        <div class="encourage-photo-wrap">
+          <a href="photos.html" class="encourage-photo" title="去看看我的相片">
+            <span class="encourage-photo-icon">📷</span>
+            <span class="encourage-photo-text">相片</span>
+          </a>
+        </div>
+        <div class="encourage-bubble">每一次努力，都让今天比昨天更好一点。</div>
+        <div class="mascot-frame glass-panel" id="mascotFrame">
+          <div class="mascot-inner">
+            <img class="mascot-img" src="images/index/mascot.webp" alt="小人">
+            <div class="mascot-shine"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右栏：时间 + 日历 -->
+      <div class="portal-side">
+        <div class="clock glass-panel" id="clock">
+          <span class="clock-time" id="clockTime">--:--:--</span>
+        </div>
+        <div class="calendar glass-panel" id="calendar">
+          <div class="cal-head">
+            <button class="cal-nav" id="calPrev">‹</button>
+            <span class="cal-label" id="calLabel"></span>
+            <button class="cal-nav" id="calNext">›</button>
+          </div>
+          <div class="cal-week">
+            <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 日历标记弹层（轻量：一句话 + 标记色） -->
+  <div class="collect-modal" id="calModal">
+    <div class="collect-modal-inner cal-modal">
+      <button class="cm-close" id="calModalClose" aria-label="关闭">×</button>
+      <h3 class="cm-title" id="calModalTitle"></h3>
+      <p class="cm-sub">给这一天记一句话，可选图标、颜色与重复方式。</p>
+      <textarea class="cal-input" id="calModalText" maxlength="60" rows="2" placeholder="这一天…"></textarea>
+      <div class="cal-icons" id="calIcons">
+        <button class="cal-ico" data-ico="🎂" title="生日">🎂</button>
+        <button class="cal-ico" data-ico="⭐" title="重要日子">⭐</button>
+        <button class="cal-ico" data-ico="❤️" title="纪念日">❤️</button>
+        <button class="cal-ico" data-ico="✈️" title="出行">✈️</button>
+        <button class="cal-ico" data-ico="📚" title="考试/学习">📚</button>
+        <button class="cal-ico" data-ico="🎉" title="庆祝">🎉</button>
+        <button class="cal-ico cal-ico-none active" data-ico="" title="无图标">○</button>
+      </div>
+      <div class="cal-colors" id="calColors">
+        <button class="cal-color is-blue active" data-color="blue" aria-label="蓝色"></button>
+        <button class="cal-color is-pink" data-color="pink" aria-label="粉色"></button>
+        <button class="cal-color is-mint" data-color="mint" aria-label="薄荷绿"></button>
+      </div>
+      <div class="cal-repeat" id="calRepeat">
+        <button class="cal-rp active" data-rp="none">仅今年</button>
+        <button class="cal-rp" data-rp="solar">每年公历</button>
+        <button class="cal-rp" data-rp="lunar">每年农历</button>
+      </div>
+      <div class="cal-modal-actions">
+        <button class="cal-del" id="calModalDelete">删除标记</button>
+        <button class="cal-save" id="calModalSave">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GSAP + Lenis -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+  <!-- SDK 适配层：必须在 main.js 与各页面模块之前 -->
+  <script src="js/fx.js?v=20260910" defer></script>
+  <script src="js/links.js?v=20260910" defer></script>
+  <script src="js/encourage.js?v=20260910" defer></script>
+  <script src="js/vendor/solarlunar.min.js" defer></script>
+  <!-- 共享工具层（弹窗开关 / 关闭途径） -->
+  <script src="js/ui.js?v=20260910" defer></script>
+  <script src="js/main.js?v=20260910" defer></script>
+</body>
+</html>

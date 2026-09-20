@@ -1,0 +1,103 @@
+﻿﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#dceef5">
+  <title>关于我 · About</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=20260910">
+</head>
+<body class="about-page">
+
+  <!-- 漂浮光斑背景 -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <div class="bg-orb orb-4"></div>
+  <div class="bg-grain"></div>
+
+  <!-- 自定义光标 -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- 左上角迷你导航 -->
+  <nav class="mini-nav" aria-label="页面导航">
+    <a href="index.html"><span class="mn-dot"></span><span class="mn-label">首页</span></a>
+    <a href="works.html"><span class="mn-dot"></span><span class="mn-label">作品集</span></a>
+    <a href="collect.html"><span class="mn-dot"></span><span class="mn-label">芸香集</span></a>
+    <a href="sites.html"><span class="mn-dot"></span><span class="mn-label">站点集</span></a>
+    <a href="photos.html"><span class="mn-dot"></span><span class="mn-label">相片</span></a>
+    <a href="notes.html"><span class="mn-dot"></span><span class="mn-label">笔记本</span></a>
+    <a href="about.html"><span class="mn-dot"></span><span class="mn-label">关于我</span></a>
+  </nav>
+
+  <!-- 关于我：内容集中在 js/about-data.js，此处仅留容器，由 main.js 渲染 -->
+  <section id="about" class="about about-page-section">
+    <div class="section-head">
+      <span class="section-tag reveal">About</span>
+      <h2 class="section-title reveal">关于我</h2>
+    </div>
+
+    <div class="about-hero reveal">
+      <div class="avatar"></div>
+      <div class="about-hero-text">
+        <h3>嗨，我是 <span class="accent-inline">你的名字</span></h3>
+        <p id="aboutRoles"></p>
+      </div>
+    </div>
+
+    <div class="about-grid" id="aboutGrid"></div>
+
+    <div class="glass-panel journey reveal" id="aboutJourney"></div>
+
+    <div class="about-cta reveal" id="aboutCta"></div>
+
+    <footer class="site-footer">
+      <p>© 2026 你的名字 · <span id="aboutTagline"></span></p>
+    </footer>
+  </section>
+
+  <!-- 弹窗：联系表单（复用 collect-modal 玻璃拟态骨架，文案由 js/about-data.js 填充） -->
+  <div class="collect-modal" id="contactModal" role="dialog" aria-modal="true" aria-label="联系我" data-lenis-prevent>
+    <div class="collect-modal-inner">
+      <button class="cm-close" data-contact-close aria-label="关闭">×</button>
+      <h3 class="cm-title" id="contactTitle">联系我</h3>
+      <p class="cm-sub" id="contactSub"></p>
+      <form id="contactForm">
+        <div class="cm-field">
+          <span>称呼</span>
+          <input type="text" id="cName" placeholder="怎么称呼你（可选）">
+        </div>
+        <div class="cm-field">
+          <span>回复邮箱（可选）</span>
+          <input type="email" id="cEmail" placeholder="name@example.com">
+        </div>
+        <div class="cm-field">
+          <span>想说的话</span>
+          <textarea id="cMsg" placeholder="写点什么告诉我吧…" required></textarea>
+        </div>
+        <div class="cm-actions">
+          <button type="button" class="collect-btn" data-contact-close>取消</button>
+          <button type="submit" class="collect-btn primary" id="contactSend">发送留言</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- GSAP + Lenis -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+  <!-- SDK 适配层：必须在 main.js 与各页面模块之前 -->
+  <script src="js/fx.js?v=20260913" defer></script>
+  <script src="js/links.js?v=20260913" defer></script>
+  <script src="js/about-data.js?v=20260913" defer></script>
+  <!-- 共享工具层（弹窗开关 / 关闭途径） -->
+  <script src="js/ui.js?v=20260913" defer></script>
+  <script src="js/main.js?v=20260913" defer></script>
+</body>
+</html>
