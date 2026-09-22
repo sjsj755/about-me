@@ -12,11 +12,18 @@
   --accent-lav: #c9b8f0;
 
   /* 玻璃 */
-  --glass-bg: rgba(220, 240, 248, 0.5);
+  /* --glass-alpha 是「卡片透明度」的唯一开关（首页外观调节，见 js/appearance.js）：
+     所有用 --glass-bg 的玻璃面（导航 / 面板 / 卡片 / feed 条目）一并跟随。
+     默认 0.5 与改造前逐像素等价，未调节时视觉零变化。 */
+  --glass-alpha: 0.5;
+  --glass-bg: rgba(220, 240, 248, var(--glass-alpha));
   --glass-border: rgba(190, 225, 240, 0.65);
   --glass-blur: 18px;
   --shadow: 0 18px 40px rgba(110, 160, 190, 0.18);
   --radius: 22px;
+
+  /* 轮播图片层透明度（首页外观调节）：1 = 图片完全清晰，0 = 只剩品牌渐变底 */
+  --bg-image-opacity: 1;
 
   /* 自定义缓动曲线（skill：ease-in 迟钝，用强 ease-out 才有手感） */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -233,19 +240,9 @@ section { position: relative; z-index: 2; padding: 64px 6%; max-width: 1280px; m
 }
 .carousel-slide.is-active { opacity: 1; }
 .carousel-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.carousel-caption {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  padding: 30px 18px 20px; /* 底部留量避开弧形底缘 */
-  background: linear-gradient(180deg, rgba(20,40,60,0), rgba(20,40,60,.55));
-  color: #fff; font-family: var(--font-display); font-weight: 600; font-size: .95rem;
-  text-shadow: 0 1px 6px rgba(0,30,50,.45);
-  pointer-events: none;
-}
-/* 渐变占位帧：横幅大图暂缺时的品牌帧（补图方式见 js/links.js 的 CAROUSEL 注释） */
+/* 渐变占位帧：横幅大图暂缺或加载失败时的品牌帧（纯视觉，不含文案；补图方式见 js/links.js 的 CAROUSEL 注释） */
 .carousel-art {
   position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 12px; padding: 0 6%; text-align: center;
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
 }
 /* 半透明白色圆斑光斑，打破大面积纯渐变的单调 */
@@ -259,15 +256,6 @@ section { position: relative; z-index: 2; padding: 64px 6%; max-width: 1280px; m
 .carousel-art::after {
   width: min(30vw, 280px); aspect-ratio: 1;
   bottom: -16%; left: -4%; background: rgba(255,255,255,.12);
-}
-.carousel-art-name {
-  font-family: var(--font-display); font-weight: 700; line-height: 1.15;
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  color: #fff; text-shadow: 0 2px 16px rgba(0,40,70,.28);
-}
-.carousel-art-motto {
-  font-size: .95rem; color: rgba(255,255,255,.88);
-  text-shadow: 0 1px 8px rgba(0,40,70,.22);
 }
 /* 指示点：44×44 热区防误触，视觉仅小圆点；负外边距收拢视觉间距 */
 .carousel-dots { position: absolute; right: 10px; bottom: 18px; display: flex; }
@@ -394,6 +382,153 @@ section { position: relative; z-index: 2; padding: 64px 6%; max-width: 1280px; m
 }
 @media (prefers-reduced-motion: reduce) {
   .carousel-slide { transition: none; }
+}
+
+/* ============ 首页外观调节（模式 / 背景透明度 / 卡片透明度） ============ */
+/* 逻辑收口在 js/appearance.js：它读 localStorage['appearance_v1']，
+   把模式写成 <html> 上的 .app-cover，把两个透明度写成 :root 上的 CSS 变量。
+   CSS 只负责「类名/变量 → 视觉」的映射，不承载任何状态。 */
+
+/* 图片层透明度：横幅与覆盖模式共用同一条规则（0 = 只剩品牌渐变底） */
+.blog-carousel .carousel-slide img,
+.blog-carousel .carousel-art { opacity: var(--bg-image-opacity, 1); }
+
+/* ---- 覆盖模式：轮播由流内横幅变为全视口固定背景层 ---- */
+/* 不用 background-attachment: fixed —— 移动端滚动严重掉帧，且无法承载多帧交叉淡入。
+   这里把 .blog-carousel 自身固定：z-index:-1 落在 body 渐变（canvas 背景）之上、
+   光斑(z-index:0) 与内容(z-index:2) 之下；body 无 transform/filter，
+   fixed 元素的包含块是视口，因此不会被 body 的 overflow-x:hidden 裁掉。 */
+.app-cover .blog-carousel {
+  position: fixed; inset: 0;
+  height: auto;          /* 覆盖 clamp(300px,56vh,600px)：由 inset 撑满视口，避免 dvh 抖动 */
+  border-radius: 0;
+  z-index: -1;
+  pointer-events: none;  /* 纯装饰层：不拦内容点击，也不再触发悬停暂停 */
+}
+/* 背景层不承载交互：fixed 必然创建层叠上下文，指示点无法浮到内容之上，
+   留着只会变成点不到的装饰（整层同时被 JS 置为 aria-hidden）。 */
+.app-cover .carousel-dots { display: none; }
+/* 横幅脱离文档流后必须补回固定导航的净空，否则内容被导航压住 */
+.app-cover .blog-wrap { padding-top: 96px; }
+
+/* ---- 触发器：挂在 .nav-links 末尾的调色板图标 ---- */
+/* 44×44 触控热区靠负块向外边距收回，不把导航条撑高
+   （导航高度一变，贴顶横幅与各页 96px 净空基线都会跟着漂）。 */
+.appearance-btn {
+  width: 44px; height: 44px; margin: -7px 0; padding: 0;
+  display: grid; place-items: center;
+  border: none; background: none; cursor: pointer;
+  color: var(--text-soft); border-radius: 50%;
+  transition: color .25s, background .25s, transform .2s var(--ease-out);
+}
+.appearance-btn:hover { color: var(--text); background: rgba(255,255,255,.6); }
+.appearance-btn:active { transform: scale(.92); }
+.appearance-btn[aria-expanded="true"] { color: var(--text); background: rgba(255,255,255,.75); }
+.appearance-btn svg { width: 22px; height: 22px; fill: currentColor; display: block; }
+
+/* ---- 面板：复用 .collect-modal 的开关 / Esc / 遮罩点击机制 ---- */
+/* 但去掉全屏压暗与模糊：调透明度时要能实时看到页面本身，糊住就失去调节意义。
+   注意必须用 .collect-modal.appearance-modal 复合选择器：home.css 在 manifest 里
+   排在 collect-book.css 之前，单类名会被 .collect-modal 覆盖；
+   而且 backdrop-filter 会为 fixed 后代建立包含块，一旦没被去掉，
+   .appearance-inner 就会相对弹窗（flex 居中）定位，面板会跑到屏幕正中间。
+   复合选择器是项目既有的页面级覆盖写法（见 .collect-modal-inner.cal-modal）。 */
+.collect-modal.appearance-modal {
+  display: block;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  /* 骨架的 visibility 是 .3s 过渡：打开后的头 300ms 里计算值仍是 hidden，
+     此刻同步 focus() 会被浏览器忽略（键盘用户点开面板后按键全部落空）。
+     这里改成「打开立即 visible、关闭延迟到淡出结束」，聚焦就不必再猜时长。 */
+  transition: opacity .3s var(--ease-out), visibility 0s .3s;
+}
+.collect-modal.appearance-modal.open {
+  transition: opacity .3s var(--ease-out), visibility 0s;
+}
+/* 同样要复合选择器：否则 width / max-height / position 全被 .collect-modal-inner 吃掉
+   （面板会变成 580px 宽的居中 flex 项，而不是贴着导航右缘的 320px 浮层）。 */
+.collect-modal-inner.appearance-inner {
+  position: fixed;
+  top: calc(84px + env(safe-area-inset-top, 0px));
+  /* 与 .glass-nav 右边缘对齐：导航宽 min(1080px, 92%)、水平居中，故右内缩 max(4%, 50% - 540px) */
+  right: max(4%, calc(50% - 540px));
+  width: min(320px, calc(100vw - 32px));
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;      /* 横屏等矮视口下可滚动（overscroll-behavior 继承基类） */
+}
+.appearance-modes { display: flex; gap: 10px; margin: 14px 0 0; }
+.appearance-mode {
+  flex: 1; min-height: 44px; padding: 10px 12px; border-radius: 40px; cursor: pointer;
+  font-family: var(--font-display); font-weight: 600; font-size: .85rem;
+  color: var(--text-soft); background: rgba(255,255,255,.6);
+  border: 1px solid rgba(255,255,255,.8);
+  transition: background .3s var(--ease-out), color .3s var(--ease-out), transform .2s var(--ease-out);
+}
+.appearance-mode:active { transform: scale(.96); }
+.appearance-mode.active {
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
+  color: #fff; border-color: transparent;
+}
+.appearance-field { margin-top: 16px; }
+.appearance-label {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  font-size: .85rem; font-weight: 600; color: var(--text);
+}
+.appearance-val { color: var(--text-soft); font-weight: 500; font-variant-numeric: tabular-nums; }
+/* 滑块：整行 44px 触控高度，轨道细、拇指大；方向键 / Home / End 为原生行为 */
+.appearance-range {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 44px; margin: 2px 0 0;
+  background: none; cursor: pointer;
+}
+.appearance-range::-webkit-slider-runnable-track {
+  height: 6px; border-radius: 999px;
+  background: rgba(255,255,255,.85); border: 1px solid var(--glass-border);
+}
+.appearance-range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 20px; height: 20px; margin-top: -8px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
+  border: 2px solid #fff; box-shadow: 0 2px 6px rgba(110,160,190,.35);
+  transition: transform .2s var(--ease-out);
+}
+.appearance-range:active::-webkit-slider-thumb { transform: scale(1.12); }
+.appearance-range::-moz-range-track {
+  height: 6px; border-radius: 999px;
+  background: rgba(255,255,255,.85); border: 1px solid var(--glass-border);
+}
+.appearance-range::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%; border: 2px solid #fff;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
+  box-shadow: 0 2px 6px rgba(110,160,190,.35);
+}
+.appearance-range:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; border-radius: 999px; }
+.appearance-actions { display: flex; justify-content: flex-end; margin-top: 14px; }
+.appearance-reset {
+  min-height: 44px; padding: 8px 16px; border-radius: 40px; cursor: pointer;
+  font-size: .82rem; font-weight: 600; color: var(--text-soft);
+  background: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.8);
+  transition: background .25s, color .25s;
+}
+.appearance-reset:hover { background: rgba(255,255,255,.9); color: var(--text); }
+
+/* 动效偏好：本面板只有悬停 / 按下的微过渡，reduce 时全部关掉（与项目其它页面同一处理） */
+@media (prefers-reduced-motion: reduce) {
+  .appearance-btn, .appearance-mode, .appearance-reset,
+  .appearance-range::-webkit-slider-thumb { transition: none; }
+  .appearance-btn:active, .appearance-mode:active { transform: none; }
+  .appearance-range:active::-webkit-slider-thumb { transform: none; }
+}
+
+/* 窄屏：面板改从底部弹出（触发点此时在导航下拉菜单里，顶部空间不够）；
+   下拉菜单里的触发器不再需要负外边距，改回常规内缩。 */
+@media (max-width: 768px) {
+  .collect-modal-inner.appearance-inner {
+    top: auto; left: 4%; right: 4%; width: auto;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+  .nav-links .appearance-btn { margin: 4px 8px 2px; }
 }
 
 /* ============ 小人头像 + 鼓励语（首页博客布局沿用） ============ */

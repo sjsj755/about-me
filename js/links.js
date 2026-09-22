@@ -3,14 +3,16 @@
 const SITE = {
   name: '真名有寻',     // 名字
   year: '2026',       // 版权年份
-  motto: '记录学习、作品与生活的一片小园地。',  // 首页轮播占位帧副标语
 };
 
 // ============ 首页轮播横幅配置 ============
-// 通栏轮播的帧数据；src 省略时该帧渲染为品牌渐变占位帧。
-// 有了横幅大图后按格式追加即可，例如：
+// 通栏轮播的帧数据；src 省略或图片加载失败时该帧降级为品牌渐变占位帧。
+// caption 仅作为 img.alt 供读屏使用，轮播内不渲染任何文字叠层。
+// 追加更多帧的格式：
 //   { src: 'images/banner/1.webp', caption: '站点新装上线' },
-const CAROUSEL = [];
+const CAROUSEL = [
+  { src: 'images/banner/hollowknight-redmemory.webp' },
+];
 
 // ============ 社交链接集中配置 ============
 // 首页头像下方的图标使用；键名对应 index.html 中 data-social 的值。改成你的真实主页地址即可。

@@ -1,8 +1,9 @@
 // ============ 首页 · 通栏轮播横幅 ============
-// 数据源：js/links.js 的 CAROUSEL 数组，项格式 { src: '图片路径', caption: '标题' }。
-// src 省略时该帧渲染为品牌渐变占位帧；CAROUSEL 为空时回退为单帧站点占位横幅。
+// 数据源：js/links.js 的 CAROUSEL 数组，项格式 { src: '图片路径', caption: '图片说明' }。
+// 轮播内不渲染任何视觉文字：caption 只作为 img.alt 供读屏使用，不做标题叠层。
+// src 省略或图片加载失败时该帧降级为品牌渐变占位帧（纯视觉，同样无文案）。
 // 动效：0.8s ease-out 淡入；5s 自动轮播，悬停 / 切后台暂停；prefers-reduced-motion 不自动播。
-// 容错：#blogCarousel 不存在（非首页）静默退出；图片加载失败就地降级为渐变占位帧。
+// 容错：#blogCarousel 不存在（非首页）静默退出。
 // 可达性：指示点为 button 可键盘操作；非活动帧 aria-hidden。
 (function () {
   'use strict';
@@ -11,19 +12,18 @@
   if (!root) return;
 
   var INTERVAL = 5000;
-  var FALLBACK_MOTTO = '记录学习、作品与生活的一片小园地。';
   var reduceMotion = window.matchMedia
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  var site = (typeof SITE !== 'undefined') ? SITE : { name: '', motto: '' };
+  var site = (typeof SITE !== 'undefined') ? SITE : { name: '' };
   var conf = (typeof CAROUSEL !== 'undefined' && CAROUSEL.length) ? CAROUSEL : [{}];
   var data = conf
     .filter(function (s) { return s && typeof s === 'object'; })
     .map(function (s) {
       return {
         src: typeof s.src === 'string' ? s.src : '',
+        // caption 仅用于 img.alt（无 caption 时退回站点名），不参与视觉渲染
         caption: (typeof s.caption === 'string' && s.caption) || site.name || '',
-        motto: (typeof s.motto === 'string' && s.motto) || site.motto || FALLBACK_MOTTO,
       };
     });
   if (!data.length) { root.hidden = true; return; }
@@ -33,18 +33,10 @@
   var idx = 0;
   var timer = null;
 
-  // 渐变占位帧内容：站点名 + 副标语
-  function buildArt(item) {
+  // 渐变占位帧：纯品牌视觉（渐变 + 光斑），不含任何文案
+  function buildArt() {
     var art = document.createElement('div');
     art.className = 'carousel-art';
-    var name = document.createElement('span');
-    name.className = 'carousel-art-name';
-    name.textContent = item.caption;
-    var motto = document.createElement('span');
-    motto.className = 'carousel-art-motto';
-    motto.textContent = item.motto;
-    art.appendChild(name);
-    art.appendChild(motto);
     return art;
   }
 
@@ -60,26 +52,20 @@
       img.loading = i === 0 ? 'eager' : 'lazy';
       img.decoding = 'async';
       img.addEventListener('error', function () {
-        // 坏图就地降级：清空后换成渐变占位帧（保留 caption 文案）
+        // 坏图就地降级：清空后换成纯渐变占位帧
         while (slide.firstChild) slide.removeChild(slide.firstChild);
         slide.classList.add('is-art');
-        slide.appendChild(buildArt(item));
+        slide.appendChild(buildArt());
       });
       slide.appendChild(img);
-      if (item.caption) {
-        var cap = document.createElement('span');
-        cap.className = 'carousel-caption';
-        cap.textContent = item.caption;
-        slide.appendChild(cap);
-      }
     } else {
       slide.classList.add('is-art');
-      slide.appendChild(buildArt(item));
+      slide.appendChild(buildArt());
     }
     return slide;
   }
 
-  // 幻灯片：DOM API + textContent 写入，无 innerHTML 拼接
+  // 幻灯片：纯 DOM API 构建，无 innerHTML 拼接
   data.forEach(function (item, i) {
     var slide = buildSlide(item, i);
     root.appendChild(slide);
