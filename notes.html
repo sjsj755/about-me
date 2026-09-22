@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#dceef5">
   <title>笔记本 · Notes</title>
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+  <!-- 字体统一走系统栈（声明见 css/src/tokens.css 的 --font-display / --font-body）。
+       原 Google Fonts 外链是渲染阻塞资源：实测 4 个页面共发起 115 个字体请求，
+       首页 load 因此增加约 6.9s（A/B 实测 7554ms → 679ms），且阻塞全部 defer 脚本执行，故移除。
+       回退结果：标题 Quicksand → HarmonyOS Sans / sans-serif；正文 Noto Sans SC → 系统中文；
+       引文与书名的 Noto Serif SC → serif（本页 notes 使用）。 -->
   <link rel="stylesheet" href="css/dist/shared.css?v=20260930">
 </head>
 <body class="works-page">
