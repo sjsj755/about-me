@@ -1129,7 +1129,7 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
       在低性能/低内存设备上收缩模糊半径与采样，换取流畅滚动。 */
 @media (prefers-reduced-motion: reduce), (max-width: 480px) {
   .glass-panel, .glass-card, .glass-nav, .about-chip,
-  .about-hero, .mini-nav, .encourage-bubble, .encourage-photo {
+  .about-hero, .encourage-bubble, .encourage-photo {
     backdrop-filter: blur(8px) saturate(140%);
     -webkit-backdrop-filter: blur(8px) saturate(140%);
   }
@@ -1212,10 +1212,6 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
 
 /* 触屏（安卓/鸿蒙）：小控件命中区扩至 ≥40px；收藏/删除改为常显（无 hover 无法唤出） */
 @media (pointer: coarse) {
-  .mini-nav a { position: relative; padding: 13px; }
-  .mini-nav a.active { padding: 13px 16px; }
-  .mini-nav a .mn-dot { width: 12px; height: 12px; }
-  .mini-nav a::after { content: ""; position: absolute; inset: -3px; border-radius: 30px; }
   .cal-nav, .cal-ico, .cal-color, .cc-star, .cc-del { position: relative; }
   .cal-nav::after, .cal-ico::after, .cal-color::after,
   .cc-star::after, .cc-del::after {

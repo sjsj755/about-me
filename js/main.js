@@ -1070,9 +1070,9 @@ FX.refreshNow();
   renderGrid();
 })();
 
-// ============ 导航自动高亮：按 href 与当前文件名比对（顶部胶囊/迷你导航通用） ============
+// ============ 导航自动高亮：按 href 与当前文件名比对 ============
 (function () {
-  const nav = document.querySelector('.glass-nav, .mini-nav');
+  const nav = document.querySelector('.glass-nav');
   if (!nav) return;
   // 直接用链接 href 与当前文件名比对，无需维护页面清单——新增页面自动高亮，零耦合
   const page = location.pathname.split('/').pop() || 'index.html';

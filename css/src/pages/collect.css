@@ -75,10 +75,6 @@
 
 /* 触屏（安卓/鸿蒙）：小控件命中区扩至 ≥40px；收藏/删除改为常显（无 hover 无法唤出） */
 @media (pointer: coarse) {
-  .mini-nav a { position: relative; padding: 13px; }
-  .mini-nav a.active { padding: 13px 16px; }
-  .mini-nav a .mn-dot { width: 12px; height: 12px; }
-  .mini-nav a::after { content: ""; position: absolute; inset: -3px; border-radius: 30px; }
   .cal-nav, .cal-ico, .cal-color, .cc-star, .cc-del { position: relative; }
   .cal-nav::after, .cal-ico::after, .cal-color::after,
   .cc-star::after, .cc-del::after {

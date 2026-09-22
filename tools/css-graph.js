@@ -112,4 +112,29 @@ function validate(manifest, srcFiles) {
   return errors;
 }
 
-module.exports = { layerOf, resolveBundles, validate };
+// 各页 HTML 里的 ?v= 缓存参数必须等于 manifest.version。
+// manifest.version 自称是缓存参数的唯一来源，但没有任何环节会自动把它同步到 HTML ——
+// 漏改一页，该页就会在 nginx 的 30d immutable 缓存下继续吃旧 CSS/JS（曾实际发生）。
+// files 由调用方读好传入（本文件零 I/O）：[{ name, text }]。同一页可能出现多处同一错误
+// 版本（每个 asset 一处），只报首个，避免刷屏。
+function cacheVersionErrors(manifest, files) {
+  const want = manifest && manifest.version ? String(manifest.version) : '';
+  const errors = [];
+  files.forEach(({ name, text }) => {
+    const re = /[?&]v=(\d+)/g;
+    const reported = new Set();
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      if (m[1] === want || reported.has(m[1])) continue;
+      reported.add(m[1]);
+      const line = text.slice(0, m.index).split('\n').length;
+      errors.push({
+        code: 'E-CACHEVER', where: name, file: name,
+        message: `${name}:${line} 的 v=${m[1]} 与 manifest.version（${want}）不一致：升级版本号后须同步所有页面的 ?v=`,
+      });
+    }
+  });
+  return errors;
+}
+
+module.exports = { layerOf, resolveBundles, validate, cacheVersionErrors };
