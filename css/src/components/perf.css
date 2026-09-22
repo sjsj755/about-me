@@ -13,7 +13,7 @@
       在低性能/低内存设备上收缩模糊半径与采样，换取流畅滚动。 */
 @media (prefers-reduced-motion: reduce), (max-width: 480px) {
   .glass-panel, .glass-card, .glass-nav, .about-chip,
-  .about-hero, .encourage-bubble, .encourage-photo {
+  .about-hero, .encourage-bubble {
     backdrop-filter: blur(8px) saturate(140%);
     -webkit-backdrop-filter: blur(8px) saturate(140%);
   }

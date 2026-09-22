@@ -599,32 +599,6 @@ section { position: relative; z-index: 2; padding: 64px 6%; max-width: 1280px; m
   border: 6px solid transparent; border-top-color: rgba(255,255,255,.7);
 }
 
-/* 鼓励语上方：相片跳转入口 */
-.encourage-photo {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 7px 18px; border-radius: 40px;
-  background: rgba(255,255,255,.7);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(10px);
-  color: var(--text); font-family: var(--font-display);
-  font-size: 0.95rem; font-weight: 600;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out);
-}
-.encourage-photo:hover { transform: translateY(-3px); box-shadow: 0 12px 22px rgba(120,150,165,.3); }
-.encourage-photo:active { transform: scale(.95); }
-.encourage-photo-icon {
-  display: grid; place-items: center;
-  width: 26px; height: 26px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
-  font-size: 0.95rem; color: #fff;
-  flex-shrink: 0;
-  transition: transform .25s var(--ease-spring);
-}
-.encourage-photo:hover .encourage-photo-icon { transform: rotate(-8deg) scale(1.1); }
-.encourage-photo-text { white-space: nowrap; }
-
 /* ============ 日历组件（再次缩小） ============ */
 .calendar { width: min(300px, 100%); padding: 13px 14px; }
 .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
@@ -969,8 +943,6 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
   .work-card:hover { transform: rotate(0deg) translateY(-8px); box-shadow: 0 28px 46px rgba(120,150,165,.3); }
   .portal-link:hover { background: rgba(255,255,255,.5); }
   .portal-icon:hover { transform: scale(1.12); }
-  .encourage-photo:hover { transform: translateY(-3px); box-shadow: 0 12px 22px rgba(120,150,165,.3); }
-  .encourage-photo:hover .encourage-photo-icon { transform: rotate(-8deg) scale(1.1); }
   .cal-nav:hover { background: rgba(255,255,255,.85); transform: scale(1.08); }
   .cal-day:hover { background: rgba(255,255,255,.7); transform: scale(1.08); }
   .nav-links a:hover { color: var(--text); }
@@ -1264,7 +1236,7 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
       在低性能/低内存设备上收缩模糊半径与采样，换取流畅滚动。 */
 @media (prefers-reduced-motion: reduce), (max-width: 480px) {
   .glass-panel, .glass-card, .glass-nav, .about-chip,
-  .about-hero, .encourage-bubble, .encourage-photo {
+  .about-hero, .encourage-bubble {
     backdrop-filter: blur(8px) saturate(140%);
     -webkit-backdrop-filter: blur(8px) saturate(140%);
   }

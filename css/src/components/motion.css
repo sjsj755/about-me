@@ -11,8 +11,6 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
   .work-card:hover { transform: rotate(0deg) translateY(-8px); box-shadow: 0 28px 46px rgba(120,150,165,.3); }
   .portal-link:hover { background: rgba(255,255,255,.5); }
   .portal-icon:hover { transform: scale(1.12); }
-  .encourage-photo:hover { transform: translateY(-3px); box-shadow: 0 12px 22px rgba(120,150,165,.3); }
-  .encourage-photo:hover .encourage-photo-icon { transform: rotate(-8deg) scale(1.1); }
   .cal-nav:hover { background: rgba(255,255,255,.85); transform: scale(1.08); }
   .cal-day:hover { background: rgba(255,255,255,.7); transform: scale(1.08); }
   .nav-links a:hover { color: var(--text); }
