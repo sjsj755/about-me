@@ -183,10 +183,11 @@
 }
 
 /* 右栏：时钟 + 日历 */
+/* 注意：此栏承载日历点击交互，禁止加 floatY 等常驻位移动画——
+   点击时目标位移会让 click 落到相邻格/空隙上（弹层不开、标记错位）。 */
 .blog-side {
   position: sticky; top: 108px;
   display: flex; flex-direction: column; align-items: center; gap: 12px;
-  animation: floatY 5.5s var(--ease-inout) infinite;
 }
 /* 桌面端日历收窄（基础层 .calendar 为 300px；格子 aspect-ratio 流式，随容器等比缩小） */
 .blog-side .calendar { width: min(248px, 100%); padding: 10px 11px; }
@@ -213,7 +214,6 @@
   .blog-profile .mascot-frame { width: 120px; height: 120px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .blog-side { animation: none; }
   .carousel-slide { transition: none; }
 }
 

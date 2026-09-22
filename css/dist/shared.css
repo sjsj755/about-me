@@ -362,10 +362,11 @@ section { position: relative; z-index: 2; padding: 64px 6%; max-width: 1280px; m
 }
 
 /* 右栏：时钟 + 日历 */
+/* 注意：此栏承载日历点击交互，禁止加 floatY 等常驻位移动画——
+   点击时目标位移会让 click 落到相邻格/空隙上（弹层不开、标记错位）。 */
 .blog-side {
   position: sticky; top: 108px;
   display: flex; flex-direction: column; align-items: center; gap: 12px;
-  animation: floatY 5.5s var(--ease-inout) infinite;
 }
 /* 桌面端日历收窄（基础层 .calendar 为 300px；格子 aspect-ratio 流式，随容器等比缩小） */
 .blog-side .calendar { width: min(248px, 100%); padding: 10px 11px; }
@@ -392,7 +393,6 @@ section { position: relative; z-index: 2; padding: 64px 6%; max-width: 1280px; m
   .blog-profile .mascot-frame { width: 120px; height: 120px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .blog-side { animation: none; }
   .carousel-slide { transition: none; }
 }
 
@@ -525,15 +525,24 @@ section { position: relative; z-index: 2; padding: 64px 6%; max-width: 1280px; m
 
 /* 日期标记小圆点 */
 .cal-day { position: relative; }
+/* 圆点置于左上角空位：原先 bottom:6% 会压在农历小字上，
+   日历缩到 248px（格子仅 30px）后圆点与文字糊成一片，看起来"标记没显示" */
 .cal-dot {
-  position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%);
-  width: 4px; height: 4px; border-radius: 50%; pointer-events: none;
-  box-shadow: 0 0 0 2px rgba(255,255,255,.55);
+  position: absolute; top: 2px; left: 2px;
+  width: 5px; height: 5px; border-radius: 50%; pointer-events: none;
 }
 .cal-dot.blue { background: var(--accent-blue); }
 .cal-dot.pink { background: #e0697f; }
 .cal-dot.mint { background: #3cbfa0; }
-.cal-day.today .cal-dot { box-shadow: none; }
+/* 今日底色为渐变，圆点加细白边才分得清（原先 2px 光晕过大，糊住文字） */
+.cal-day.today .cal-dot { box-shadow: 0 0 0 1.5px rgba(255,255,255,.9); }
+
+/* 有标记的日期：整格淡色底纹（颜色随标记色）+ 左上角圆点，双重提示一眼可辨 */
+.cal-day.has-mark { background: rgba(127,180,232,.18); }
+.cal-day.has-mark.pink { background: rgba(224,105,127,.16); }
+.cal-day.has-mark.mint { background: rgba(60,191,160,.18); }
+/* 今日且已标记：今日渐变优先，靠左上角圆点区分 */
+.cal-day.today.has-mark { background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint)); }
 /* 日期图标徽标（右上角小 emoji） */
 .cal-emoji {
   position: absolute; top: 1px; right: 2px;
@@ -627,6 +636,8 @@ section { position: relative; z-index: 2; padding: 64px 6%; max-width: 1280px; m
 @keyframes wheel { 0% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, 14px); } }
 
 /* ============ 作品集（照片墙错落布局） ============ */
+/* 首屏让位：顶部悬浮胶囊导航（fixed，底缘约 70px），首节内容下移避让（同 photos 的 #photos） */
+#works { padding-top: 96px; }
 .works-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -706,6 +717,8 @@ section { position: relative; z-index: 2; padding: 64px 6%; max-width: 1280px; m
 }
 
 /* ============ 关于 + 联系 ============ */
+/* 首屏让位：顶部悬浮胶囊导航（fixed，底缘约 70px） */
+#about { padding-top: 96px; }
 .about-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; align-items: start; }
 .about-left { display: flex; flex-direction: column; gap: 20px; }
 .about-intro { padding: 26px 30px; font-size: 1rem; }
@@ -1051,52 +1064,6 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
   .pl-img { animation: none; }
 }
 
-/* ============ 左上角迷你导航（子页面通用） ============ */
-.mini-nav {
-  /* 安全区避让：沉浸式（鸿蒙 ArkWeb / iOS）下不被挖孔遮挡，桌面与常规安卓 env()=0 */
-  position: fixed; top: calc(16px + env(safe-area-inset-top, 0px));
-  left: calc(16px + env(safe-area-inset-left, 0px)); z-index: 120;
-  display: flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,.6);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(14px) saturate(150%);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
-  border-radius: 40px;
-  padding: 6px 8px;
-  box-shadow: var(--shadow);
-  animation: floatY 6s var(--ease-inout) infinite;
-}
-.mini-nav a {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 7px 14px; border-radius: 30px;
-  font-family: var(--font-display); font-weight: 600; font-size: 0.85rem;
-  color: var(--text-soft); white-space: nowrap;
-  transition: background .3s var(--ease-out), color .3s var(--ease-out), transform .2s var(--ease-out);
-}
-.mini-nav a .mn-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--accent-mint); transition: background .3s;
-}
-.mini-nav a.active {
-  background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
-  color: #fff;
-}
-.mini-nav a.active .mn-dot { background: #fff; }
-@media (hover: hover) and (pointer: fine) {
-  .mini-nav a:hover { background: rgba(255,255,255,.85); color: var(--text); transform: translateY(-2px); }
-  .mini-nav a:hover .mn-dot { background: var(--accent-blue); }
-}
-.mini-nav a:active { transform: scale(.95); }
-
-/* 迷你导航移动端：压缩为仅图标圆点，点击展开 */
-@media (max-width: 768px) {
-  .mini-nav { padding: 6px; border-radius: 30px; }
-  .mini-nav a { padding: 6px; }
-  .mini-nav a .mn-label { display: none; }
-  .mini-nav a.active { padding: 6px 10px; }
-  .mini-nav a.active .mn-label { display: inline; }
-}
-
 /* ============ 作品卡片真实封面图：柔和玻璃蒙层 ============ */
 /* 弱化硬裁剪与错位旋转带来的生硬感，让旅行实拍图融入清新浅色风 */
 .work-thumb.has-img {
@@ -1170,6 +1137,8 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
 
 /* ============ 芸香集 · 收集本页 ============ */
 .collect-page-section { padding-top: 66px; }
+/* 首屏让位：顶部悬浮胶囊导航（fixed，底缘约 70px），id 优先级高于上方类规则与移动端覆盖 */
+#collect { padding-top: 96px; }
 /* 顶部标题行：说明文案 + 收藏 / 添加入口 */
 .collect-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .collect-head-text { max-width: 640px; }
@@ -1699,6 +1668,8 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
 }
 
 /* ============ 站点集 · 简洁链接卡 ============ */
+/* 首屏让位：顶部悬浮胶囊导航（fixed，底缘约 70px） */
+#sites { padding-top: 96px; }
 /* 网格：紧凑等宽卡，宽度自适应列数 */
 .sites-grid {
   display: grid;
@@ -1769,6 +1740,8 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
   .site-card:hover, .site-card:active { transform: none; }
 }
 /* ============ 笔记本 · 学习笔记（晾绳便签墙） ============ */
+/* 首屏让位：顶部悬浮胶囊导航（fixed，底缘约 70px） */
+#notes { padding-top: 96px; }
 /* 层级：.note-group（绳 + 一组 3 张）> .note-row（3 列）> .note-item（挂点/倾斜）> .note-card（玻璃便签）
    每张便签靠顶部金属夹“别”在绳子上，因此分组顶部要留出绳与夹子所需的空间。
    倾斜写在 .note-item、入场动画写在其子级 .note-card：两层各管一个 transform，互不覆盖。 */
@@ -1824,7 +1797,7 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
   font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: var(--text);
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-/* 标题即飞书文档链接：用真锚点，支持键盘 Enter / 中键新窗口打开 */
+/* 标题即文档链接：用真锚点，支持键盘 Enter / 中键新窗口打开 */
 .note-link { color: inherit; }
 /* 聚焦环画在框内（outline-offset 为负）：标题上方的 overflow: hidden 会裁掉外扩的环 */
 .note-link:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: -3px; border-radius: 4px; }
@@ -1835,11 +1808,6 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
 }
 .note-meta { display: flex; align-items: center; gap: 8px; margin-top: auto; }
 .note-date { font-size: .78rem; color: var(--text-soft); }
-/* 来源标记：仅带链接的便签出现 */
-.note-src {
-  font-size: .72rem; color: var(--text-soft); padding: 2px 9px; border-radius: 10px;
-  background: rgba(127,180,232,.16); border: 1px solid rgba(127,180,232,.3);
-}
 .note-del {
   margin-left: auto; cursor: pointer; font-size: .8rem; color: var(--text-soft);
   padding: 3px 10px; border-radius: 10px;

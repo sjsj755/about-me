@@ -1,5 +1,7 @@
 /* ============ 芸香集 · 收集本页 ============ */
 .collect-page-section { padding-top: 66px; }
+/* 首屏让位：顶部悬浮胶囊导航（fixed，底缘约 70px），id 优先级高于上方类规则与移动端覆盖 */
+#collect { padding-top: 96px; }
 /* 顶部标题行：说明文案 + 收藏 / 添加入口 */
 .collect-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .collect-head-text { max-width: 640px; }

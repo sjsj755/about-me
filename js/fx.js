@@ -1,7 +1,8 @@
 // ============ 外部动效 SDK 适配层（GSAP / Lenis / solarlunar） ============
 // 全站唯一允许直接引用 window.gsap / window.Lenis / window.ScrollTrigger / window.solarlunar 的文件。
 //
-// 为什么需要它：这些 SDK 全部走 CDN（jsdelivr），网络不可达时全局变量根本不存在。
+// 为什么需要它：这些 SDK 全部本地化在 js/vendor/（原先走 CDN，网络不可达时全局变量根本不存在），
+// 但本地文件同样可能缺失、损坏或部署漏传 —— 只要全局变量不存在，后果与 CDN 不可达一致。
 // 业务模块若直接写 gsap.xxx，一旦 SDK 缺失就是顶层抛错 —— 后续逻辑全部停摆，
 // 且 .reveal 的 CSS 初始态（opacity:0）无人解除，整页变空白。
 // 因此业务只向 FX 索取「能力」，不感知 SDK 是否就位：

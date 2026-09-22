@@ -664,7 +664,10 @@ if (contactForm) {
       const iso = `${viewYear}-${pad(viewMonth + 1)}-${pad(d)}`;
       const mark = marks[iso] || overlayMap[iso]; // 精确标记优先于重复展开
       const cell = document.createElement('div');
-      cell.className = 'cal-day' + (isCurrentMonth && d === today ? ' today' : '');
+      // has-mark + 颜色类下发给格子本身，供 CSS 做底纹提示（圆点仍单独渲染）
+      cell.className = 'cal-day'
+        + (isCurrentMonth && d === today ? ' today' : '')
+        + (mark ? ' has-mark ' + (mark.color || 'blue') : '');
       cell.dataset.date = iso;
       // 农历小字：初一显示月名，节气优先显示节气名，其余显示日子
       let lunarText = '';
@@ -1067,9 +1070,9 @@ FX.refreshNow();
   renderGrid();
 })();
 
-// ============ 左上角迷你导航：根据当前页面自动高亮 ============
+// ============ 导航自动高亮：按 href 与当前文件名比对（顶部胶囊/迷你导航通用） ============
 (function () {
-  const nav = document.querySelector('.mini-nav');
+  const nav = document.querySelector('.glass-nav, .mini-nav');
   if (!nav) return;
   // 直接用链接 href 与当前文件名比对，无需维护页面清单——新增页面自动高亮，零耦合
   const page = location.pathname.split('/').pop() || 'index.html';

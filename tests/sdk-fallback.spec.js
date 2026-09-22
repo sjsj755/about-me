@@ -1,8 +1,9 @@
 // ============ 外部 SDK 不可达时的降级验证 ============
-// 背景：GSAP / ScrollTrigger / Lenis 走 cdn.jsdelivr.net。该域名不可达时，
+// 背景：GSAP / ScrollTrigger / Lenis 本地化为 js/vendor/*.min.js。
+// 文件损坏、被误删或部署漏传时同样是「全局变量不存在」——
 // 原实现在 main.js 顶层直接 new Lenis(...)，抛错会导致整个 main.js 不执行，
 // 且 .reveal 的 CSS 初始态（opacity:0）无人解除 —— 页面呈现为空白。
-// 本用例拦截 CDN 请求，断言 7 个页面在无 SDK 时依然可见、可读。
+// 本用例拦截本地 vendor 的 SDK 请求，断言 7 个页面在无 SDK 时依然可见、可读。
 const { test, expect } = require('@playwright/test');
 
 const PAGES = [
@@ -18,14 +19,18 @@ const PAGES = [
 // 各页均存在的容器：section（index 的 #home、子页的 #works/#photos/...）
 const ANCHOR = 'section';
 
+// 拦截本地 vendor 的 SDK 请求，模拟「SDK 不可达」。
+// 只拦三个动画 SDK，不拦 solarlunar —— 农历能力与动画降级互不影响。
+const blockSdk = (page) => page.route(/\/js\/vendor\/(gsap|ScrollTrigger|lenis)\.min\.js/, (r) => r.abort());
+
 test.describe('外部 SDK 不可达时的降级', () => {
   for (const page_ of PAGES) {
-    test(`${page_} 在 CDN 被拦截时内容仍可见`, async ({ page }) => {
+    test(`${page_} 在 SDK 被拦截时内容仍可见`, async ({ page }) => {
       const errors = [];
       page.on('pageerror', (e) => errors.push(String(e)));
 
-      // 拦截全部 CDN 请求，模拟网络不可达
-      await page.route('**/*jsdelivr*/**', (route) => route.abort());
+      // 拦截全部 SDK 请求，模拟本地文件缺失
+      await blockSdk(page);
 
       await page.goto(page_);
 

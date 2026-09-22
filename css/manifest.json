@@ -1,5 +1,5 @@
 {
-  "version": "20260923",
+  "version": "20260926",
   "shared": [
     "tokens.css",
     "base.css",
@@ -19,7 +19,6 @@
     "components/chips.css",
     "components/cards.css",
     "components/lightbox.css",
-    "components/nav-mini.css",
     "components/cards-cover.css",
     "components/lightbox-action.css",
     "components/perf.css",

@@ -1,7 +1,7 @@
 // ============ 笔记本 · 学习笔记页逻辑 ============
 // 数据源：js/notes-data.js 内置示例 + 用户笔记（localStorage 持久化，同域各页共享）。
 // 公共能力（转义/存储/弹窗）来自 js/ui.js。
-// 展示形态：每 3 张便签挂在同一根绳子上（.note-group），便签指向飞书文档链接。
+// 展示形态：每 3 张便签挂在同一根绳子上（.note-group），便签指向外部链接（飞书文档 / 博客 / GitHub 等不限来源）。
 (function () {
   const grid = document.getElementById('notesGrid');
   if (!grid) return;
@@ -70,7 +70,6 @@
       <p class="note-body">${esc(d.desc)}</p>
       <div class="note-meta">
         <span class="note-date">📅 ${esc(d.date || '—')}</span>
-        ${d.link ? '<span class="note-src">飞书文档</span>' : ''}
         ${d.user ? '<span class="note-del" role="button" tabindex="0" aria-label="删除">✕ 删除</span>' : ''}
       </div>`;
     card.addEventListener('click', (e) => {

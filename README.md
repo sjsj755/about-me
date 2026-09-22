@@ -23,7 +23,7 @@
 - **localStorage**：日历标记、用户新增条目等本地数据持久化
 - **Playwright**：端到端测试（本地开发用）
 
-外部 SDK 全部通过 CDN（jsdelivr）加载，并由 `js/fx.js` 统一封装为适配层：CDN 不可达时业务模块自动降级为「无动画但内容完整可见」，避免整页空白。
+外部 SDK（GSAP / ScrollTrigger / Lenis / solarlunar）全部本地化到 `js/vendor/`，不再依赖外部 CDN，并由 `js/fx.js` 统一封装为适配层：SDK 缺失或损坏时业务模块自动降级为「无动画但内容完整可见」，避免整页空白。
 
 ## 构建与校验
 

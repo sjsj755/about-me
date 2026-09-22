@@ -25,9 +25,9 @@ test.describe('笔记本页', () => {
     await expect(page.locator('.note-card')).toHaveCount(BUILTIN_COUNT);
     await expect(page.locator('.note-card .note-del')).toHaveCount(0); // 内置条目不可删除
     await expect(page.locator('#notesHint')).toContainText(`${BUILTIN_COUNT} 篇`);
-    // 内置条目带飞书链接：标题渲染为真锚点，并出现来源标记
+    // 内置条目都带链接：标题渲染为真锚点；便签上不标来源（链接可能来自博客 / GitHub / 飞书）
     await expect(page.locator('.note-card .note-link')).toHaveCount(BUILTIN_COUNT);
-    await expect(page.locator('.note-card .note-src')).toHaveCount(BUILTIN_COUNT);
+    await expect(page.locator('.note-card .note-meta .note-src')).toHaveCount(0);
     // 2 张便签挂在同一根绳子上
     await expect(page.locator('.note-group')).toHaveCount(1);
     await expect(page.locator('.note-rope')).toHaveCount(1);
@@ -49,7 +49,7 @@ test.describe('笔记本页', () => {
     await expect(page.locator('.note-group').nth(2).locator('.note-card')).toHaveCount(1);
   });
 
-  test('带链接的便签点击后新窗口打开飞书文档', async ({ page }) => {
+  test('带链接的便签点击后新窗口打开文档', async ({ page }) => {
     await page.context().route('**/*feishu*', (route) => route.abort()); // 拦截外部跳转，避免真实请求
     await openAddForm(page);
     await page.locator('#fTitle').fill('带链接的笔记');
@@ -144,10 +144,10 @@ test.describe('笔记本页', () => {
   });
 
   test('无链接笔记点击打开详情弹窗与三种关闭方式', async ({ page }) => {
-    // 内置条目都带飞书链接（点击跳新窗口），所以先造一条无链接笔记来验证详情弹窗
+    // 内置条目都带链接（点击跳新窗口），所以先造一条无链接笔记来验证详情弹窗
     await openAddForm(page);
     await page.locator('#fTitle').fill('本地笔记');
-    await page.locator('#fDesc').fill('没有飞书链接，走详情弹窗。');
+    await page.locator('#fDesc').fill('没有链接，走详情弹窗。');
     await page.locator('#addForm button[type="submit"]').click();
     await expect(page.locator('.note-card')).toHaveCount(BUILTIN_COUNT + 1);
 

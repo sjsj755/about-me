@@ -1,4 +1,6 @@
 /* ============ 关于 + 联系 ============ */
+/* 首屏让位：顶部悬浮胶囊导航（fixed，底缘约 70px） */
+#about { padding-top: 96px; }
 .about-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; align-items: start; }
 .about-left { display: flex; flex-direction: column; gap: 20px; }
 .about-intro { padding: 26px 30px; font-size: 1rem; }

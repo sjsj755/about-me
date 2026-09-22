@@ -1,4 +1,6 @@
 /* ============ 作品集（照片墙错落布局） ============ */
+/* 首屏让位：顶部悬浮胶囊导航（fixed，底缘约 70px），首节内容下移避让（同 photos 的 #photos） */
+#works { padding-top: 96px; }
 .works-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

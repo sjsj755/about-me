@@ -33,15 +33,24 @@
 
 /* 日期标记小圆点 */
 .cal-day { position: relative; }
+/* 圆点置于左上角空位：原先 bottom:6% 会压在农历小字上，
+   日历缩到 248px（格子仅 30px）后圆点与文字糊成一片，看起来"标记没显示" */
 .cal-dot {
-  position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%);
-  width: 4px; height: 4px; border-radius: 50%; pointer-events: none;
-  box-shadow: 0 0 0 2px rgba(255,255,255,.55);
+  position: absolute; top: 2px; left: 2px;
+  width: 5px; height: 5px; border-radius: 50%; pointer-events: none;
 }
 .cal-dot.blue { background: var(--accent-blue); }
 .cal-dot.pink { background: #e0697f; }
 .cal-dot.mint { background: #3cbfa0; }
-.cal-day.today .cal-dot { box-shadow: none; }
+/* 今日底色为渐变，圆点加细白边才分得清（原先 2px 光晕过大，糊住文字） */
+.cal-day.today .cal-dot { box-shadow: 0 0 0 1.5px rgba(255,255,255,.9); }
+
+/* 有标记的日期：整格淡色底纹（颜色随标记色）+ 左上角圆点，双重提示一眼可辨 */
+.cal-day.has-mark { background: rgba(127,180,232,.18); }
+.cal-day.has-mark.pink { background: rgba(224,105,127,.16); }
+.cal-day.has-mark.mint { background: rgba(60,191,160,.18); }
+/* 今日且已标记：今日渐变优先，靠左上角圆点区分 */
+.cal-day.today.has-mark { background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint)); }
 /* 日期图标徽标（右上角小 emoji） */
 .cal-emoji {
   position: absolute; top: 1px; right: 2px;

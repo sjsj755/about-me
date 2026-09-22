@@ -1,4 +1,6 @@
 /* ============ 笔记本 · 学习笔记（晾绳便签墙） ============ */
+/* 首屏让位：顶部悬浮胶囊导航（fixed，底缘约 70px） */
+#notes { padding-top: 96px; }
 /* 层级：.note-group（绳 + 一组 3 张）> .note-row（3 列）> .note-item（挂点/倾斜）> .note-card（玻璃便签）
    每张便签靠顶部金属夹“别”在绳子上，因此分组顶部要留出绳与夹子所需的空间。
    倾斜写在 .note-item、入场动画写在其子级 .note-card：两层各管一个 transform，互不覆盖。 */
@@ -54,7 +56,7 @@
   font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: var(--text);
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-/* 标题即飞书文档链接：用真锚点，支持键盘 Enter / 中键新窗口打开 */
+/* 标题即文档链接：用真锚点，支持键盘 Enter / 中键新窗口打开 */
 .note-link { color: inherit; }
 /* 聚焦环画在框内（outline-offset 为负）：标题上方的 overflow: hidden 会裁掉外扩的环 */
 .note-link:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: -3px; border-radius: 4px; }
@@ -65,11 +67,6 @@
 }
 .note-meta { display: flex; align-items: center; gap: 8px; margin-top: auto; }
 .note-date { font-size: .78rem; color: var(--text-soft); }
-/* 来源标记：仅带链接的便签出现 */
-.note-src {
-  font-size: .72rem; color: var(--text-soft); padding: 2px 9px; border-radius: 10px;
-  background: rgba(127,180,232,.16); border: 1px solid rgba(127,180,232,.3);
-}
 .note-del {
   margin-left: auto; cursor: pointer; font-size: .8rem; color: var(--text-soft);
   padding: 3px 10px; border-radius: 10px;

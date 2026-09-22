@@ -18,10 +18,6 @@ const clickMask = (page, sel) => page.locator(sel).click({ position: { x: 4, y: 
 test.describe('弹窗关闭途径', () => {
   test('日历标记弹层：× / 遮罩 / Esc', async ({ page }) => {
     await page.goto('index.html');
-    // 首页 .blog-side 有常驻装饰性浮动（floatY，且按设计在减少动态偏好下也保留），
-    // 日历因此一直在缓慢位移，Playwright 的稳定性检查永远无法通过。
-    // 这里只冻结这一处装饰动画，不绕过可点击性检查 —— 真被遮挡仍会失败。
-    await page.addStyleTag({ content: '.blog-side { animation: none !important; }' });
     const sel = '#calModal';
     const open = async () => {
       await page.locator('.cal-day:not(.empty)').first().click();
@@ -39,6 +35,49 @@ test.describe('弹窗关闭途径', () => {
     await open();
     await page.keyboard.press('Escape');
     await expectClosed(page, sel);
+  });
+
+  test('日历标记：保存 → 持久化 → 刷新后仍渲染', async ({ page }) => {
+    // Playwright 每测试都是全新 context（localStorage 初始为空），天然幂等；
+    // 不能用 addInitScript 清键——它会在 reload 时把刚保存的标记一并清掉。
+    await page.goto('index.html');
+
+    // 真实点击日期格（不冻结任何动画：曾因 .blog-side 常驻浮动导致点击落点漂移、弹层打不开）
+    await page.locator('.cal-day:not(.empty)').first().click();
+    await expectOpen(page, '#calModal');
+
+    await page.locator('#calModalText').fill('回归验证标记');
+    await page.locator('#calModalSave').click();
+    await expectClosed(page, '#calModal');
+
+    // 保存后立即渲染色点
+    await expect(page.locator('.cal-dot').first()).toBeVisible();
+
+    // 标记必须"真正可辨"：格子带 has-mark 底纹，且圆点不得压在农历小字上
+    // （曾因圆点定位在 bottom:6% 压住农历小字、外加白色光晕，看起来像污渍而"标记没显示"）
+    const geo = await page.evaluate(() => {
+      const cell = document.querySelector('.cal-day.has-mark');
+      if (!cell) return { hasMark: false };
+      const dot = cell.querySelector('.cal-dot');
+      const lunar = cell.querySelector('.cal-lunar');
+      const d = dot ? dot.getBoundingClientRect() : null;
+      const l = lunar ? lunar.getBoundingClientRect() : null;
+      const overlap = (d && l)
+        ? !(d.right <= l.left || d.left >= l.right || d.bottom <= l.top || d.top >= l.bottom)
+        : false;
+      return { hasMark: true, dotSize: d ? d.width * d.height : 0, overlap };
+    });
+    expect(geo.hasMark).toBe(true);
+    expect(geo.dotSize).toBeGreaterThan(0);
+    expect(geo.overlap).toBe(false);
+
+    // localStorage 已写入
+    const ls = await page.evaluate(() => localStorage.getItem('calendar_marks_v1'));
+    expect(ls).toContain('回归验证标记');
+
+    // 刷新后标记仍渲染
+    await page.reload();
+    await expect(page.locator('.cal-dot').first()).toBeVisible();
   });
 
   test('联系表单弹窗：× / 遮罩 / Esc', async ({ page }) => {
