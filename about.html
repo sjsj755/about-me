@@ -9,7 +9,8 @@
        原 Google Fonts 外链是渲染阻塞资源：实测 4 个页面共发起 115 个字体请求，
        首页 load 因此增加约 6.9s（A/B 实测 7554ms → 679ms），且阻塞全部 defer 脚本执行，故移除。
        回退结果：标题 Quicksand → HarmonyOS Sans / sans-serif；正文 Noto Sans SC → 系统中文。 -->
-  <link rel="stylesheet" href="css/dist/shared.css?v=20260930">
+  <link rel="stylesheet" href="css/dist/shared.css?v=20260934">
+  <link rel="stylesheet" href="css/dist/about.css?v=20260934">
 </head>
 <body class="about-page">
 
@@ -97,15 +98,15 @@
   </div>
 
   <!-- GSAP + Lenis -->
-  <script src="js/vendor/gsap.min.js?v=20260930" defer></script>
-  <script src="js/vendor/ScrollTrigger.min.js?v=20260930" defer></script>
-  <script src="js/vendor/lenis.min.js?v=20260930" defer></script>
+  <script src="js/vendor/gsap.min.js?v=20260934" defer></script>
+  <script src="js/vendor/ScrollTrigger.min.js?v=20260934" defer></script>
+  <script src="js/vendor/lenis.min.js?v=20260934" defer></script>
   <!-- SDK 适配层：必须在 main.js 与各页面模块之前 -->
-  <script src="js/fx.js?v=20260930" defer></script>
-  <script src="js/links.js?v=20260930" defer></script>
-  <script src="js/about-data.js?v=20260930" defer></script>
+  <script src="js/fx.js?v=20260934" defer></script>
+  <script src="js/links.js?v=20260934" defer></script>
+  <script src="js/about-data.js?v=20260934" defer></script>
   <!-- 共享工具层（弹窗开关 / 关闭途径） -->
-  <script src="js/ui.js?v=20260930" defer></script>
-  <script src="js/main.js?v=20260930" defer></script>
+  <script src="js/ui.js?v=20260934" defer></script>
+  <script src="js/main.js?v=20260934" defer></script>
 </body>
 </html>

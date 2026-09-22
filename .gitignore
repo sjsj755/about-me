@@ -5,6 +5,12 @@ node_modules/
 playwright-report/
 test-results/
 
+# 视觉基线快照（Phase B CSS 拆分的一次性验证产物，不入库；基线丢失时重跑 visual.spec.js 重建）
+tests/visual.spec.js-snapshots/
+
+# 本地一次性截图对比目录
+_font-compare/
+
 # IDE / 工具配置
 .trae/
 .vscode/

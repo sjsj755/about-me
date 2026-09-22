@@ -1,5 +1,5 @@
 {
-  "version": "20260930",
+  "version": "20260934",
   "shared": [
     "tokens.css",
     "base.css",
@@ -8,29 +8,28 @@
     "components/nav-glass.css",
     "components/section.css",
     "components/glass.css",
-    "pages/home.css",
-    "pages/home-mascot.css",
-    "pages/home-calendar.css",
-    "pages/works.css",
-    "pages/photos.css",
-    "pages/about.css",
+    "components/works-grid.css",
+    "components/work-card.css",
     "components/nav-mobile.css",
     "components/motion.css",
     "components/chips.css",
+    "components/collect-shell.css",
     "components/cards.css",
     "components/lightbox.css",
     "components/cards-cover.css",
     "components/lightbox-action.css",
     "components/perf.css",
-    "pages/collect.css",
-    "pages/collect-acad.css",
-    "pages/collect-quote.css",
-    "pages/collect-book.css",
-    "pages/works-magazine.css",
-    "overrides.css",
-    "pages/sites.css",
-    "pages/notes.css"
+    "components/modal.css",
+    "components/footer.css"
   ],
-  "pages": {},
-  "overrides": []
+  "pages": {
+    "index": ["pages/home.css", "pages/home-mascot.css", "pages/home-calendar.css"],
+    "works": ["pages/works.css", "pages/works-magazine.css"],
+    "collect": ["pages/collect.css", "pages/collect-acad.css", "pages/collect-quote.css", "pages/collect-book.css"],
+    "photos": ["pages/photos.css"],
+    "about": ["pages/about.css"],
+    "sites": ["pages/sites.css"],
+    "notes": ["pages/notes.css"]
+  },
+  "overrides": ["overrides.css"]
 }

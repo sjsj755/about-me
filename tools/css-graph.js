@@ -137,4 +137,45 @@ function cacheVersionErrors(manifest, files) {
   return errors;
 }
 
-module.exports = { layerOf, resolveBundles, validate, cacheVersionErrors };
+// Phase B：每页必须恰好加载「shared.css + 本页 <stem>.css」两个产物。
+// 漏加 page link 是拆分后新引入的错误模式：<link> 缺失不会 404、不会报错，
+// 页面只会静默失去全部专属样式，只能靠门禁静态拦截。
+// files 由调用方读好传入（本文件零 I/O）：[{ name, text }]，name 为 xxx.html。
+function pageLinkErrors(manifest, files) {
+  const errors = [];
+  const pages = manifest.pages || {};
+  const htmlStems = new Set();
+  files.forEach(({ name, text }) => {
+    const stem = String(name).replace(/\.html$/, '');
+    htmlStems.add(stem);
+    const links = new Set();
+    const re = /<link\b[^>]*rel="stylesheet"[^>]*>/g;
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      const href = (m[0].match(/href="css\/dist\/([\w.-]+\.css)/) || [])[1];
+      if (href) links.add(href);
+    }
+    const want = ['shared.css', `${stem}.css`];
+    want.forEach((f) => {
+      if (!links.has(f)) {
+        errors.push({ code: 'E-PAGELINK', where: name, message: `${name} 缺少样式引用 css/dist/${f}：每页必须恰好加载 shared.css + 本页产物` });
+      }
+    });
+    links.forEach((f) => {
+      if (!want.includes(f)) {
+        errors.push({ code: 'E-PAGELINK', where: name, message: `${name} 引用了预期之外的样式 ${f}：每页只允许 shared.css + ${stem}.css` });
+      }
+    });
+    if (!pages[stem]) {
+      errors.push({ code: 'E-PAGELINK', where: name, message: `${name} 在 manifest.pages 中没有对应条目（key 须为文件名去掉 .html，即 ${stem}）` });
+    }
+  });
+  Object.keys(pages).forEach((p) => {
+    if (!htmlStems.has(p)) {
+      errors.push({ code: 'E-PAGELINK', where: 'manifest', message: `manifest.pages.${p} 没有对应的 ${p}.html` });
+    }
+  });
+  return errors;
+}
+
+module.exports = { layerOf, resolveBundles, validate, cacheVersionErrors, pageLinkErrors };

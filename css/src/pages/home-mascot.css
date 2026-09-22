@@ -61,8 +61,19 @@
 @media (prefers-reduced-motion: reduce) {
   .encourage-bubble { transition: none; }
 }
+/* 尾巴指向左侧头像（说话人）：相片胶囊删除后，气泡下方已无对象可指。
+   三角用 border-right 画：底边贴在气泡左缘（盖住 1px 边框、不留缝），尖端朝左伸出 5px。
+   top: 50% 让尾巴对准左栏（桌面 / 平板头像都在左栏，高度见 .blog-profile 的 sticky 区）。 */
 .encourage-bubble::after {
-  content: ""; position: absolute; bottom: -7px; left: 50%; transform: translateX(-50%);
-  border: 6px solid transparent; border-top-color: rgba(255,255,255,.7);
+  content: ""; position: absolute;
+  top: 50%; left: -12px; transform: translateY(-50%);
+  border: 6px solid transparent; border-right-color: rgba(255,255,255,.7);
+}
+/* 单栏（≤768px）时头像横排到内容上方，左向尾巴会指到页边空白 —— 改回向上，指向头顶的头像卡 */
+@media (max-width: 768px) {
+  .encourage-bubble::after {
+    top: -12px; left: 50%; transform: translateX(-50%);
+    border-right-color: transparent; border-bottom-color: rgba(255,255,255,.7);
+  }
 }
 

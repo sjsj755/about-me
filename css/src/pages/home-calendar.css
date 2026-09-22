@@ -120,23 +120,7 @@
 .cal-save:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(140,190,220,.5); }
 .cal-save:active { transform: scale(.96); }
 
-.btn {
-  padding: 13px 30px; border-radius: 50px; font-family: var(--font-display);
-  font-weight: 600; font-size: 0.98rem; border: 1px solid transparent;
-  cursor: pointer; transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out);
-}
-.btn-primary {
-  background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
-  color: #fff; box-shadow: 0 10px 24px rgba(140,190,220,.4);
-}
-.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(140,190,220,.5); }
-.btn-primary:active { transform: translateY(-1px) scale(.97); }
-.btn-ghost {
-  background: var(--glass-bg); border-color: var(--glass-border); color: var(--text);
-  backdrop-filter: blur(10px);
-}
-.btn-ghost:hover { transform: translateY(-3px); background: rgba(255,255,255,.6); }
-.btn-ghost:active { transform: translateY(-1px) scale(.97); }
+/* .btn/.btn-primary/.btn-ghost 已下沉 pages/about.css（仅本页 .about-cta 消费） */
 
 .scroll-hint { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); text-align: center; color: var(--text-soft); font-size: 0.8rem; }
 .scroll-hint .mouse { width: 24px; height: 38px; border: 2px solid var(--text-soft); border-radius: 14px; margin: 8px auto 0; position: relative; }

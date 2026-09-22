@@ -12,7 +12,8 @@ const SITE = {
 //   { src: 'images/banner/1.webp', caption: '站点新装上线' },
 const CAROUSEL = [
   { src: 'images/banner/hollowknight-redmemory.webp' },
-];
+  { src: 'images/banner/dwrg-EmmaWoods.webp' },
+ ];
 
 // ============ 社交链接集中配置 ============
 // 首页头像下方的图标使用；键名对应 index.html 中 data-social 的值。改成你的真实主页地址即可。

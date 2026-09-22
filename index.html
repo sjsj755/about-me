@@ -9,7 +9,8 @@
        原 Google Fonts 外链是渲染阻塞资源：实测 4 个页面共发起 115 个字体请求，
        首页 load 因此增加约 6.9s（A/B 实测 7554ms → 679ms），且阻塞全部 defer 脚本执行，故移除。
        回退结果：标题 Quicksand → HarmonyOS Sans / sans-serif；正文 Noto Sans SC → 系统中文。 -->
-  <link rel="stylesheet" href="css/dist/shared.css?v=20260930">
+  <link rel="stylesheet" href="css/dist/shared.css?v=20260934">
+  <link rel="stylesheet" href="css/dist/index.css?v=20260934">
   <!-- 首屏轮播横幅（LCP 候选）：提前于解析器发现图片，避免等到 blog-carousel.js 执行后才开始下载。
        href 必须与 js/blog-carousel.js 注入的 img.src 完全一致（同为一个不带 query 的路径），
        否则浏览器会把两者当成不同资源、重复下载一份。
@@ -18,8 +19,8 @@
   <!-- ui.js 提到 head 同步加载：外观调节必须在首次绘制前读取偏好并落到 <html> 上
        （否则覆盖模式会先按横幅排一次版再跳一次，见 js/appearance.js 顶部说明）。
        两者都只定义函数、不碰 DOM，同步执行安全；其余脚本仍在页尾按 defer 加载。 -->
-  <script src="js/ui.js?v=20260930"></script>
-  <script src="js/appearance.js?v=20260930"></script>
+  <script src="js/ui.js?v=20260934"></script>
+  <script src="js/appearance.js?v=20260934"></script>
 </head>
 <body class="home-blog">
 
@@ -194,20 +195,20 @@
   </div>
 
   <!-- GSAP + Lenis -->
-  <script src="js/vendor/gsap.min.js?v=20260930" defer></script>
-  <script src="js/vendor/ScrollTrigger.min.js?v=20260930" defer></script>
-  <script src="js/vendor/lenis.min.js?v=20260930" defer></script>
+  <script src="js/vendor/gsap.min.js?v=20260934" defer></script>
+  <script src="js/vendor/ScrollTrigger.min.js?v=20260934" defer></script>
+  <script src="js/vendor/lenis.min.js?v=20260934" defer></script>
   <!-- SDK 适配层：必须在 main.js 与各页面模块之前 -->
-  <script src="js/fx.js?v=20260930" defer></script>
-  <script src="js/links.js?v=20260930" defer></script>
-  <script src="js/encourage.js?v=20260930" defer></script>
+  <script src="js/fx.js?v=20260934" defer></script>
+  <script src="js/links.js?v=20260934" defer></script>
+  <script src="js/encourage.js?v=20260934" defer></script>
   <!-- 首页 feed 数据源（只含数据，无逻辑） -->
-  <script src="js/notes-data.js?v=20260930" defer></script>
-  <script src="js/works-data.js?v=20260930" defer></script>
-  <script src="js/vendor/solarlunar.min.js?v=20260930" defer></script>
+  <script src="js/notes-data.js?v=20260934" defer></script>
+  <script src="js/works-data.js?v=20260934" defer></script>
+  <script src="js/vendor/solarlunar.min.js?v=20260934" defer></script>
   <!-- 共享工具层 ui.js 已提前到 <head> 同步加载（外观调节需要它在首次绘制前就绪） -->
-  <script src="js/main.js?v=20260930" defer></script>
-  <script src="js/blog-feed.js?v=20260930" defer></script>
-  <script src="js/blog-carousel.js?v=20260930" defer></script>
+  <script src="js/main.js?v=20260934" defer></script>
+  <script src="js/blog-feed.js?v=20260934" defer></script>
+  <script src="js/blog-carousel.js?v=20260934" defer></script>
 </body>
 </html>

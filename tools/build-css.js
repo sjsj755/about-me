@@ -1,13 +1,14 @@
 // ============ CSS 构建（唯一 I/O 入口） ============
 // 按 css/manifest.json 把 css/src/** 拼成 css/dist/shared.css 与 css/dist/<page>.css。
 //
-// 拼接方式是「原样首尾相接」（join('')），不做任何格式化。因此只要源文件按原顺序排列、
-// 且每个文件都以换行结尾，产物就与拆分前的单文件逐字节等价 —— 这正是 Phase A 重构期间的
-// 验收手段：每拆一次文件，css/dist/shared.css 都必须仍然逐字节不变。
+// 拼接方式是「原样首尾相接」（join('')），不做任何格式化。Phase A 期间源文件是原单文件的
+// 连续切片，产物与拆分前逐字节等价，以此作为当时的验收手段。Phase B 按页拆分后，
+// 跨页规则在 pages 与 components 之间迁移，验收口径升级为「视觉等价」：
+// 以 Playwright 全页截图基线（tests/visual.spec.js，7 页 × 2 视口 × 2 弹窗态）兜底。
 //
-// 由此推出一条硬约束：**manifest 数组的排列就是级联顺序**，源文件必须是原文件的
-// 连续切片且按原顺序列出。不能按 tokens/base/components 分组重排 —— 原文件里
-// base 与 component 区块本来就是交错的，重排会改变级联结果。
+// 由此推出一条硬约束：**manifest 数组的排列就是级联顺序**。上移/下沉规则时必须先做
+// 特异性与级联顺序分析——组件件（特异性低、无交集）放 shared，页面特化（特异性更高）
+// 留 pages bundle（必然最后加载），覆盖关系与顺序解耦。
 //
 // 用法：
 //   node tools/build-css.js           按 manifest 生成 css/dist/

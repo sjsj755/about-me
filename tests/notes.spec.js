@@ -5,7 +5,16 @@
 const { test, expect } = require('@playwright/test');
 
 const KEY = 'bijiben_notes_v1';
-const BUILTIN_COUNT = 2;
+
+// 内置便签条数不写死：js/notes-data.js 是纯内容文件，增删改一条就会让写死的数字全线飘红。
+// 用例改为「以页面实际加载到的数据为准」再验证渲染（js/notes.js 也读同一个 window.NOTES_BUILTIN，
+// 所以这仍然是端到端断言：数据有几条，墙上就该有几张便签纸）。
+async function readBuiltinCount(page) {
+  const n = await page.evaluate(() => (window.NOTES_BUILTIN || []).length);
+  // 数据被清空时立刻失败，否则 "0 === 0" 会让用例假通过
+  expect(n).toBeGreaterThan(0);
+  return n;
+}
 
 // 打开「写笔记」弹窗并等自动聚焦落定：openAdd 里有 60ms 的 focus 定时器，
 // 不等它结束就输入，会把后一个字段的内容敲进前一个字段（新增字段后必现）。
@@ -22,31 +31,37 @@ test.describe('笔记本页', () => {
   });
 
   test('渲染内置笔记', async ({ page }) => {
-    await expect(page.locator('.note-card')).toHaveCount(BUILTIN_COUNT);
+    const builtin = await readBuiltinCount(page);
+    await expect(page.locator('.note-card')).toHaveCount(builtin);
     await expect(page.locator('.note-card .note-del')).toHaveCount(0); // 内置条目不可删除
-    await expect(page.locator('#notesHint')).toContainText(`${BUILTIN_COUNT} 篇`);
+    await expect(page.locator('#notesHint')).toContainText(`${builtin} 篇`);
     // 内置条目都带链接：标题渲染为真锚点；便签上不标来源（链接可能来自博客 / GitHub / 飞书）
-    await expect(page.locator('.note-card .note-link')).toHaveCount(BUILTIN_COUNT);
+    await expect(page.locator('.note-card .note-link')).toHaveCount(builtin);
     await expect(page.locator('.note-card .note-meta .note-src')).toHaveCount(0);
-    // 2 张便签挂在同一根绳子上
-    await expect(page.locator('.note-group')).toHaveCount(1);
-    await expect(page.locator('.note-rope')).toHaveCount(1);
+    // 每 3 张便签一组，各自挂在同一根绳子上
+    const groups = Math.ceil(builtin / 3);
+    await expect(page.locator('.note-group')).toHaveCount(groups);
+    await expect(page.locator('.note-rope')).toHaveCount(groups);
   });
 
   test('每 3 张便签一组，各自挂在同一根绳子上', async ({ page }) => {
+    const builtin = await readBuiltinCount(page);
     for (let i = 0; i < 5; i++) {
       await openAddForm(page);
       await page.locator('#fTitle').fill(`分组笔记 ${i}`);
       await page.locator('#fDesc').fill('分组验证');
       await page.locator('#addForm button[type="submit"]').click();
     }
-    // 2 内置 + 5 新增 = 7 张 → 3 组（3 / 3 / 1）
-    await expect(page.locator('.note-card')).toHaveCount(BUILTIN_COUNT + 5);
-    await expect(page.locator('.note-group')).toHaveCount(3);
-    await expect(page.locator('.note-rope')).toHaveCount(3);
-    await expect(page.locator('.note-group').nth(0).locator('.note-card')).toHaveCount(3);
-    await expect(page.locator('.note-group').nth(1).locator('.note-card')).toHaveCount(3);
-    await expect(page.locator('.note-group').nth(2).locator('.note-card')).toHaveCount(1);
+    // 内置 + 5 张新增 → 每 3 张一组，最后一组是余数（整除时仍为 3）
+    const total = builtin + 5;
+    const groups = Math.ceil(total / 3);
+    await expect(page.locator('.note-card')).toHaveCount(total);
+    await expect(page.locator('.note-group')).toHaveCount(groups);
+    await expect(page.locator('.note-rope')).toHaveCount(groups);
+    for (let g = 0; g < groups; g++) {
+      const inGroup = g < groups - 1 ? 3 : (total % 3 || 3);
+      await expect(page.locator('.note-group').nth(g).locator('.note-card')).toHaveCount(inGroup);
+    }
   });
 
   test('带链接的便签点击后新窗口打开文档', async ({ page }) => {
@@ -90,6 +105,7 @@ test.describe('笔记本页', () => {
   });
 
   test('新增笔记并持久化', async ({ page }) => {
+    const builtin = await readBuiltinCount(page);
     await openAddForm(page);
     await expect(page.locator('#addModal')).toHaveClass(/open/);
 
@@ -98,12 +114,12 @@ test.describe('笔记本页', () => {
     await page.locator('#addForm button[type="submit"]').click();
 
     await expect(page.locator('#addModal')).not.toHaveClass(/open/);
-    await expect(page.locator('.note-card')).toHaveCount(BUILTIN_COUNT + 1);
+    await expect(page.locator('.note-card')).toHaveCount(builtin + 1);
     await expect(page.locator('.note-card').first()).toContainText('grid 断点测试');
 
     // 持久化：刷新后仍在
     await page.reload();
-    await expect(page.locator('.note-card')).toHaveCount(BUILTIN_COUNT + 1);
+    await expect(page.locator('.note-card')).toHaveCount(builtin + 1);
     await expect(page.locator('.note-card').first()).toContainText('grid 断点测试');
   });
 
@@ -144,12 +160,13 @@ test.describe('笔记本页', () => {
   });
 
   test('无链接笔记点击打开详情弹窗与三种关闭方式', async ({ page }) => {
+    const builtin = await readBuiltinCount(page);
     // 内置条目都带链接（点击跳新窗口），所以先造一条无链接笔记来验证详情弹窗
     await openAddForm(page);
     await page.locator('#fTitle').fill('本地笔记');
     await page.locator('#fDesc').fill('没有链接，走详情弹窗。');
     await page.locator('#addForm button[type="submit"]').click();
-    await expect(page.locator('.note-card')).toHaveCount(BUILTIN_COUNT + 1);
+    await expect(page.locator('.note-card')).toHaveCount(builtin + 1);
 
     // 点击卡片本体打开详情
     await page.locator('.note-card').first().click();
@@ -174,15 +191,16 @@ test.describe('笔记本页', () => {
   });
 
   test('删除用户笔记', async ({ page }) => {
+    const builtin = await readBuiltinCount(page);
     await openAddForm(page);
     await page.locator('#fTitle').fill('待删除');
     await page.locator('#fDesc').fill('这条会被删掉。');
     await page.locator('#addForm button[type="submit"]').click();
-    await expect(page.locator('.note-card')).toHaveCount(BUILTIN_COUNT + 1);
+    await expect(page.locator('.note-card')).toHaveCount(builtin + 1);
 
     page.once('dialog', (d) => d.accept());
     await page.locator('.note-card').first().locator('.note-del').click();
 
-    await expect(page.locator('.note-card')).toHaveCount(BUILTIN_COUNT);
+    await expect(page.locator('.note-card')).toHaveCount(builtin);
   });
 });

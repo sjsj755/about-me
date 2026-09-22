@@ -1,0 +1,12 @@
+/* ============ 魔法网格基础布局（works-grid） ============ */
+/* 自 works.css 上移：3 列 + 20px 行粒度的「魔法网格」是 works / photos /
+   collect(书籍墙与学术列表) / notes 消费的跨页布局契约。
+   各页变体（.book-wall / .acad-list 等列数改写）留在 pages/*.css，
+   依赖「page bundle 晚于 shared 加载」完成覆盖。 */
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 20px;
+  gap: 20px;
+  align-items: start;
+}

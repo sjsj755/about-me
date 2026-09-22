@@ -76,6 +76,24 @@ function checkCacheVersion() {
   console.log(`缓存版本校验通过（${pages.length} 个页面，v${manifest.version}）`);
 }
 
+// 各页 HTML 的样式引用必须是「shared.css + 本页 <stem>.css」恰好两个（Phase B 契约）。
+// <link> 缺失不报 404、页面静默丢样式，只能静态拦截；规则本体在 css-graph.js。
+function checkPageLinks() {
+  const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'css', 'manifest.json'), 'utf8'));
+  const pages = fs.readdirSync(ROOT)
+    .filter((n) => n.endsWith('.html'))
+    .sort()
+    .map((n) => ({ name: n, text: fs.readFileSync(path.join(ROOT, n), 'utf8') }));
+
+  const errors = graph.pageLinkErrors(manifest, pages);
+  if (errors.length) {
+    errors.forEach((e) => console.error(`  x [${e.code}] ${e.message}`));
+    console.error(`\n页面样式引用校验未通过（${errors.length} 项），已中止。`);
+    process.exit(1);
+  }
+  console.log(`页面样式引用校验通过（${pages.length} 个页面 = shared + 本页产物）`);
+}
+
 function main() {
   const files = listJs();
   const bad = checkJs(files);
@@ -94,6 +112,7 @@ function main() {
   }
 
   checkCacheVersion();
+  checkPageLinks();
 
   console.log('门禁校验全部通过。');
 }

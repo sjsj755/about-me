@@ -19,3 +19,14 @@
   }
 }
 
+/* 3) 触屏（安卓/鸿蒙）：小控件命中区扩至 ≥40px；收藏/删除改为常显（无 hover 无法唤出）。
+      自 collect.css 上移：首页日历 .cal-nav/.cal-ico/.cal-color 同样消费。 */
+@media (pointer: coarse) {
+  .cal-nav, .cal-ico, .cal-color, .cc-star, .cc-del { position: relative; }
+  .cal-nav::after, .cal-ico::after, .cal-color::after,
+  .cc-star::after, .cc-del::after {
+    content: ""; position: absolute; inset: -9px; border-radius: 50%;
+  }
+  .collect-card .cc-star, .collect-card .cc-del { opacity: 1; transform: scale(1); }
+}
+

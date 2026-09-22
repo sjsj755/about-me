@@ -352,3 +352,224 @@
   .nav-links .appearance-btn { margin: 4px 8px 2px; }
 }
 
+/* ============ 小人头像 + 鼓励语（首页博客布局沿用） ============ */
+.mascot-frame {
+  width: 230px; height: 230px; /* 方形 */
+  border-radius: 28px; padding: 10px;
+  display: grid; place-items: center;
+  overflow: hidden;
+  /* 透明化方框背景 */
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  /* 3D 视角支持：父容器提供透视，子元素做按压形变 */
+  perspective: 600px;
+  transform-style: preserve-3d;
+}
+.mascot-inner {
+  width: 100%; height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.mascot-img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block;
+}
+/* 高光层：位置随鼠标移动，模拟光线随按压角度变化 */
+.mascot-shine {
+  position: absolute; inset: 0;
+  border-radius: 20px;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--shx, 50%) var(--shy, 30%),
+    rgba(255,255,255,.5), rgba(255,255,255,0) 45%);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.mascot-frame.is-active .mascot-shine { opacity: 1; }
+
+/* 鼓励话语气泡 */
+.encourage-bubble {
+  position: relative;
+  background: rgba(255,255,255,.7); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  border-radius: 14px; padding: 9px 14px;
+  font-size: 0.85rem; line-height: 1.5; color: var(--text);
+  box-shadow: var(--shadow);
+  cursor: pointer; user-select: none; text-align: center;
+  /* 固定尺寸：换句时文字在框内换行，三列布局零重排（防闪烁关键） */
+  width: min(280px, 100%);
+  min-height: calc(2.55rem + 18px);
+  transition: opacity .24s var(--ease-out), filter .24s var(--ease-out);
+}
+/* 退场：轻模糊交叉淡化（blur 让两句话融为一次变形而非两个物体交叠） */
+.encourage-bubble.is-swapping {
+  opacity: 0;
+  filter: blur(2px);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .encourage-bubble { transition: none; }
+}
+/* 尾巴指向左侧头像（说话人）：相片胶囊删除后，气泡下方已无对象可指。
+   三角用 border-right 画：底边贴在气泡左缘（盖住 1px 边框、不留缝），尖端朝左伸出 5px。
+   top: 50% 让尾巴对准左栏（桌面 / 平板头像都在左栏，高度见 .blog-profile 的 sticky 区）。 */
+.encourage-bubble::after {
+  content: ""; position: absolute;
+  top: 50%; left: -12px; transform: translateY(-50%);
+  border: 6px solid transparent; border-right-color: rgba(255,255,255,.7);
+}
+/* 单栏（≤768px）时头像横排到内容上方，左向尾巴会指到页边空白 —— 改回向上，指向头顶的头像卡 */
+@media (max-width: 768px) {
+  .encourage-bubble::after {
+    top: -12px; left: 50%; transform: translateX(-50%);
+    border-right-color: transparent; border-bottom-color: rgba(255,255,255,.7);
+  }
+}
+
+/* ============ 日历组件（再次缩小） ============ */
+.calendar { width: min(300px, 100%); padding: 13px 14px; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cal-label { font-family: var(--font-display); font-weight: 700; font-size: 0.88rem; }
+.cal-nav {
+  width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,.5); color: var(--text); font-size: 1rem; cursor: pointer;
+  transition: background .3s, transform .2s;
+}
+.cal-nav:hover { background: rgba(255,255,255,.85); transform: scale(1.08); }
+.cal-week {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+  margin-bottom: 4px; text-align: center;
+  color: var(--text-soft); font-size: 0.7rem; font-weight: 600;
+}
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-day {
+  aspect-ratio: 1; display: grid; place-items: center;
+  font-size: 0.75rem; border-radius: 8px; color: var(--text);
+  transition: background .2s, color .2s, transform .15s; cursor: pointer;
+}
+.cal-day:hover { background: rgba(255,255,255,.7); transform: scale(1.08); }
+.cal-day.empty { pointer-events: none; }
+.cal-day.today {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
+  color: #fff; font-weight: 700;
+}
+
+/* 农历小字（初一显示月名 / 节气 / 日子） */
+.cal-lunar { font-size: .46rem; line-height: 1; color: var(--text-soft); margin-top: 1px; }
+.cal-day.today .cal-lunar { color: rgba(255,255,255,.9); }
+@media (max-width: 480px) { .cal-lunar { display: none; } }
+
+/* 日期标记小圆点 */
+.cal-day { position: relative; }
+/* 圆点置于左上角空位：原先 bottom:6% 会压在农历小字上，
+   日历缩到 248px（格子仅 30px）后圆点与文字糊成一片，看起来"标记没显示" */
+.cal-dot {
+  position: absolute; top: 2px; left: 2px;
+  width: 5px; height: 5px; border-radius: 50%; pointer-events: none;
+}
+.cal-dot.blue { background: var(--accent-blue); }
+.cal-dot.pink { background: #e0697f; }
+.cal-dot.mint { background: #3cbfa0; }
+/* 今日底色为渐变，圆点加细白边才分得清（原先 2px 光晕过大，糊住文字） */
+.cal-day.today .cal-dot { box-shadow: 0 0 0 1.5px rgba(255,255,255,.9); }
+
+/* 有标记的日期：整格淡色底纹（颜色随标记色）+ 左上角圆点，双重提示一眼可辨 */
+.cal-day.has-mark { background: rgba(127,180,232,.18); }
+.cal-day.has-mark.pink { background: rgba(224,105,127,.16); }
+.cal-day.has-mark.mint { background: rgba(60,191,160,.18); }
+/* 今日且已标记：今日渐变优先，靠左上角圆点区分 */
+.cal-day.today.has-mark { background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint)); }
+/* 日期图标徽标（右上角小 emoji） */
+.cal-emoji {
+  position: absolute; top: 1px; right: 2px;
+  font-size: .6rem; line-height: 1; pointer-events: none;
+}
+
+/* 日历标记弹层（复用 .collect-modal 骨架） */
+.collect-modal-inner.cal-modal { width: min(320px, 100%); padding: 22px 22px 20px; }
+.cal-input {
+  width: 100%; border: 1px solid var(--glass-border); border-radius: 10px;
+  background: rgba(255,255,255,.75); padding: 10px 12px;
+  font: inherit; font-size: 16px; color: var(--text); /* 16px 防移动端聚焦缩放 */
+  resize: none; outline: none; transition: border-color .2s;
+}
+.cal-input:focus { border-color: var(--accent-blue); }
+.cal-colors { display: flex; gap: 10px; margin-top: 12px; }
+/* 图标选择行 */
+.cal-icons { display: flex; gap: 6px; margin-top: 12px; }
+.cal-ico {
+  width: 27px; height: 27px; border-radius: 8px; padding: 0;
+  border: 1px solid var(--glass-border); background: rgba(255,255,255,.6);
+  font-size: .82rem; line-height: 1; cursor: pointer;
+  display: grid; place-items: center;
+  transition: transform .2s var(--ease-spring), border-color .2s, background .2s;
+}
+.cal-ico:hover { transform: translateY(-2px); }
+.cal-ico.active { border-color: var(--accent-blue); background: rgba(255,255,255,.95); }
+.cal-ico-none { font-size: .55rem; color: var(--text-soft); }
+.cal-color {
+  width: 22px; height: 22px; border-radius: 50%; padding: 0;
+  border: 2px solid transparent; cursor: pointer;
+  transition: transform .2s var(--ease-spring), border-color .2s;
+}
+.cal-color.active { border-color: var(--text-soft); transform: scale(1.12); }
+.cal-color.is-blue { background: var(--accent-blue); }
+.cal-color.is-pink { background: var(--accent-pink); }
+.cal-color.is-mint { background: var(--accent-mint); }
+/* 重复方式（仅今年 / 每年公历 / 每年农历） */
+.cal-repeat { display: flex; gap: 6px; margin-top: 10px; }
+.cal-rp {
+  flex: 1; padding: 7px 0; border-radius: 8px;
+  border: 1px solid var(--glass-border); background: rgba(255,255,255,.6);
+  font-family: inherit; font-size: .72rem; color: var(--text-soft); cursor: pointer;
+  transition: border-color .2s, color .2s, background .2s, transform .2s var(--ease-spring);
+}
+.cal-rp:hover { transform: translateY(-1px); }
+.cal-rp.active {
+  border-color: var(--accent-blue); color: var(--text);
+  background: rgba(255,255,255,.95); font-weight: 600;
+}
+.cal-modal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+.cal-del {
+  border: none; background: none; color: var(--text-soft);
+  font-size: .82rem; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px;
+  transition: color .2s;
+}
+.cal-del:hover { color: #c0566d; }
+.cal-save {
+  border: none; border-radius: 40px; padding: 8px 24px;
+  font-family: var(--font-display); font-weight: 600; font-size: .85rem;
+  color: #fff; cursor: pointer;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
+  box-shadow: 0 8px 18px rgba(140,190,220,.4);
+  transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out);
+}
+.cal-save:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(140,190,220,.5); }
+.cal-save:active { transform: scale(.96); }
+
+/* .btn/.btn-primary/.btn-ghost 已下沉 pages/about.css（仅本页 .about-cta 消费） */
+
+.scroll-hint { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); text-align: center; color: var(--text-soft); font-size: 0.8rem; }
+.scroll-hint .mouse { width: 24px; height: 38px; border: 2px solid var(--text-soft); border-radius: 14px; margin: 8px auto 0; position: relative; }
+.scroll-hint .mouse span { position: absolute; top: 6px; left: 50%; width: 4px; height: 8px; transform: translateX(-50%); background: var(--accent-blue); border-radius: 4px; animation: wheel 1.6s infinite; }
+@keyframes wheel { 0% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, 14px); } }
+
+/* ============ 移动端补充适配（安卓 / 鸿蒙） ============ */
+/* 小屏手机（<381px）：弹窗收紧，避免贴边 */
+@media (max-width: 380px) {
+  .collect-modal { padding: 12px; }
+  .collect-modal-inner,
+  .collect-modal-inner.cal-modal { padding: 18px 16px; }
+}
+
+/* 折叠屏展开态 / 窄窗口（鸿蒙 Mate X 展开约 720-900px）：两列档位 */
+@media (min-width: 769px) and (max-width: 1100px) {
+  .works-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
