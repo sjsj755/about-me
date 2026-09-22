@@ -20,5 +20,9 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
   .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(140,190,220,.5); }
   .btn-ghost:hover { transform: translateY(-3px); background: rgba(255,255,255,.6); }
   .filter-chip:hover { background: rgba(255,255,255,.7); color: var(--text); }
+  /* 便签：悬停时“被捏直”并微微提起，纸张投影随之加深（倾斜在 .note-item，投影在 .note-card） */
+  .note-item:hover { transform: rotate(0deg) translateY(-3px); }
+  .note-item:hover .note-card { box-shadow: 0 26px 44px rgba(120,150,165,.3); }
+  .note-item:hover .note-link { color: var(--accent-blue); }
 }
 

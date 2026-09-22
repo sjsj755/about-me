@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/dist/shared.css?v=20260921">
+  <link rel="stylesheet" href="css/dist/shared.css?v=20260923">
 </head>
 <body class="works-page">
 
@@ -30,8 +30,8 @@
     <a href="works.html"><span class="mn-dot"></span><span class="mn-label">作品集</span></a>
     <a href="collect.html"><span class="mn-dot"></span><span class="mn-label">芸香集</span></a>
     <a href="sites.html"><span class="mn-dot"></span><span class="mn-label">站点集</span></a>
-    <a href="notes.html"><span class="mn-dot"></span><span class="mn-label">笔记本</span></a>
     <a href="photos.html"><span class="mn-dot"></span><span class="mn-label">相片</span></a>
+    <a href="notes.html"><span class="mn-dot"></span><span class="mn-label">笔记本</span></a>
     <a href="about.html"><span class="mn-dot"></span><span class="mn-label">关于我</span></a>
   </nav>
 
@@ -41,14 +41,14 @@
       <div class="collect-head-text">
         <span class="section-tag reveal">Notes</span>
         <h2 class="section-title reveal">笔记本</h2>
-        <p class="collect-desc reveal">学习路上记下的每一条笔记，都安放在这里。</p>
+        <p class="collect-desc reveal">学习笔记都存在飞书，这里挂着通往它们的一张张便签。</p>
       </div>
       <div class="collect-actions reveal">
-        <button class="collect-btn primary" id="addBtn">＋ 写笔记</button>
+        <button class="collect-btn primary" id="addBtn">＋ 挂一张便签</button>
       </div>
     </div>
 
-    <!-- 笔记卡片（JS 渲染） -->
+    <!-- 便签墙（JS 渲染：每 3 张一组挂在同一根绳子上） -->
     <div class="works-grid" id="notesGrid"></div>
 
     <p class="collect-hint reveal" id="notesHint"></p>
@@ -63,15 +63,21 @@
     <div class="collect-modal-inner">
       <button class="cm-close" data-close="addModal" aria-label="关闭">×</button>
       <h3 class="cm-title">写笔记</h3>
-      <p class="cm-sub">记下今天的所学所得，自动保存到本地。</p>
+      <p class="cm-sub">粘贴飞书文档链接，便签会自动挂上晾绳。</p>
       <form id="addForm">
         <div class="cm-field">
           <span>标题</span>
           <input type="text" id="fTitle" placeholder="这篇笔记是关于什么" required>
         </div>
         <div class="cm-field">
-          <span>内容</span>
-          <textarea id="fDesc" placeholder="今天学到的知识点、踩过的坑、想记住的东西…" required></textarea>
+          <span>飞书链接</span>
+          <input type="url" id="fLink" placeholder="https://xxx.feishu.cn/docx/…（选填，留空则只在本地留存）">
+        </div>
+        <div class="cm-field">
+          <!-- maxlength 是摘要字数的唯一来源：js/notes.js 的计数器直接读它，两处不会漂移。
+               便签纸是固定尺寸的，摘要超过上限就会被 CSS 截断，所以限制必须挡在输入侧。 -->
+          <span>摘要 <em class="note-counter" id="fDescCount" aria-live="polite"></em></span>
+          <textarea id="fDesc" maxlength="60" placeholder="一句话记下这条笔记的关键点…（最多 60 字，便签正面会完整显示）" required></textarea>
         </div>
         <div class="cm-actions">
           <button type="button" class="collect-btn" data-close="addModal">取消</button>
@@ -95,11 +101,11 @@
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
   <!-- 页面逻辑：适配层（fx）→ 公共工具（ui）→ 共享脚本（main）→ 数据（notes-data）→ 页面模块（notes），defer 保证按序执行 -->
   <!-- ui.js 必须早于 main.js：main.js 内的 UI.* 调用依赖它 -->
-  <script src="js/fx.js" defer></script>
-  <script src="js/links.js" defer></script>
-  <script src="js/ui.js" defer></script>
-  <script src="js/main.js" defer></script>
-  <script src="js/notes-data.js" defer></script>
-  <script src="js/notes.js" defer></script>
+  <script src="js/fx.js?v=20260923" defer></script>
+  <script src="js/links.js?v=20260923" defer></script>
+  <script src="js/ui.js?v=20260923" defer></script>
+  <script src="js/main.js?v=20260923" defer></script>
+  <script src="js/notes-data.js?v=20260923" defer></script>
+  <script src="js/notes.js?v=20260923" defer></script>
 </body>
 </html>

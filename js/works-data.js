@@ -28,8 +28,8 @@ const WORKS_DATA = [
   { title: '热点agent', cat: 'agent', catText: 'a2a-agent', year: '2026', desc: '专注「AI 热点追踪与深度分析」，将散落在 GitHub、博客、Hacker News 与 arXiv 上的技术浪潮，串成一段可回溯的知识旅程。核心能力覆盖：多源并发采集、文本与语义双重去重合并、LLM 三维评分（关联度/热度/可信度）、逐条深度分析，以及日报/周报自动生成。以 Task + Artifact 的标准契约交付，通过 A2A 协议让每一次调用都自然、明确、可复用——像一张智能雷达屏，实时扫描技术前沿的潮汐涌动。受限于成本目前仅给出项目地址', skills: ['智能采集', '深度分析', '报告生成'], img: 'images/works/agent-a2a.webp', grad: 'g2', ratio: '4 / 3', linkKey: 'works2' },
   { title: 'ai厨师', cat: 'web', catText: 'web厨师', year: '2026', desc: '专注「冰箱里有什么，就推荐什么菜」，将散落的食材串成可烹饪的美味旅程。核心能力覆盖：口语化输入识别、食材标准化映射、混合检索召回、缺料最少排序、AI 推荐文案生成，以及快路径秒级响应。以 parse → link → filter → retrieve → rank → generate 的 LangGraph 流水线驱动，让每一次推荐都有迹可循、可插拔、可降级——像一位懂食材的厨师，温和而可靠', skills: ['口语化识别', '轻量便捷', '精准推荐'],img: 'images/works/chef.webp', grad: 'g3', ratio: '1 / 1', linkKey: 'works3' },
   { title: '洛克图鉴', cat:'web', catText: '游戏图鉴', year: '2026', desc: '一个功能完善的游戏宠物图鉴网站，为玩家提供宠物信息查询、属性克制查看、技能检索、特性展示等核心功能，打造一站式的游戏数据查询平台。', skills: ['资料', '游戏'], img: 'images/works/roke.webp',grad: 'g4', ratio: '4 / 5', linkKey: 'works4' },
-  { title: 'bilibi弹幕助手', cat:'web', catText: '弹幕助手', year:'2026', desc: '基于 Python + React 的 B 站直播弹幕实时采集与分析工具，支持直播中实时轻量分析和直播回放离线深度分析两种模式', skills:['工具'],img: 'images/works/bilibil.webp',grad:'g5',ratio:'5/5',linkkey:'works5'},
-  { title: '数学rag', cat:'rag', catText: 'rag', year:'2026', desc: '这是一个面向数学教材与学习资料的智能问答工具。上传数学资料后，系统会自动整理内容，形成可按问题查找的知识库。之后，你可以像请教老师一样提问，系统会从资料中找出相关段落，生成答案，并标注来源和页码，方便核对。', skills:['rag','工具'],img: 'images/works/rag.webp',grad:'g6',ratio:'5/6',linkkey:'works6'},
+  { title: 'bilibi弹幕助手', cat:'web', catText: '弹幕助手', year:'2026', desc: '基于 Python + React 的 B 站直播弹幕实时采集与分析工具，支持直播中实时轻量分析和直播回放离线深度分析两种模式', skills:['工具'],img: 'images/works/bilibil.webp',grad:'g5',ratio:'5/5',linkKey:'works5'},
+  { title: '数学rag', cat:'rag', catText: 'rag', year:'2026', desc: '这是一个面向数学教材与学习资料的智能问答工具。上传数学资料后，系统会自动整理内容，形成可按问题查找的知识库。之后，你可以像请教老师一样提问，系统会从资料中找出相关段落，生成答案，并标注来源和页码，方便核对。', skills:['rag','工具'],img: 'images/works/rag.webp',grad:'g6',ratio:'5/6',linkKey:'works6'},
   
 ];
 

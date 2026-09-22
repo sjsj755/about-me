@@ -25,7 +25,7 @@
 .nav-links a:hover { color: var(--text); }
 .nav-links a:hover::after { width: 100%; }
 
-.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 10px; }
 .hamburger span { width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: .3s; }
 
 /* 导航滚动态 */

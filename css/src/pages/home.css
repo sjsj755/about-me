@@ -1,85 +1,15 @@
-/* ============ Hero ============ */
-.hero { min-height: 92vh; display: flex; align-items: center; padding-top: 60px; }
-.hero-eyebrow { color: var(--text-soft); font-size: 1rem; letter-spacing: 1px; margin-bottom: 12px; }
-.hero-title { font-family: var(--font-display); font-size: clamp(2.4rem, 7vw, 5rem); font-weight: 700; line-height: 1.12; }
-.hero-title .line { display: block; overflow: hidden; }
-.hero-title .accent {
-  background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-.hero-desc { margin-top: 16px; color: var(--text-soft); max-width: 460px; font-size: 1rem; }
-.hero-actions { margin-top: 26px; display: flex; gap: 14px; flex-wrap: wrap; }
-
-/* ============ 首页门户：中央小人 + 周边环绕 ============ */
-.portal-hero {
-  min-height: 100vh;
-  min-height: 100svh; /* 移动端动态地址栏下不再超高 */
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 20px 6%;
-}
-.portal-stage {
-  display: flex; flex-direction: row;
-  align-items: center; justify-content: center;
-  gap: 30px; /* 不换行，三列始终并排 */
-  flex-wrap: nowrap;
-}
-/* 通用轻微浮动：各组件错相位，避免同步机械，个别带轻微缩放/旋转更有生命感 */
+/* ============ 首页通用浮动动画 ============ */
+/* 各组件错相位浮动，避免同步机械 */
 @keyframes floatY {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
-}
-@keyframes floatYScale {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-8px) scale(1.02); }
 }
 @keyframes floatSoft {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-6px) rotate(1.5deg); }
 }
-.float-soft { animation: floatY 5.5s ease-in-out infinite; }
-.portal-merged { animation: floatYScale 6s var(--ease-inout) infinite; }
 .mascot-frame { animation: floatSoft 5s var(--ease-inout) infinite; }
-.portal-side { animation: floatY 5.5s ease-in-out infinite; }
 .encourage-bubble { animation: floatY 6.5s var(--ease-inout) infinite; }
-.portal-merged {
-  display: grid; grid-template-columns: 1fr; /* 竖向两块 */
-  width: min(170px, 100%); /* 进一步缩小作品集组件 */
-  overflow: hidden; padding: 0;
-  flex-shrink: 0;
-}
-.portal-link {
-  display: flex; flex-direction: row; align-items: center; gap: 10px;
-  padding: 16px 18px;
-  position: relative;
-  transition: background .3s var(--ease-out);
-}
-.portal-link + .portal-link { border-top: 1px solid var(--glass-border); }
-.portal-link:hover { background: rgba(255,255,255,.5); }
-.portal-link:active { background: rgba(255,255,255,.75); }
-.portal-icon {
-  font-size: 0.95rem; width: 32px; height: 32px; border-radius: 10px;
-  display: grid; place-items: center; color: #fff;
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
-  flex-shrink: 0;
-  transition: transform .25s var(--ease-spring);
-}
-.portal-icon:hover { transform: scale(1.12); }
-.portal-icon:active { transform: scale(0.94); }
-.portal-link:nth-child(2) .portal-icon { background: linear-gradient(135deg, var(--accent-mint), var(--accent-lav)); }
-.portal-link:nth-child(3) .portal-icon { background: linear-gradient(135deg, var(--accent-sand), var(--accent-pink)); }
-.portal-link:nth-child(4) .portal-icon { background: linear-gradient(135deg, var(--accent-lav), var(--accent-blue)); }
-.portal-link h3 { font-family: var(--font-display); font-size: 1rem; }
-.portal-arrow {
-  margin-left: auto; font-size: 0.95rem;
-  color: var(--accent-blue); transition: transform .3s var(--ease-out);
-}
-.portal-link:hover .portal-arrow { transform: translateX(6px); }
-.portal-link:active .portal-arrow { transform: translateX(9px); }
-
-/* 右栏：时间 + 日历（与小人并排） */
-.portal-side { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-
 /* 时间组件 */
 .clock {
   padding: 8px 14px;
@@ -90,5 +20,200 @@
   font-size: 1.3rem; letter-spacing: 1px;
   background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
   -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* ============ 首页博客布局：导航 + 三栏 ============ */
+.blog-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 34px 4% 60px; /* 轮播已通栏贴顶，此处仅留内容区间距 */
+  min-height: 100vh;
+  min-height: 100svh; /* 移动端动态地址栏下不再超高 */
+}
+.blog-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 300px;
+  gap: 26px;
+  align-items: start;
+}
+
+/* 通栏轮播横幅：body 直接子元素贴视口顶部，玻璃导航浮于其上，底部弧形过渡到内容区 */
+/* .blog-carousel 也是 <section>，先整组还原基础层通栏规则（同 .blog-main 注释） */
+.blog-carousel {
+  position: relative; overflow: hidden;
+  max-width: none; margin: 0; padding: 0; z-index: auto;
+  height: clamp(300px, 56vh, 600px);
+  border-radius: 0 0 50% 50% / 0 0 46px 46px;
+  /* 段落底色 = 占位帧渐变：JS 未跑/换帧交叉淡入时不露出页面底色 */
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
+}
+.blog-carousel[hidden] { display: none; }
+.carousel-slide {
+  position: absolute; inset: 0;
+  opacity: 0; transition: opacity .8s var(--ease-out);
+}
+.carousel-slide.is-active { opacity: 1; }
+.carousel-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.carousel-caption {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 30px 18px 20px; /* 底部留量避开弧形底缘 */
+  background: linear-gradient(180deg, rgba(20,40,60,0), rgba(20,40,60,.55));
+  color: #fff; font-family: var(--font-display); font-weight: 600; font-size: .95rem;
+  text-shadow: 0 1px 6px rgba(0,30,50,.45);
+  pointer-events: none;
+}
+/* 渐变占位帧：横幅大图暂缺时的品牌帧（补图方式见 js/links.js 的 CAROUSEL 注释） */
+.carousel-art {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 0 6%; text-align: center;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
+}
+/* 半透明白色圆斑光斑，打破大面积纯渐变的单调 */
+.carousel-art::before, .carousel-art::after {
+  content: ""; position: absolute; border-radius: 50%; pointer-events: none;
+}
+.carousel-art::before {
+  width: min(46vw, 420px); aspect-ratio: 1;
+  top: -18%; right: -6%; background: rgba(255,255,255,.16);
+}
+.carousel-art::after {
+  width: min(30vw, 280px); aspect-ratio: 1;
+  bottom: -16%; left: -4%; background: rgba(255,255,255,.12);
+}
+.carousel-art-name {
+  font-family: var(--font-display); font-weight: 700; line-height: 1.15;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  color: #fff; text-shadow: 0 2px 16px rgba(0,40,70,.28);
+}
+.carousel-art-motto {
+  font-size: .95rem; color: rgba(255,255,255,.88);
+  text-shadow: 0 1px 8px rgba(0,40,70,.22);
+}
+/* 指示点：44×44 热区防误触，视觉仅小圆点；负外边距收拢视觉间距 */
+.carousel-dots { position: absolute; right: 10px; bottom: 18px; display: flex; }
+.carousel-dot {
+  width: 44px; height: 44px; margin: 0 -10px; padding: 0;
+  border: none; background: none;
+  display: grid; place-items: center; cursor: pointer;
+}
+.carousel-dot::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,.55); box-shadow: 0 0 0 2px rgba(255,255,255,.18);
+  transition: background .25s, transform .25s;
+}
+.carousel-dot:hover::before { background: rgba(255,255,255,.85); }
+.carousel-dot.is-active::before { background: #fff; transform: scale(1.25); }
+
+/* 左栏：头像 + 社交链接 */
+.blog-profile {
+  position: sticky; top: 108px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 20px;
+  padding: 26px 14px;
+}
+.blog-profile .mascot-frame { width: 150px; height: 150px; padding: 6px; }
+.blog-profile .mascot-inner,
+.blog-profile .mascot-shine { border-radius: 50%; }
+.social-row { display: flex; gap: 14px; }
+.social-link {
+  width: 44px; height: 44px; border-radius: 14px;
+  display: grid; place-items: center;
+  color: var(--text-soft);
+  background: rgba(255,255,255,.55);
+  border: 1px solid var(--glass-border);
+  transition: transform .25s var(--ease-out), color .25s, background .25s;
+}
+.social-link:hover { color: var(--text); background: rgba(255,255,255,.8); transform: translateY(-3px); }
+.social-link:active { transform: scale(.94); }
+.social-link svg { width: 22px; height: 22px; fill: currentColor; display: block; }
+
+/* 中栏：问候区 + 最近更新 */
+/* 还原基础层 section 通栏规则（components/section.css：max-width:1280 + margin:auto +
+   padding:64px 6% + z-index:2）。网格栏目是轨道内流动盒子，必须整组还原，
+   否则中栏按 max-width 撑到 1280px 横向压住右栏日历（z-index:2 还会拦截其点击）。 */
+.blog-main,
+.blog-feed {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  z-index: auto;
+}
+.blog-main { min-width: 0; }
+.blog-greet {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 4vw, 2.7rem);
+  font-weight: 700; line-height: 1.2;
+}
+.blog-greet .accent {
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.blog-motto { margin-top: 10px; font-weight: 600; color: var(--text); }
+.blog-intro { margin-top: 8px; color: var(--text-soft); max-width: 560px; }
+.blog-meta-row {
+  margin-top: 20px;
+  display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap;
+}
+
+/* 最近更新列表 */
+.blog-feed { margin-top: 44px; }
+.blog-h2 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; }
+.feed-list { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.feed-link {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; border-radius: 16px;
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out), background .25s;
+}
+.feed-link:hover { transform: translateY(-2px); background: rgba(255,255,255,.75); box-shadow: var(--shadow); }
+.feed-link:active { transform: scale(.99); }
+.feed-chip { flex-shrink: 0; font-size: .75rem; font-weight: 600; padding: 4px 10px; border-radius: 999px; color: #fff; }
+.feed-chip.is-note { background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint)); }
+.feed-chip.is-work { background: linear-gradient(135deg, var(--accent-sand), var(--accent-pink)); }
+.feed-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.feed-title { font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.feed-desc { font-size: .85rem; color: var(--text-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.feed-date { flex-shrink: 0; font-size: .8rem; color: var(--text-soft); font-variant-numeric: tabular-nums; }
+.feed-empty {
+  padding: 26px; text-align: center; color: var(--text-soft);
+  background: var(--glass-bg); border: 1px dashed var(--glass-border); border-radius: 16px;
+}
+
+/* 右栏：时钟 + 日历 */
+.blog-side {
+  position: sticky; top: 108px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  animation: floatY 5.5s var(--ease-inout) infinite;
+}
+/* 桌面端日历收窄（基础层 .calendar 为 300px；格子 aspect-ratio 流式，随容器等比缩小） */
+.blog-side .calendar { width: min(248px, 100%); padding: 10px 11px; }
+
+/* 响应式：≤1024px 两栏（侧栏横排置底）；≤768px 单栏（头像横排置顶） */
+@media (max-width: 1024px) {
+  .blog-layout { grid-template-columns: 200px minmax(0, 1fr); }
+  .blog-side {
+    grid-column: 1 / -1;
+    position: static;
+    flex-direction: row; justify-content: center; align-items: center;
+  }
+  .blog-side .calendar { width: min(420px, 100%); }
+}
+@media (max-width: 768px) {
+  .blog-layout { grid-template-columns: 1fr; }
+  .blog-wrap { padding-top: 28px; }
+  .blog-carousel { height: clamp(220px, 44vh, 360px); }
+  .blog-profile {
+    position: static;
+    flex-direction: row; justify-content: center;
+    padding: 18px 12px;
+  }
+  .blog-profile .mascot-frame { width: 120px; height: 120px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .blog-side { animation: none; }
+  .carousel-slide { transition: none; }
 }
 

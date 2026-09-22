@@ -1,25 +1,102 @@
-/* ============ 笔记本 · 学习笔记 ============ */
-/* 行高改为由内容决定：.works-grid 的 20px 隐式行是为 .work-card 的 grid-row: span 设计的，
-   笔记卡没有 span，若沿用会让卡片溢出所在行、网格高度塌陷成 20px，
-   导致提示文案与页脚叠到卡片上（页脚在上层会吃掉卡片点击）。 */
-#notesGrid { grid-auto-rows: auto; }
+/* ============ 笔记本 · 学习笔记（晾绳便签墙） ============ */
+/* 层级：.note-group（绳 + 一组 3 张）> .note-row（3 列）> .note-item（挂点/倾斜）> .note-card（玻璃便签）
+   每张便签靠顶部金属夹“别”在绳子上，因此分组顶部要留出绳与夹子所需的空间。
+   倾斜写在 .note-item、入场动画写在其子级 .note-card：两层各管一个 transform，互不覆盖。 */
+
+/* 容器：由「网格平铺卡片」改为「纵向排列的便签分组」。
+   原 .works-grid 的 20px 隐式行高是为 .work-card 的 grid-row: span 设计的，
+   分组后由 flex 承接排布，隐式行规则随之失效，故不再需要 grid-auto-rows。 */
+#notesGrid { display: flex; flex-direction: column; gap: 42px; }
+
+.note-group { position: relative; padding-top: 22px; }
+
+/* 绳子：斜向条纹模拟麻绳绞纹；左右各 6px 出血，视觉上像一根贯通的绳 */
+.note-rope {
+  position: absolute; left: -6px; right: -6px; top: 12px; height: 3px; border-radius: 2px;
+  background: repeating-linear-gradient(114deg, rgba(146,172,192,.95) 0 5px, rgba(206,222,234,.95) 5px 10px);
+  box-shadow: 0 2px 5px rgba(110,150,175,.28);
+  transform-origin: left center; /* 入场时绳子自左向右“抽出” */
+}
+
+.note-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+
+/* 挂点：以顶边中点为轴心倾斜，模拟挂在绳子上的自然歪斜（悬停回正见 components/motion.css） */
+.note-item {
+  position: relative; transform-origin: 50% 0;
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform .45s var(--ease-out);
+}
+
 .note-card {
-  padding: 24px 26px; cursor: pointer;
+  position: relative; padding: 24px 22px 18px; cursor: pointer;
   display: flex; flex-direction: column; gap: 10px;
+  /* 固定尺寸：便签墙要求所有便签同宽同高，不随内容长短伸缩。
+     用 rem 与内部字号同基准，浏览器缩放时纸面比例不走样。
+     内容上限由「标题 2 行 + 摘要 3 行」的截断兜住，不会溢出这张固定大小的纸。 */
+  height: 15rem;
+  border-radius: 14px; /* 便签比通用玻璃卡更“方”，更贴近纸张 */
+  /* 便签纸底色：叠在玻璃底色之上的半透明色纸，--note-tint 由 JS 按顺序轮转 */
+  background-image: linear-gradient(var(--note-tint, transparent), var(--note-tint, transparent));
+  transition: box-shadow .45s var(--ease-out);
 }
+
+/* 金属夹：上半部分压在绳子上，下半部分夹住纸张（绳子与夹子重叠，视觉上即“别住”） */
+.note-clip {
+  position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+  width: 26px; height: 13px; border-radius: 4px;
+  background: linear-gradient(180deg, #f4f8fb, #cdd9e3);
+  border: 1px solid rgba(140,170,190,.65);
+  box-shadow: 0 2px 4px rgba(110,150,175,.3);
+}
+
+/* 标题固定 2 行：固定高度的前提是标题行数有上限，否则长标题会把摘要挤出纸面 */
 .note-title {
-  font-family: var(--font-display); font-weight: 700;
-  font-size: 1.05rem; color: var(--text);
+  font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: var(--text);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
+/* 标题即飞书文档链接：用真锚点，支持键盘 Enter / 中键新窗口打开 */
+.note-link { color: inherit; }
+/* 聚焦环画在框内（outline-offset 为负）：标题上方的 overflow: hidden 会裁掉外扩的环 */
+.note-link:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: -3px; border-radius: 4px; }
+
 .note-body {
   font-size: .88rem; color: var(--text-soft); line-height: 1.75;
-  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
 .note-meta { display: flex; align-items: center; gap: 8px; margin-top: auto; }
 .note-date { font-size: .78rem; color: var(--text-soft); }
+/* 来源标记：仅带链接的便签出现 */
+.note-src {
+  font-size: .72rem; color: var(--text-soft); padding: 2px 9px; border-radius: 10px;
+  background: rgba(127,180,232,.16); border: 1px solid rgba(127,180,232,.3);
+}
 .note-del {
   margin-left: auto; cursor: pointer; font-size: .8rem; color: var(--text-soft);
   padding: 3px 10px; border-radius: 10px;
   transition: color .2s, background .2s;
 }
 .note-del:hover { color: #c0392b; background: rgba(192,57,43,.08); }
+
+/* 摘要字数计数器：贴在「摘要」标签行右端，实时显示「已用 / 上限」。
+   放在标签行而不是 textarea 内部右下角，是为了不与 textarea 的 resize 手柄抢位置。
+   行高固定为 1，避免浮动元素把标签行撑高、造成输入框位置跳动。 */
+.note-counter {
+  float: right; font-style: normal; font-weight: 500;
+  font-size: .78rem; line-height: 1; color: var(--text-soft); letter-spacing: .02em;
+  transition: color .2s ease;
+}
+/* 写满上限：转为主题蓝，提示“额度已用尽”，比红色告警更贴合本站语气 */
+.note-counter.is-full { color: var(--accent-blue); }
+
+/* 窄屏：绳子由顶部横绳换成左侧竖绳，便签改为单列贴着绳子往下挂 */
+@media (max-width: 820px) {
+  #notesGrid { gap: 30px; }
+  .note-group { padding-top: 4px; padding-left: 26px; }
+  .note-row { grid-template-columns: 1fr; gap: 24px; }
+  .note-item { max-width: 460px; }
+  .note-rope {
+    left: 8px; right: auto; top: 0; bottom: 0; width: 3px; height: auto;
+    background: repeating-linear-gradient(28deg, rgba(146,172,192,.95) 0 5px, rgba(206,222,234,.95) 5px 10px);
+  }
+  .note-clip { top: 20px; left: -19px; transform: none; }
+}

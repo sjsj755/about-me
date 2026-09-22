@@ -31,17 +31,24 @@
 
   let lenis = null;
 
-  // 自初始化：能力缺失时给 <html> 打 no-gsap，交由 CSS 还原 .reveal 初始态保证内容可见
+  // 自初始化：能力缺失时给 <html> 打 no-gsap，交由 CSS 还原 .reveal 初始态保证内容可见。
+  // 必须整段包 try/catch：window.FX 在本文件末尾才导出，此处一旦抛错，FX 就永远不存在，
+  // 随后 main.js 顶层的 FX.ready 会直接抛 ReferenceError，全站 JS 停摆（比没有动画严重得多）。
+  // 所以这里的异常一律降级：Lenis 不可用则退回原生滚动，GSAP 能力照常保留。
   if (ready) {
-    if (hasLenis) {
-      lenis = new window.Lenis({ duration: 1.1, smoothWheel: true });
-      lenis.on('scroll', window.ScrollTrigger.update);
-      gsap.ticker.add((time) => lenis.raf(time * 1000));
-      gsap.ticker.lagSmoothing(0);
-      // JS 动态渲染 / 字体与图片晚到都会在初始化后改变页面高度，此时必须重测滚动上限，
-      // 否则 limit 停留在旧值，滚轮会被钳制无法下滚。
-      window.addEventListener('load', () => lenis.resize());
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => lenis.resize());
+    try {
+      if (hasLenis) {
+        lenis = new window.Lenis({ duration: 1.1, smoothWheel: true });
+        lenis.on('scroll', window.ScrollTrigger.update);
+        gsap.ticker.add((time) => lenis.raf(time * 1000));
+        gsap.ticker.lagSmoothing(0);
+        // JS 动态渲染 / 字体与图片晚到都会在初始化后改变页面高度，此时必须重测滚动上限，
+        // 否则 limit 停留在旧值，滚轮会被钳制无法下滚。
+        window.addEventListener('load', () => lenis.resize());
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => lenis.resize());
+      }
+    } catch (e) {
+      lenis = null;
     }
   } else {
     document.documentElement.classList.add('no-gsap');

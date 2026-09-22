@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/dist/shared.css?v=20260921">
+  <link rel="stylesheet" href="css/dist/shared.css?v=20260923">
 </head>
-<body class="home-portal">
+<body class="home-blog">
 
   <!-- 漂浮光斑背景 -->
   <div class="bg-orb orb-1"></div>
@@ -27,57 +27,72 @@
   <!-- 鼠标轨迹粒子层 -->
   <canvas id="trailCanvas"></canvas>
 
-  <!-- 门户：中央小人 + 周边环绕 -->
-  <section id="home" class="portal-hero">
-    <div class="portal-stage reveal">
-      <!-- 左栏：作品集 + 芸香集 + 关于我 -->
-      <div class="portal-merged glass-panel">
-        <a href="works.html" class="portal-link">
-          <span class="portal-icon">✦</span>
-          <h3>作品集</h3>
-          <span class="portal-arrow">→</span>
-        </a>
-        <a href="collect.html" class="portal-link">
-          <span class="portal-icon">🌿</span>
-          <h3>芸香集</h3>
-          <span class="portal-arrow">→</span>
-        </a>
-        <a href="sites.html" class="portal-link">
-          <span class="portal-icon">🔗</span>
-          <h3>站点集</h3>
-          <span class="portal-arrow">→</span>
-        </a>
-        <a href="notes.html" class="portal-link">
-          <span class="portal-icon">📝</span>
-          <h3>笔记本</h3>
-          <span class="portal-arrow">→</span>
-        </a>
-        <a href="about.html" class="portal-link">
-          <span class="portal-icon">◉</span>
-          <h3>关于我</h3>
-          <span class="portal-arrow">→</span>
-        </a>
-      </div>
+  <!-- 顶部导航 -->
+  <header class="glass-nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">真名有寻</a>
+      <nav class="nav-links" aria-label="站内导航">
+        <a href="index.html" class="active">首页</a>
+        <a href="works.html">作品集</a>
+        <a href="collect.html">芸香集</a>
+        <a href="sites.html">站点集</a>
+        <a href="photos.html">相片</a>
+        <a href="notes.html">笔记本</a>
+        <a href="about.html">关于我</a>
+      </nav>
+      <button class="hamburger" id="hamburger" aria-label="打开菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
 
-      <!-- 中央：小人（最下方）+ 鼓励话语（上方） -->
-      <div class="mascot-stage">
-        <div class="encourage-photo-wrap">
+  <!-- 通栏轮播横幅：贴视口顶部、导航浮于其上；数据源 js/links.js 的 CAROUSEL，由 js/blog-carousel.js 渲染 -->
+  <section class="blog-carousel" id="blogCarousel" aria-label="作品推荐轮播"></section>
+
+  <!-- 博客主体：三栏（头像 / 内容 / 时钟日历） -->
+  <main class="blog-wrap">
+    <div class="blog-layout">
+
+      <!-- 左栏：头像 + 社交链接 -->
+      <aside class="blog-profile glass-panel">
+        <div class="mascot-frame" id="mascotFrame">
+          <div class="mascot-inner">
+            <img class="mascot-img" src="images/index/mascot.webp" alt="头像">
+            <div class="mascot-shine"></div>
+          </div>
+        </div>
+        <div class="social-row">
+          <a class="social-link" data-social="bilibili" href="#" target="_blank" rel="noopener noreferrer" aria-label="B站" title="B站">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 0 1 .16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773zM8 11.107c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c0-.373.129-.689.386-.947.258-.257.574-.386.947-.386zm8 0c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c.017-.391.15-.711.4-.96.249-.249.56-.373.933-.373Z"/></svg>
+          </a>
+          <a class="social-link" data-social="github" href="#" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          </a>
+        </div>
+      </aside>
+
+      <!-- 中栏：问候区 + 最近更新 -->
+      <section class="blog-main">
+        <h1 class="blog-greet">Hi，我是<span class="accent">真名有寻</span>。</h1>
+        <p class="blog-motto">记录学习、作品与生活的一片小园地。</p>
+        <p class="blog-intro">在这里写学习笔记、放做过的作品、收集喜欢的句子与好站点，也会在日历上记下重要的日子。</p>
+
+        <div class="blog-meta-row">
+          <div class="encourage-bubble">每一次努力，都让今天比昨天更好一点。</div>
           <a href="photos.html" class="encourage-photo" title="去看看我的相片">
             <span class="encourage-photo-icon">📷</span>
             <span class="encourage-photo-text">相片</span>
           </a>
         </div>
-        <div class="encourage-bubble">每一次努力，都让今天比昨天更好一点。</div>
-        <div class="mascot-frame glass-panel" id="mascotFrame">
-          <div class="mascot-inner">
-            <img class="mascot-img" src="images/index/mascot.webp" alt="小人">
-            <div class="mascot-shine"></div>
-          </div>
-        </div>
-      </div>
+
+        <section class="blog-feed" aria-label="最近更新">
+          <h2 class="blog-h2">最近更新</h2>
+          <ol class="feed-list" id="feedList"></ol>
+        </section>
+      </section>
 
       <!-- 右栏：时间 + 日历 -->
-      <div class="portal-side">
+      <aside class="blog-side">
         <div class="clock glass-panel" id="clock">
           <span class="clock-time" id="clockTime">--:--:--</span>
         </div>
@@ -92,9 +107,10 @@
           </div>
           <div class="cal-grid" id="calGrid"></div>
         </div>
-      </div>
+      </aside>
+
     </div>
-  </section>
+  </main>
 
   <!-- 日历标记弹层（轻量：一句话 + 标记色） -->
   <div class="collect-modal" id="calModal">
@@ -134,12 +150,17 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
   <!-- SDK 适配层：必须在 main.js 与各页面模块之前 -->
-  <script src="js/fx.js?v=20260910" defer></script>
-  <script src="js/links.js?v=20260910" defer></script>
-  <script src="js/encourage.js?v=20260910" defer></script>
+  <script src="js/fx.js?v=20260923" defer></script>
+  <script src="js/links.js?v=20260923" defer></script>
+  <script src="js/encourage.js?v=20260923" defer></script>
+  <!-- 首页 feed 数据源（只含数据，无逻辑） -->
+  <script src="js/notes-data.js?v=20260923" defer></script>
+  <script src="js/works-data.js?v=20260923" defer></script>
   <script src="js/vendor/solarlunar.min.js" defer></script>
   <!-- 共享工具层（弹窗开关 / 关闭途径） -->
-  <script src="js/ui.js?v=20260910" defer></script>
-  <script src="js/main.js?v=20260910" defer></script>
+  <script src="js/ui.js?v=20260923" defer></script>
+  <script src="js/main.js?v=20260923" defer></script>
+  <script src="js/blog-feed.js?v=20260923" defer></script>
+  <script src="js/blog-carousel.js?v=20260923" defer></script>
 </body>
 </html>

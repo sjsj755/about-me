@@ -18,10 +18,10 @@ const clickMask = (page, sel) => page.locator(sel).click({ position: { x: 4, y: 
 test.describe('弹窗关闭途径', () => {
   test('日历标记弹层：× / 遮罩 / Esc', async ({ page }) => {
     await page.goto('index.html');
-    // 首页 .portal-side 有常驻装饰性浮动（floatY，且按设计在减少动态偏好下也保留），
+    // 首页 .blog-side 有常驻装饰性浮动（floatY，且按设计在减少动态偏好下也保留），
     // 日历因此一直在缓慢位移，Playwright 的稳定性检查永远无法通过。
     // 这里只冻结这一处装饰动画，不绕过可点击性检查 —— 真被遮挡仍会失败。
-    await page.addStyleTag({ content: '.portal-side { animation: none !important; }' });
+    await page.addStyleTag({ content: '.blog-side { animation: none !important; }' });
     const sel = '#calModal';
     const open = async () => {
       await page.locator('.cal-day:not(.empty)').first().click();

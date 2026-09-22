@@ -17,11 +17,6 @@
   .work-card.wide .work-thumb { height: 150px; }
   .about-grid { grid-template-columns: 1fr; }
   .contact-panel { padding: 28px 24px; }
-  .portal-cards, .portal-merged { grid-template-columns: 1fr; gap: 0; }
-  .portal-merged .portal-link + .portal-link { border-top: 1px solid var(--glass-border); }
-  .portal-link { padding: 16px 20px; }
-  .portal-stage { flex-direction: column; gap: 22px; }
-  .mascot-frame { width: 200px; height: 200px; }
   .calendar { padding: 8px 9px; }
   .about-hero { flex-direction: column; text-align: center; }
 }
