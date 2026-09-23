@@ -29,5 +29,5 @@
 .hamburger span { width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: .3s; }
 
 /* 导航滚动态 */
-.glass-nav.scrolled { background: rgba(255,255,255,.62); }
+.glass-nav.scrolled { background: var(--w-60); }
 

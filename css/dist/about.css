@@ -9,11 +9,11 @@
 .skills h3 { font-family: var(--font-display); margin-bottom: 14px; }
 .skill-list { display: flex; flex-wrap: wrap; gap: 10px; }
 .skill {
-  background: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.7);
+  background: var(--w-55); border: 1px solid var(--w-70);
   padding: 7px 14px; border-radius: 40px; font-size: 0.85rem; color: var(--text);
   transition: background .3s, transform .3s;
 }
-.skill:hover { background: var(--accent-mint); color: #fff; transform: translateY(-3px); }
+.skill:hover { background: var(--accent-mint); color: var(--white); transform: translateY(-3px); }
 
 /* 联系面板 */
 .contact-wrap { display: flex; justify-content: center; }
@@ -22,12 +22,12 @@
 .contact-form { display: flex; flex-direction: column; gap: 12px; text-align: left; }
 .contact-form input, .contact-form textarea {
   width: 100%; padding: 12px 16px; border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.8); background: rgba(255,255,255,.5);
+  border: 1px solid var(--w-80); background: var(--w-50);
   font-family: var(--font-body); font-size: 16px; color: var(--text); /* 16px 防移动端聚焦缩放 */
   outline: none; transition: border-color .3s, background .3s;
 }
 .contact-form input:focus, .contact-form textarea:focus {
-  border-color: var(--accent-blue); background: rgba(255,255,255,.75);
+  border-color: var(--accent-blue); background: var(--w-75);
 }
 .contact-form button { align-self: center; margin-top: 4px; }
 
@@ -51,7 +51,7 @@
 }
 .avatar::after {
   content: ""; position: absolute; inset: 6px; border-radius: 50%;
-  background: rgba(255,255,255,.35);
+  background: var(--w-35);
 }
 /* 配了真实头像图时隐藏白色高光遮罩，避免人像发灰 */
 .avatar.has-img::after { display: none; }
@@ -88,7 +88,7 @@
 }
 .btn-primary {
   background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
-  color: #fff; box-shadow: 0 10px 24px rgba(140,190,220,.4);
+  color: var(--white); box-shadow: 0 10px 24px rgba(140,190,220,.4);
 }
 .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(140,190,220,.5); }
 .btn-primary:active { transform: translateY(-1px) scale(.97); }
@@ -96,7 +96,7 @@
   background: var(--glass-bg); border-color: var(--glass-border); color: var(--text);
   backdrop-filter: blur(10px);
 }
-.btn-ghost:hover { transform: translateY(-3px); background: rgba(255,255,255,.6); }
+.btn-ghost:hover { transform: translateY(-3px); background: var(--w-60); }
 .btn-ghost:active { transform: translateY(-1px) scale(.97); }
 
 /* ============ 移动端补充适配（安卓 / 鸿蒙） ============ */

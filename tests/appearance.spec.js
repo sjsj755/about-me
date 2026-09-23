@@ -2,7 +2,7 @@
 // 三条主线：
 //   1) 默认状态必须与改造前逐像素等价（不调节 = 零变化）；
 //   2) 覆盖模式真的把轮播变成全视口固定背景层，且内容让出导航净空；
-//   3) 两个滑块只写 :root 变量、可键盘操作、能落盘并跨刷新保持。
+//   3) 两个滑块只写 :root 变量、可键盘操作、能落盘并跨刷新保持，且只在覆盖模式下提供。
 // 另外守住「无闪烁」的结构前提：appearance.js 与它依赖的 ui.js 必须在 <head> 同步加载
 // （若退回 defer，覆盖模式会先按横幅排一次版再跳一次）。
 const { test, expect } = require('@playwright/test');
@@ -132,12 +132,16 @@ test.describe('首页外观调节', () => {
 
     await page.locator('#appearanceBtn').click();
     await expectOpen(page, '#appearanceModal');
-    // 打开后焦点落在第一个滑块上（键盘用户不必先 Tab 一圈）。
-    // 必须是「同步」就位：.appearance-modal 把骨架的 visibility 过渡改成了打开即时生效
+    // 横幅模式（默认）下两个透明度滑块整组 hidden，所以「打开即聚焦第一个可用控件」
+    // 落到的是模式组里的按钮而不是滑块 —— 对隐藏元素 focus() 会被浏览器静默忽略。
+    // 焦点必须是「同步」就位：.appearance-modal 把骨架的 visibility 过渡改成了打开即时生效
     // （若退回带过渡的写法，这里的 activeElement 会停在触发器上，键盘操作全部落空）。
-    expect(await page.evaluate(() => document.activeElement.id)).toBe('appearanceBg');
+    await expect(page.locator('#appearanceSliders')).toBeHidden();
+    expect(await page.evaluate(() => document.activeElement.dataset.mode)).toBe('banner');
 
     await page.locator('.appearance-mode[data-mode="cover"]').click();
+    // 覆盖模式才提供这两个旋钮
+    await expect(page.locator('#appearanceSliders')).toBeVisible();
     const s = await snapshot(page);
 
     expect(s.cover).toBe(true);
@@ -182,6 +186,9 @@ test.describe('首页外观调节', () => {
     await page.goto('index.html');
     await page.locator('#appearanceBtn').click();
     await expectOpen(page, '#appearanceModal');
+    // 滑块只在覆盖模式下提供，先切过去（横幅模式下它们是 hidden，focus() 不会生效）
+    await page.locator('.appearance-mode[data-mode="cover"]').click();
+    await expect(page.locator('#appearanceSliders')).toBeVisible();
 
     // 背景透明度：Home → 0%，End → 100%
     await page.locator('#appearanceBg').focus();
@@ -216,6 +223,55 @@ test.describe('首页外观调节', () => {
     })).toBe(0.6);
   });
 
+  test('两个透明度滑块只在覆盖模式下提供，切换模式时显隐与值都不出错', async ({ page }) => {
+    await page.goto('index.html');
+    await page.locator('#appearanceBtn').click();
+    await expectOpen(page, '#appearanceModal');
+
+    // 横幅模式（默认）：整组 hidden —— 不可见、不在 tab 序里、也不进可访问性树
+    await expect(page.locator('#appearanceSliders')).toBeHidden();
+    await expect(page.locator('#appearanceBg')).toBeHidden();
+    await expect(page.locator('#appearanceCard')).toBeHidden();
+
+    // 覆盖模式：两个旋钮出现
+    await page.locator('.appearance-mode[data-mode="cover"]').click();
+    await expect(page.locator('#appearanceSliders')).toBeVisible();
+
+    // 在覆盖模式调到下限并落盘
+    await page.locator('#appearanceCard').focus();
+    await page.keyboard.press('Home');
+    await page.locator('#appearanceCard').blur();
+    await expect.poll(async () => page.evaluate(() => {
+      const raw = localStorage.getItem('appearance_v1');
+      return raw ? JSON.parse(raw).cardOpacity : null;
+    })).toBe(0.2);
+
+    // 切回横幅：滑块收起，但隐藏的是控件不是设置 —— --glass-alpha 仍是 0.2
+    await page.locator('.appearance-mode[data-mode="banner"]').click();
+    await expect(page.locator('#appearanceSliders')).toBeHidden();
+    expect((await snapshot(page)).glassAlpha).toBe('0.2');
+
+    // 再切回覆盖：原值原样回灌，用户不需要重调
+    await page.locator('.appearance-mode[data-mode="cover"]').click();
+    await expect(page.locator('#appearanceSliders')).toBeVisible();
+    await expect(page.locator('#appearanceCardVal')).toHaveText('20%');
+
+    // 焦点在滑块里时切到横幅：隐藏会把焦点抛回 body（Safari 点击按钮不移动焦点，
+    // 这是真实可达的路径），必须交回刚点的模式按钮，键盘用户才不会掉出面板。
+    // 用 dispatchEvent 触发是为了模拟「点击没有移动焦点」的那种浏览器行为。
+    await page.locator('#appearanceCard').focus();
+    await page.locator('.appearance-mode[data-mode="banner"]').dispatchEvent('click');
+    await expect(page.locator('#appearanceSliders')).toBeHidden();
+    expect(await page.evaluate(() => document.activeElement.dataset.mode)).toBe('banner');
+
+    // 重置同理会先隐藏滑块：焦点同样不能掉出面板（此时交回重置按钮）
+    await page.locator('.appearance-mode[data-mode="cover"]').click();
+    await page.locator('#appearanceCard').focus();
+    await page.locator('#appearanceReset').dispatchEvent('click');
+    await expect(page.locator('#appearanceSliders')).toBeHidden();
+    expect(await page.evaluate(() => document.activeElement.id)).toBe('appearanceReset');
+  });
+
   test('恢复默认：一键回到改造前外观', async ({ page }) => {
     await page.goto('index.html');
     await page.locator('#appearanceBtn').click();
@@ -234,6 +290,8 @@ test.describe('首页外观调节', () => {
     expect(s.panelBg).toBe('rgba(220, 240, 248, 0.5)');
     await expect(page.locator('#appearanceCardVal')).toHaveText('50%');
     await expect(page.locator('.appearance-mode[data-mode="banner"]')).toHaveAttribute('aria-pressed', 'true');
+    // 重置回横幅模式 → 滑块整组收起（值已回到默认 50%，见上一条断言）
+    await expect(page.locator('#appearanceSliders')).toBeHidden();
     expect(await page.evaluate(() => JSON.parse(localStorage.getItem('appearance_v1')))).toEqual({
       mode: 'banner', bgOpacity: 1, cardOpacity: 0.5,
     });

@@ -3,7 +3,7 @@
   .hamburger { display: flex; }
   .nav-links {
     position: fixed; top: 78px; right: 4%;
-    flex-direction: column; gap: 0; background: rgba(255,255,255,.9);
+    flex-direction: column; gap: 0; background: var(--w-90);
     backdrop-filter: blur(18px); border-radius: 18px; padding: 12px;
     box-shadow: var(--shadow); opacity: 0; pointer-events: none; transform: translateY(-10px); transition: .3s;
   }

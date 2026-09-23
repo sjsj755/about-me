@@ -12,7 +12,7 @@
   position: absolute; top: 10px; right: 10px; z-index: 3;
   width: 30px; height: 30px; border-radius: 50%;
   display: grid; place-items: center; cursor: pointer;
-  background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.85);
+  background: var(--w-70); border: 1px solid var(--w-85);
   backdrop-filter: blur(8px); font-size: 0.82rem; color: var(--text-soft);
   opacity: 0; transform: scale(.85);
   transition: opacity .25s var(--ease-out), transform .25s var(--ease-out), background .25s, color .25s;
@@ -21,7 +21,7 @@
   position: absolute; top: 10px; left: 10px; z-index: 3;
   width: 30px; height: 30px; border-radius: 50%;
   display: grid; place-items: center; cursor: pointer;
-  background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.85);
+  background: var(--w-70); border: 1px solid var(--w-85);
   backdrop-filter: blur(8px); font-size: 0.78rem; color: var(--text-soft);
   opacity: 0; transform: scale(.85);
   transition: opacity .25s var(--ease-out), transform .25s var(--ease-out), background .25s, color .25s;
@@ -29,7 +29,7 @@
 @media (hover: hover) and (pointer: fine) {
   .collect-card:hover .cc-star, .collect-card:hover .cc-del { opacity: 1; transform: scale(1); }
   .cc-star:hover { background: var(--accent-sand); color: #7a5c1e; transform: scale(1.12); }
-  .cc-del:hover { background: var(--accent-pink); color: #fff; transform: scale(1.12); }
+  .cc-del:hover { background: var(--accent-pink); color: var(--white); transform: scale(1.12); }
 }
 .collect-card .cc-star.on { opacity: 1; transform: scale(1); color: #b98a1e; }
 .collect-card .cc-del.on { opacity: 1; transform: scale(1); }
@@ -41,7 +41,7 @@
 .collect-card .cc-type-badge {
   z-index: 2; display: inline-flex; align-items: center; gap: 7px;
   padding: 7px 15px; border-radius: 40px;
-  background: rgba(255,255,255,.72); border: 1px solid rgba(255,255,255,.9);
+  background: var(--w-70); border: 1px solid var(--w-90);
   backdrop-filter: blur(10px);
   font-family: var(--font-display); font-weight: 700; font-size: 0.85rem; color: var(--text);
   box-shadow: 0 6px 16px rgba(120,150,165,.18);

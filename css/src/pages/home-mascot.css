@@ -32,7 +32,7 @@
   border-radius: 20px;
   pointer-events: none;
   background: radial-gradient(circle at var(--shx, 50%) var(--shy, 30%),
-    rgba(255,255,255,.5), rgba(255,255,255,0) 45%);
+    var(--w-50), var(--w-0) 45%);
   opacity: 0;
   transition: opacity .3s;
 }
@@ -41,7 +41,7 @@
 /* 鼓励话语气泡 */
 .encourage-bubble {
   position: relative;
-  background: rgba(255,255,255,.7); border: 1px solid var(--glass-border);
+  background: var(--w-70); border: 1px solid var(--glass-border);
   backdrop-filter: blur(10px);
   border-radius: 14px; padding: 9px 14px;
   font-size: 0.85rem; line-height: 1.5; color: var(--text);
@@ -67,13 +67,13 @@
 .encourage-bubble::after {
   content: ""; position: absolute;
   top: 50%; left: -12px; transform: translateY(-50%);
-  border: 6px solid transparent; border-right-color: rgba(255,255,255,.7);
+  border: 6px solid transparent; border-right-color: var(--w-70);
 }
 /* 单栏（≤768px）时头像横排到内容上方，左向尾巴会指到页边空白 —— 改回向上，指向头顶的头像卡 */
 @media (max-width: 768px) {
   .encourage-bubble::after {
     top: -12px; left: 50%; transform: translateX(-50%);
-    border-right-color: transparent; border-bottom-color: rgba(255,255,255,.7);
+    border-right-color: transparent; border-bottom-color: var(--w-70);
   }
 }
 

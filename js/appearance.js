@@ -3,6 +3,8 @@
 //   mode        'banner' = 贴顶通栏横幅（默认）；'cover' = 轮播整幅变为全视口固定背景层
 //   bgOpacity   轮播图片层不透明度，1 = 图片清晰，0 = 只剩品牌渐变底
 //   cardOpacity 玻璃面不透明度（写入 :root 的 --glass-alpha），0.5 = 改造前原样
+//   面板契约：两个透明度滑块只在覆盖模式下提供（横幅模式整组 hidden，但数值不丢）；
+//             隐藏的是控件，不是设置 —— 切回覆盖模式时按 state 原样回灌。
 //
 // 为什么这个文件在 <head> 里同步加载（而不是 defer）：
 //   覆盖模式会把 .blog-carousel 从流内横幅改为 fixed 背景层，内容起始位置随之从「横幅之下」
@@ -70,6 +72,7 @@
 
     var closeBtn = document.getElementById('appearanceClose');
     var modes = document.getElementById('appearanceModes');
+    var sliders = document.getElementById('appearanceSliders');
     var bg = document.getElementById('appearanceBg');
     var card = document.getElementById('appearanceCard');
     var bgVal = document.getElementById('appearanceBgVal');
@@ -96,6 +99,11 @@
         b.classList.toggle('active', on);
         b.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
+      // 两个滑块只在覆盖模式下提供：横幅模式背后是纯渐变底，图片层不透明度看不出差别，
+      // 卡片透明度也不是这个模式要解决的问题。用原生 hidden 整组收起（同时移出 tab 序与
+      // 可访问性树，读屏与键盘都不会再碰到它们）。注意隐藏的只是控件：state 里的数值照旧
+      // 持久化并在切回覆盖模式时原样回灌，不重置、不丢弃。
+      if (sliders) sliders.hidden = state.mode !== 'cover';
       var bgPct = Math.round(state.bgOpacity * 100);
       var cardPct = Math.round(state.cardOpacity * 100);
       bg.value = String(bgPct);
@@ -117,10 +125,14 @@
       syncControls();
       UI.openModal(modal);
       btn.setAttribute('aria-expanded', 'true');
-      // 焦点直接落到第一个滑块（键盘用户不必先 Tab 一圈）。
+      // 焦点落到第一个「当下可用」的控件（键盘用户不必先 Tab 一圈）：
+      //   覆盖模式 → 滑块已显示，落在背景透明度滑块；
+      //   横幅模式 → 滑块是 hidden，对隐藏元素 focus() 会被浏览器静默忽略（键盘按键全部落空），
+      //             退回模式组里的按钮。
       // 这里可以同步聚焦：.appearance-modal 覆盖了骨架的 visibility 过渡（见 home.css），
       // 打开当帧计算值就是 visible；不像日历弹层那样需要等 300ms 过渡。
-      bg.focus();
+      var first = (sliders && !sliders.hidden) ? bg : modes.querySelector('.appearance-mode');
+      if (first) first.focus();
     }
 
     function close() {
@@ -139,8 +151,14 @@
       if (!b) return;
       var next = b.dataset.mode === 'cover' ? 'cover' : 'banner';
       if (next === state.mode) return;
+      // 切到横幅会把整组滑块隐藏。若此刻焦点正落在滑块里，隐藏会把焦点抛回 body
+      //（Safari 点击按钮不移动焦点，键盘用户会直接掉出面板），所以先记录、切换后交接。
+      var focusWasInSliders = !!sliders && sliders.contains(document.activeElement);
       state.mode = next;
       syncControls();
+      // 只有「焦点原本在滑块里、切换后滑块被隐藏」这一种需要交接；
+      // 切到覆盖时滑块可见，焦点保持不动即可。
+      if (focusWasInSliders && sliders.hidden) b.focus();
       persist();
       apply();
       refreshFx();
@@ -164,12 +182,16 @@
     bindRange(card, cardVal, function (pct) { state.cardOpacity = pct / 100; });
 
     reset.addEventListener('click', function () {
+      // 与模式切换同一个坑：重置会回到横幅模式并把滑块隐藏，
+      // 焦点若在滑块里必须先记下来，之后交回按钮，否则掉回 body。
+      var focusWasInSliders = !!sliders && sliders.contains(document.activeElement);
       state = {
         mode: DEFAULTS.mode,
         bgOpacity: DEFAULTS.bgOpacity,
         cardOpacity: DEFAULTS.cardOpacity,
       };
       syncControls();
+      if (focusWasInSliders && sliders.hidden) reset.focus();
       persist();
       apply();
       refreshFx();

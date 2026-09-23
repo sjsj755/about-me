@@ -2,7 +2,7 @@
 // 数据源：js/links.js 的 CAROUSEL 数组，项格式 { src: '图片路径', caption: '图片说明' }。
 // 轮播内不渲染任何视觉文字：caption 只作为 img.alt 供读屏使用，不做标题叠层。
 // src 省略或图片加载失败时该帧降级为品牌渐变占位帧（纯视觉，同样无文案）。
-// 动效：0.8s ease-out 淡入；5s 自动轮播，悬停 / 切后台暂停；prefers-reduced-motion 不自动播。
+// 动效：0.8s ease-out 淡入；15s 自动轮播，悬停 / 切后台暂停；prefers-reduced-motion 不自动播。
 // 容错：#blogCarousel 不存在（非首页）静默退出。
 // 可达性：指示点为 button 可键盘操作；非活动帧 aria-hidden。
 (function () {
@@ -11,7 +11,7 @@
   var root = document.getElementById('blogCarousel');
   if (!root) return;
 
-  var INTERVAL = 5000;
+  var INTERVAL = 15000;
   var reduceMotion = window.matchMedia
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

@@ -14,7 +14,7 @@
 }
 .cursor-ring.hovered {
   width: 58px; height: 58px; border-color: var(--accent-mint);
-  background: rgba(255,255,255,.25);
+  background: var(--w-25);
 }
 @media (pointer: coarse) { body { cursor: auto; } .cursor-dot, .cursor-ring { display: none; } }
 

@@ -11,8 +11,8 @@
        首页 load 因此增加约 6.9s（A/B 实测 7554ms → 679ms），且阻塞全部 defer 脚本执行，故移除。
        回退结果：标题 Quicksand → HarmonyOS Sans / sans-serif；正文 Noto Sans SC → 系统中文；
        引文与书名的 Noto Serif SC → serif（本页 collect-quote/collect-book/collect-acad 使用）。 -->
-  <link rel="stylesheet" href="css/dist/shared.css?v=20260934">
-  <link rel="stylesheet" href="css/dist/collect.css?v=20260934">
+  <link rel="stylesheet" href="css/dist/shared.css?v=20260938">
+  <link rel="stylesheet" href="css/dist/collect.css?v=20260938">
 </head>
 <body class="works-page">
 
@@ -100,19 +100,19 @@
   </div>
 
   <!-- GSAP + Lenis -->
-  <script src="js/vendor/gsap.min.js?v=20260934" defer></script>
-  <script src="js/vendor/ScrollTrigger.min.js?v=20260934" defer></script>
-  <script src="js/vendor/lenis.min.js?v=20260934" defer></script>
+  <script src="js/vendor/gsap.min.js?v=20260938" defer></script>
+  <script src="js/vendor/ScrollTrigger.min.js?v=20260938" defer></script>
+  <script src="js/vendor/lenis.min.js?v=20260938" defer></script>
   <!-- SDK 适配层：必须在 main.js 与各页面模块之前 -->
-  <script src="js/fx.js?v=20260934" defer></script>
-  <script src="js/links.js?v=20260934" defer></script>
+  <script src="js/fx.js?v=20260938" defer></script>
+  <script src="js/links.js?v=20260938" defer></script>
   <!-- 共享工具层：必须早于 main.js，main.js 内的 UI.* 调用依赖它 -->
-  <script src="js/ui.js?v=20260934" defer></script>
-  <script src="js/main.js?v=20260934" defer></script>
+  <script src="js/ui.js?v=20260938" defer></script>
+  <script src="js/main.js?v=20260938" defer></script>
   <!-- 内容数据：与本页逻辑解耦，补充条目只改 js/collect-data.js -->
-  <script src="js/collect-data.js?v=20260934"></script>
+  <script src="js/collect-data.js?v=20260938"></script>
   <!-- 芸香集页面逻辑 -->
-  <script src="js/collect.js?v=20260934" defer></script>
+  <script src="js/collect.js?v=20260938" defer></script>
 
 </body>
 </html>

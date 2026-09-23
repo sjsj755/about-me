@@ -9,17 +9,17 @@
   display: inline-flex; align-items: center; gap: 6px;
   padding: 9px 18px; border-radius: 40px;
   font-family: var(--font-display); font-weight: 600; font-size: 0.85rem;
-  background: rgba(255,255,255,.6);
-  border: 1px solid rgba(255,255,255,.8);
+  background: var(--w-60);
+  border: 1px solid var(--w-80);
   color: var(--text); cursor: pointer;
   backdrop-filter: blur(10px);
   transition: transform .25s var(--ease-out), background .25s var(--ease-out), box-shadow .25s var(--ease-out);
 }
 .collect-btn:active { transform: scale(.96); }
-.collect-btn:hover { background: rgba(255,255,255,.85); box-shadow: 0 8px 18px rgba(120,150,165,.22); }
+.collect-btn:hover { background: var(--w-85); box-shadow: 0 8px 18px rgba(120,150,165,.22); }
 .collect-btn.primary {
   background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
-  color: #fff; border-color: transparent;
+  color: var(--white); border-color: transparent;
 }
 .collect-btn.primary:hover { background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint)); box-shadow: 0 10px 24px rgba(96,165,220,.35); }
 .collect-btn.danger { color: #a85a5a; border-color: rgba(200,120,120,.3); }
@@ -35,12 +35,12 @@
 }
 .collect-search input {
   width: 100%; padding: 10px 16px 10px 38px; border-radius: 40px;
-  border: 1px solid rgba(255,255,255,.8); background: rgba(255,255,255,.6);
+  border: 1px solid var(--w-80); background: var(--w-60);
   font-family: var(--font-body); font-size: 16px; color: var(--text); /* 16px 防移动端聚焦缩放 */
   outline: none; backdrop-filter: blur(10px);
   transition: border-color .3s, background .3s;
 }
-.collect-search input:focus { border-color: var(--accent-blue); background: rgba(255,255,255,.85); }
+.collect-search input:focus { border-color: var(--accent-blue); background: var(--w-85); }
 
 /* 通用标签胶囊（collect/sites 条目的分类与关键词标签） */
 .cc-tag {
@@ -66,7 +66,7 @@
 .collect-empty {
   grid-column: 1 / -1; text-align: center; padding: 54px 20px;
   border: 1.5px dashed rgba(150,185,205,.55); border-radius: var(--radius);
-  background: rgba(255,255,255,.35); color: var(--text-soft);
+  background: var(--w-35); color: var(--text-soft);
   transition: opacity .3s var(--ease-out), transform .3s var(--ease-out);
 }
 @starting-style {

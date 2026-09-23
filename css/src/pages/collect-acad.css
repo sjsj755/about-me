@@ -8,7 +8,7 @@
   position: relative;
   display: flex; gap: 20px; align-items: flex-start;
   padding: 22px 26px;
-  background: rgba(255,255,255,.92);
+  background: var(--w-90);
   border: 1px solid rgba(110,125,150,.16);
   border-left: 3px solid var(--accent-blue);
   border-radius: 4px;

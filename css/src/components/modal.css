@@ -14,8 +14,8 @@
 .collect-modal-inner {
   width: min(580px, 100%); max-height: 84vh; overflow-y: auto;
   overscroll-behavior: contain; /* 弹窗滚动到底不再带动背后页面（移动端滚动穿透） */
-  background: rgba(255,255,255,.94);
-  border: 1px solid rgba(255,255,255,.85);
+  background: var(--w-95);
+  border: 1px solid var(--w-85);
   border-radius: var(--radius); box-shadow: 0 30px 60px rgba(40,60,75,.35);
   padding: 26px 28px; position: relative;
   transform-origin: center; /* 弹窗居中锚定，无需跟随触发点 */
@@ -28,11 +28,11 @@
 .cm-close {
   position: absolute; top: 14px; right: 14px;
   width: 32px; height: 32px; border-radius: 50%; border: none;
-  background: rgba(255,255,255,.7); color: var(--text); font-size: 1.1rem; line-height: 1;
+  background: var(--w-70); color: var(--text); font-size: 1.1rem; line-height: 1;
   display: grid; place-items: center; cursor: pointer;
   transition: background .25s, transform .2s var(--ease-out);
 }
-.cm-close:hover { background: rgba(255,255,255,1); }
+.cm-close:hover { background: var(--white); }
 .cm-close:active { transform: scale(.9); }
 .cm-title { font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 4px; }
 .cm-sub { color: var(--text-soft); font-size: 0.85rem; margin-bottom: 16px; }
@@ -65,12 +65,12 @@
 }
 .cm-field input, .cm-field textarea, .cm-field select {
   width: 100%; padding: 10px 14px; border-radius: 12px;
-  border: 1px solid rgba(180,205,220,.7); background: rgba(255,255,255,.75);
+  border: 1px solid rgba(180,205,220,.7); background: var(--w-75);
   font-family: var(--font-body); font-size: 16px; color: var(--text); /* 16px 防移动端聚焦缩放 */
   outline: none; transition: border-color .3s, background .3s;
 }
 .cm-field textarea { resize: vertical; min-height: 92px; }
-.cm-field input:focus, .cm-field textarea:focus, .cm-field select:focus { border-color: var(--accent-blue); background: #fff; }
+.cm-field input:focus, .cm-field textarea:focus, .cm-field select:focus { border-color: var(--accent-blue); background: var(--white); }
 .cm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .cm-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
 

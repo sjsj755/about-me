@@ -30,7 +30,7 @@
 .quote-card .cc-star, .quote-card .cc-del {
   flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%;
   display: grid; place-items: center; cursor: pointer;
-  background: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.8);
+  background: var(--w-60); border: 1px solid var(--w-80);
   font-size: .78rem; line-height: 1; color: var(--text-soft);
   transition: color .25s, background .25s, transform .2s var(--ease-out);
 }

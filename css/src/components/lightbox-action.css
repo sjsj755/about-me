@@ -4,7 +4,7 @@
   align-self: flex-start; margin-top: 4px;
   padding: 10px 20px; border-radius: 999px;
   background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
-  color: #fff; font-size: 0.9rem; font-weight: 600;
+  color: var(--white); font-size: 0.9rem; font-weight: 600;
   text-decoration: none;
   box-shadow: 0 8px 20px rgba(96,165,220,.28);
   transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out), filter .25s;

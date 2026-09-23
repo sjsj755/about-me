@@ -8,20 +8,20 @@
   background: linear-gradient(180deg, rgba(44,58,68,0) 35%, rgba(44,58,68,.55) 100%);
   opacity: 0; transition: opacity .4s var(--ease-out);
 }
-.work-overlay h4 { color: #fff; font-family: var(--font-display); font-size: 1.02rem; line-height: 1.25; }
-.work-overlay .wo-meta { color: rgba(255,255,255,.85); font-size: 0.78rem; display: flex; gap: 8px; flex-wrap: wrap; }
+.work-overlay h4 { color: var(--white); font-family: var(--font-display); font-size: 1.02rem; line-height: 1.25; }
+.work-overlay .wo-meta { color: var(--w-85); font-size: 0.78rem; display: flex; gap: 8px; flex-wrap: wrap; }
 .work-overlay .wo-view {
   display: inline-flex; align-items: center; gap: 6px;
   margin-top: 0; width: fit-content;
-  font-size: 0.8rem; font-weight: 600; color: #fff;
-  border-bottom: 1.5px solid rgba(255,255,255,.8); padding-bottom: 2px;
+  font-size: 0.8rem; font-weight: 600; color: var(--white);
+  border-bottom: 1.5px solid var(--w-80); padding-bottom: 2px;
   transform: translateY(6px); transition: transform .35s var(--ease-out);
 }
 /* 卡片高光描边 + 随光标泛光 */
 .work-card::after {
   content: ""; position: absolute; inset: 0; border-radius: var(--radius);
   pointer-events: none; opacity: 0;
-  background: radial-gradient(220px circle at var(--wx,50%) var(--wy,50%), rgba(255,255,255,.35), transparent 55%);
+  background: radial-gradient(220px circle at var(--wx,50%) var(--wy,50%), var(--w-35), transparent 55%);
   transition: opacity .35s;
 }
 @media (hover: hover) and (pointer: fine) {

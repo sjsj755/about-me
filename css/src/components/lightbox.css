@@ -13,8 +13,8 @@
   display: flex; gap: 26px; align-items: stretch;
   width: min(960px, 92%);
   max-height: 78vh;
-  background: rgba(255,255,255,.9);
-  border: 1px solid rgba(255,255,255,.8);
+  background: var(--w-90);
+  border: 1px solid var(--w-80);
   border-radius: var(--radius);
   box-shadow: 0 30px 60px rgba(40,60,75,.35);
   overflow: hidden;
@@ -37,7 +37,7 @@
 .lightbox-tag {
   width: fit-content; padding: 5px 14px; border-radius: 40px;
   background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
-  color: #fff; font-family: var(--font-display); font-weight: 600; font-size: 0.8rem;
+  color: var(--white); font-family: var(--font-display); font-weight: 600; font-size: 0.8rem;
 }
 .lightbox-title { font-family: var(--font-display); font-size: 1.7rem; line-height: 1.2; }
 .lightbox-desc { color: var(--text-soft); font-size: 0.95rem; line-height: 1.7; }
@@ -49,7 +49,7 @@
 .lightbox-close, .lightbox-nav {
   position: fixed; z-index: 3001; cursor: pointer;
   width: 44px; height: 44px; border-radius: 50%;
-  border: none; color: #fff; font-size: 1.4rem; line-height: 1;
+  border: none; color: var(--white); font-size: 1.4rem; line-height: 1;
   background: rgba(60,78,92,.6);
   display: grid; place-items: center;
   transition: background .3s, transform .2s var(--ease-out);
@@ -102,8 +102,8 @@
 .pl-stage {
   width: min(920px, 92vw);
   margin: 0;
-  background: rgba(255,255,255,.9);
-  border: 1px solid rgba(255,255,255,.8);
+  background: var(--w-90);
+  border: 1px solid var(--w-80);
   border-radius: var(--radius);
   box-shadow: 0 30px 60px rgba(40,60,75,.35);
   overflow: hidden;
@@ -119,8 +119,8 @@
 @keyframes plZoom { from { transform: scale(1.04); opacity: .5; } to { transform: scale(1); opacity: 1; } }
 .pl-caption {
   display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
-  padding: 14px 20px; border-top: 1px solid rgba(255,255,255,.8);
-  background: rgba(255,255,255,.55);
+  padding: 14px 20px; border-top: 1px solid var(--w-80);
+  background: var(--w-55);
 }
 .pl-caption h3 { font-family: var(--font-display); font-size: 1.02rem; }
 .pl-caption p { color: var(--text-soft); font-size: .85rem; }
@@ -133,7 +133,7 @@
 .pl-close, .pl-nav {
   position: fixed; z-index: 3001; cursor: pointer;
   width: 44px; height: 44px; border-radius: 50%;
-  border: none; color: #fff; font-size: 1.4rem; line-height: 1;
+  border: none; color: var(--white); font-size: 1.4rem; line-height: 1;
   background: rgba(60,78,92,.6);
   display: grid; place-items: center;
   transition: background .3s, transform .2s var(--ease-out);

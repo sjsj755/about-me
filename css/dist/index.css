@@ -65,11 +65,11 @@
 }
 .carousel-art::before {
   width: min(46vw, 420px); aspect-ratio: 1;
-  top: -18%; right: -6%; background: rgba(255,255,255,.16);
+  top: -18%; right: -6%; background: var(--w-16);
 }
 .carousel-art::after {
   width: min(30vw, 280px); aspect-ratio: 1;
-  bottom: -16%; left: -4%; background: rgba(255,255,255,.12);
+  bottom: -16%; left: -4%; background: var(--w-12);
 }
 /* 指示点：44×44 热区防误触，视觉仅小圆点；负外边距收拢视觉间距 */
 .carousel-dots { position: absolute; right: 10px; bottom: 18px; display: flex; }
@@ -80,11 +80,11 @@
 }
 .carousel-dot::before {
   content: ""; width: 7px; height: 7px; border-radius: 50%;
-  background: rgba(255,255,255,.55); box-shadow: 0 0 0 2px rgba(255,255,255,.18);
+  background: var(--w-55); box-shadow: 0 0 0 2px var(--w-18);
   transition: background .25s, transform .25s;
 }
-.carousel-dot:hover::before { background: rgba(255,255,255,.85); }
-.carousel-dot.is-active::before { background: #fff; transform: scale(1.25); }
+.carousel-dot:hover::before { background: var(--w-85); }
+.carousel-dot.is-active::before { background: var(--white); transform: scale(1.25); }
 
 /* 左栏：头像 + 社交链接 */
 .blog-profile {
@@ -101,11 +101,11 @@
   width: 44px; height: 44px; border-radius: 14px;
   display: grid; place-items: center;
   color: var(--text-soft);
-  background: rgba(255,255,255,.55);
+  background: var(--w-55);
   border: 1px solid var(--glass-border);
   transition: transform .25s var(--ease-out), color .25s, background .25s;
 }
-.social-link:hover { color: var(--text); background: rgba(255,255,255,.8); transform: translateY(-3px); }
+.social-link:hover { color: var(--text); background: var(--w-80); transform: translateY(-3px); }
 .social-link:active { transform: scale(.94); }
 .social-link svg { width: 22px; height: 22px; fill: currentColor; display: block; }
 
@@ -149,9 +149,9 @@
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
   transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out), background .25s;
 }
-.feed-link:hover { transform: translateY(-2px); background: rgba(255,255,255,.75); box-shadow: var(--shadow); }
+.feed-link:hover { transform: translateY(-2px); background: var(--w-75); box-shadow: var(--shadow); }
 .feed-link:active { transform: scale(.99); }
-.feed-chip { flex-shrink: 0; font-size: .75rem; font-weight: 600; padding: 4px 10px; border-radius: 999px; color: #fff; }
+.feed-chip { flex-shrink: 0; font-size: .75rem; font-weight: 600; padding: 4px 10px; border-radius: 999px; color: var(--white); }
 .feed-chip.is-note { background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint)); }
 .feed-chip.is-work { background: linear-gradient(135deg, var(--accent-sand), var(--accent-pink)); }
 .feed-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -242,9 +242,9 @@
   color: var(--text-soft); border-radius: 50%;
   transition: color .25s, background .25s, transform .2s var(--ease-out);
 }
-.appearance-btn:hover { color: var(--text); background: rgba(255,255,255,.6); }
+.appearance-btn:hover { color: var(--text); background: var(--w-60); }
 .appearance-btn:active { transform: scale(.92); }
-.appearance-btn[aria-expanded="true"] { color: var(--text); background: rgba(255,255,255,.75); }
+.appearance-btn[aria-expanded="true"] { color: var(--text); background: var(--w-75); }
 .appearance-btn svg { width: 22px; height: 22px; fill: currentColor; display: block; }
 
 /* ---- 面板：复用 .collect-modal 的开关 / Esc / 遮罩点击机制 ---- */
@@ -282,14 +282,14 @@
 .appearance-mode {
   flex: 1; min-height: 44px; padding: 10px 12px; border-radius: 40px; cursor: pointer;
   font-family: var(--font-display); font-weight: 600; font-size: .85rem;
-  color: var(--text-soft); background: rgba(255,255,255,.6);
-  border: 1px solid rgba(255,255,255,.8);
+  color: var(--text-soft); background: var(--w-60);
+  border: 1px solid var(--w-80);
   transition: background .3s var(--ease-out), color .3s var(--ease-out), transform .2s var(--ease-out);
 }
 .appearance-mode:active { transform: scale(.96); }
 .appearance-mode.active {
   background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
-  color: #fff; border-color: transparent;
+  color: var(--white); border-color: transparent;
 }
 .appearance-field { margin-top: 16px; }
 .appearance-label {
@@ -305,22 +305,22 @@
 }
 .appearance-range::-webkit-slider-runnable-track {
   height: 6px; border-radius: 999px;
-  background: rgba(255,255,255,.85); border: 1px solid var(--glass-border);
+  background: var(--w-85); border: 1px solid var(--glass-border);
 }
 .appearance-range::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
   width: 20px; height: 20px; margin-top: -8px; border-radius: 50%;
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
-  border: 2px solid #fff; box-shadow: 0 2px 6px rgba(110,160,190,.35);
+  border: 2px solid var(--white); box-shadow: 0 2px 6px rgba(110,160,190,.35);
   transition: transform .2s var(--ease-out);
 }
 .appearance-range:active::-webkit-slider-thumb { transform: scale(1.12); }
 .appearance-range::-moz-range-track {
   height: 6px; border-radius: 999px;
-  background: rgba(255,255,255,.85); border: 1px solid var(--glass-border);
+  background: var(--w-85); border: 1px solid var(--glass-border);
 }
 .appearance-range::-moz-range-thumb {
-  width: 20px; height: 20px; border-radius: 50%; border: 2px solid #fff;
+  width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--white);
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
   box-shadow: 0 2px 6px rgba(110,160,190,.35);
 }
@@ -329,10 +329,10 @@
 .appearance-reset {
   min-height: 44px; padding: 8px 16px; border-radius: 40px; cursor: pointer;
   font-size: .82rem; font-weight: 600; color: var(--text-soft);
-  background: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.8);
+  background: var(--w-60); border: 1px solid var(--w-80);
   transition: background .25s, color .25s;
 }
-.appearance-reset:hover { background: rgba(255,255,255,.9); color: var(--text); }
+.appearance-reset:hover { background: var(--w-90); color: var(--text); }
 
 /* 动效偏好：本面板只有悬停 / 按下的微过渡，reduce 时全部关掉（与项目其它页面同一处理） */
 @media (prefers-reduced-motion: reduce) {
@@ -386,7 +386,7 @@
   border-radius: 20px;
   pointer-events: none;
   background: radial-gradient(circle at var(--shx, 50%) var(--shy, 30%),
-    rgba(255,255,255,.5), rgba(255,255,255,0) 45%);
+    var(--w-50), var(--w-0) 45%);
   opacity: 0;
   transition: opacity .3s;
 }
@@ -395,7 +395,7 @@
 /* 鼓励话语气泡 */
 .encourage-bubble {
   position: relative;
-  background: rgba(255,255,255,.7); border: 1px solid var(--glass-border);
+  background: var(--w-70); border: 1px solid var(--glass-border);
   backdrop-filter: blur(10px);
   border-radius: 14px; padding: 9px 14px;
   font-size: 0.85rem; line-height: 1.5; color: var(--text);
@@ -421,13 +421,13 @@
 .encourage-bubble::after {
   content: ""; position: absolute;
   top: 50%; left: -12px; transform: translateY(-50%);
-  border: 6px solid transparent; border-right-color: rgba(255,255,255,.7);
+  border: 6px solid transparent; border-right-color: var(--w-70);
 }
 /* 单栏（≤768px）时头像横排到内容上方，左向尾巴会指到页边空白 —— 改回向上，指向头顶的头像卡 */
 @media (max-width: 768px) {
   .encourage-bubble::after {
     top: -12px; left: 50%; transform: translateX(-50%);
-    border-right-color: transparent; border-bottom-color: rgba(255,255,255,.7);
+    border-right-color: transparent; border-bottom-color: var(--w-70);
   }
 }
 
@@ -437,10 +437,10 @@
 .cal-label { font-family: var(--font-display); font-weight: 700; font-size: 0.88rem; }
 .cal-nav {
   width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--glass-border);
-  background: rgba(255,255,255,.5); color: var(--text); font-size: 1rem; cursor: pointer;
+  background: var(--w-50); color: var(--text); font-size: 1rem; cursor: pointer;
   transition: background .3s, transform .2s;
 }
-.cal-nav:hover { background: rgba(255,255,255,.85); transform: scale(1.08); }
+.cal-nav:hover { background: var(--w-85); transform: scale(1.08); }
 .cal-week {
   display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
   margin-bottom: 4px; text-align: center;
@@ -452,16 +452,16 @@
   font-size: 0.75rem; border-radius: 8px; color: var(--text);
   transition: background .2s, color .2s, transform .15s; cursor: pointer;
 }
-.cal-day:hover { background: rgba(255,255,255,.7); transform: scale(1.08); }
+.cal-day:hover { background: var(--w-70); transform: scale(1.08); }
 .cal-day.empty { pointer-events: none; }
 .cal-day.today {
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
-  color: #fff; font-weight: 700;
+  color: var(--white); font-weight: 700;
 }
 
 /* 农历小字（初一显示月名 / 节气 / 日子） */
 .cal-lunar { font-size: .46rem; line-height: 1; color: var(--text-soft); margin-top: 1px; }
-.cal-day.today .cal-lunar { color: rgba(255,255,255,.9); }
+.cal-day.today .cal-lunar { color: var(--w-90); }
 @media (max-width: 480px) { .cal-lunar { display: none; } }
 
 /* 日期标记小圆点 */
@@ -476,7 +476,7 @@
 .cal-dot.pink { background: #e0697f; }
 .cal-dot.mint { background: #3cbfa0; }
 /* 今日底色为渐变，圆点加细白边才分得清（原先 2px 光晕过大，糊住文字） */
-.cal-day.today .cal-dot { box-shadow: 0 0 0 1.5px rgba(255,255,255,.9); }
+.cal-day.today .cal-dot { box-shadow: 0 0 0 1.5px var(--w-90); }
 
 /* 有标记的日期：整格淡色底纹（颜色随标记色）+ 左上角圆点，双重提示一眼可辨 */
 .cal-day.has-mark { background: rgba(127,180,232,.18); }
@@ -494,7 +494,7 @@
 .collect-modal-inner.cal-modal { width: min(320px, 100%); padding: 22px 22px 20px; }
 .cal-input {
   width: 100%; border: 1px solid var(--glass-border); border-radius: 10px;
-  background: rgba(255,255,255,.75); padding: 10px 12px;
+  background: var(--w-75); padding: 10px 12px;
   font: inherit; font-size: 16px; color: var(--text); /* 16px 防移动端聚焦缩放 */
   resize: none; outline: none; transition: border-color .2s;
 }
@@ -504,13 +504,13 @@
 .cal-icons { display: flex; gap: 6px; margin-top: 12px; }
 .cal-ico {
   width: 27px; height: 27px; border-radius: 8px; padding: 0;
-  border: 1px solid var(--glass-border); background: rgba(255,255,255,.6);
+  border: 1px solid var(--glass-border); background: var(--w-60);
   font-size: .82rem; line-height: 1; cursor: pointer;
   display: grid; place-items: center;
   transition: transform .2s var(--ease-spring), border-color .2s, background .2s;
 }
 .cal-ico:hover { transform: translateY(-2px); }
-.cal-ico.active { border-color: var(--accent-blue); background: rgba(255,255,255,.95); }
+.cal-ico.active { border-color: var(--accent-blue); background: var(--w-95); }
 .cal-ico-none { font-size: .55rem; color: var(--text-soft); }
 .cal-color {
   width: 22px; height: 22px; border-radius: 50%; padding: 0;
@@ -525,14 +525,14 @@
 .cal-repeat { display: flex; gap: 6px; margin-top: 10px; }
 .cal-rp {
   flex: 1; padding: 7px 0; border-radius: 8px;
-  border: 1px solid var(--glass-border); background: rgba(255,255,255,.6);
+  border: 1px solid var(--glass-border); background: var(--w-60);
   font-family: inherit; font-size: .72rem; color: var(--text-soft); cursor: pointer;
   transition: border-color .2s, color .2s, background .2s, transform .2s var(--ease-spring);
 }
 .cal-rp:hover { transform: translateY(-1px); }
 .cal-rp.active {
   border-color: var(--accent-blue); color: var(--text);
-  background: rgba(255,255,255,.95); font-weight: 600;
+  background: var(--w-95); font-weight: 600;
 }
 .cal-modal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
 .cal-del {
@@ -545,7 +545,7 @@
 .cal-save {
   border: none; border-radius: 40px; padding: 8px 24px;
   font-family: var(--font-display); font-weight: 600; font-size: .85rem;
-  color: #fff; cursor: pointer;
+  color: var(--white); cursor: pointer;
   background: linear-gradient(90deg, var(--accent-blue), var(--accent-mint));
   box-shadow: 0 8px 18px rgba(140,190,220,.4);
   transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out);

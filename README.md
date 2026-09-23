@@ -27,17 +27,18 @@
 
 ## 构建与校验
 
-CSS 按 `css/manifest.json` 声明的顺序在编译期拼接为单个产物，**不使用 `@import`**（避免请求瀑布）：
+CSS 按 `css/manifest.json` 声明的顺序在编译期拼接为产物，**不使用 `@import`**（避免请求瀑布）：
 
 ```bash
-npm run build:css   # 由 css/src/** 生成 css/dist/shared.css
-npm run check       # 门禁：JS 语法校验 + CSS 结构与产物一致性校验
+npm run build:css   # 由 css/src/** 生成 css/dist/：shared.css + 7 个页面产物
+npm run check       # 门禁：JS 语法 + CSS 结构与产物一致性 + 白色面刻度契约 + 缓存版本一致性 + 页面样式引用
 npm run test        # Playwright 端到端测试
 ```
 
-- 样式源码在 `css/src/`，产物 `css/dist/` **已入库**，各页只加载 `css/dist/shared.css`
+- 样式源码在 `css/src/`，产物 `css/dist/` **已入库**；每页恰好加载两个样式文件：`shared.css`（tokens + base + components）与 `css/dist/<页面>.css`（该页 pages + overrides）
 - 改样式请改 `css/src/**` 再跑 `npm run build:css`；直接改 `css/dist/` 会被 `npm run check` 拦下
 - `manifest.json` 的数组顺序**就是级联顺序**，新增源文件必须登记，否则构建会以 `E-UNUSED` 中止
+- 白色面（控件 / 指示器 / 浮层 / 文字）统一取自 `css/src/tokens.css` 的 `--white` / `--w-*` 刻度，别处禁止再写 `rgba(255,255,255,…)` 或 `#fff`
 
 ## 目录结构
 
@@ -48,7 +49,7 @@ npm run test        # Playwright 端到端测试
 ├── css/
 │   ├── manifest.json                          源文件与产物的映射（级联顺序的唯一来源）
 │   ├── src/                                   样式源码：tokens / base / components / pages / overrides
-│   └── dist/shared.css                        构建产物，全站唯一加载的样式文件
+│   └── dist/                                  构建产物：shared.css + 7 个页面产物
 ├── js/
 │   ├── fx.js                                  动效 SDK 适配层（GSAP / Lenis / solarlunar）
 │   ├── ui.js                                  公共工具（localStorage 安全读写、弹窗等）
@@ -56,7 +57,7 @@ npm run test        # Playwright 端到端测试
 │   ├── main.js                                首页门户与日历逻辑
 │   ├── *-data.js                              各页内置数据（纯数据，无逻辑）
 │   ├── collect.js / notes.js / sites.js       对应页面的交互逻辑
-│   └── vendor/solarlunar.min.js               第三方库
+│   └── vendor/                                第三方库本地副本（gsap / ScrollTrigger / lenis / solarlunar）
 ├── images/                                    图片资源
 ├── tools/                                     CSS 构建与门禁校验脚本
 ├── tests/                                     端到端测试
@@ -79,7 +80,7 @@ npx serve -l 4173
 
 ## 本地测试
 
-端到端测试位于 `tests/`，覆盖 7 个页面与弹窗、灯箱、SDK 降级等关键路径。
+端到端测试位于 `tests/`（9 个 spec / 66 个用例），覆盖 7 个页面与弹窗、灯箱、SDK 降级、视觉基线与白色面刻度接线等关键路径。
 
 ```bash
 npm install

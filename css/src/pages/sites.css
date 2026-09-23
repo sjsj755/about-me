@@ -26,9 +26,9 @@
 .site-tile {
   flex: none; width: 44px; height: 44px; border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: #fff;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: var(--white);
   text-shadow: 0 1px 3px rgba(60,90,120,.3);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+  box-shadow: inset 0 1px 0 var(--w-45);
 }
 .site-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .site-title {
@@ -55,7 +55,7 @@
 }
 /* hover 只在精确指针设备启用，避免触屏误触发；只动 transform/shadow，无布局位移 */
 @media (hover: hover) and (pointer: fine) {
-  .site-card:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(120,150,165,.25); border-color: rgba(255,255,255,.95); }
+  .site-card:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(120,150,165,.25); border-color: var(--w-95); }
   .site-card:hover .site-title { color: var(--accent-blue); }
   .site-card:hover .site-go { transform: translate(2px, -2px); color: var(--accent-blue); }
 }
