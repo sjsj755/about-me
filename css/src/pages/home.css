@@ -145,8 +145,8 @@
   display: flex; align-items: flex-start; gap: 14px;
   padding: 14px 18px; border-radius: 16px;
   background: var(--glass-bg); border: 1px solid var(--glass-border);
-  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  backdrop-filter: blur(var(--glass-blur-card)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-card)) saturate(150%);
   transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out), background .25s;
 }
 .feed-link:hover { transform: translateY(-2px); background: var(--w-75); box-shadow: var(--shadow); }
@@ -203,6 +203,22 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .carousel-slide { transition: none; }
+}
+
+/* ============ 首页卡片薄膜：更厚 + 更少模糊（仅首页） ============ */
+/* 首页的玻璃卡片 —— .blog-profile / .clock / .calendar，三者都是 .glass-panel —— 背后是
+   会滚动的渐变、水波与光斑，模糊半径大时整片糊成奶白，看不出背后的层次。这里把模糊收到
+   --glass-blur-card（4px），配合更厚的膜（α 默认 0.7，见 js/appearance.js 的 CARD_DEFAULT），
+   换「看得见背景、又不失玻璃感」。.feed-link 同属首页玻璃面，已在上面的规则里按同一 token 处理。
+   为什么用 .blog-wrap 作用域而不是直接改 --glass-blur：后者同时被 .glass-nav 与其余 6 页的
+   卡片消费，改它等于全站换材质。首页的 .glass-panel 恰好全部落在 .blog-wrap 内（index.html 实测：
+   .blog-profile / .clock / .calendar 三处，无例外），因此这条选择器只命中首页卡片。
+   为什么不做 prefers-reduced-motion / 窄屏降级：本规则（0,2,0）会盖过 perf.css 的降级档（0,1,0），
+   首页卡片在任何条件下都固定走这一档。代价可接受 —— blur 半径减半（4px < 降级档的 8px）是实打实的
+   采样量下降，saturate 从 140% 升到 150% 只是色彩矩阵的系数、不增加采样成本。 */
+.blog-wrap .glass-panel {
+  backdrop-filter: blur(var(--glass-blur-card)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-card)) saturate(150%);
 }
 
 /* ============ 首页外观调节（模式 / 背景透明度 / 卡片透明度） ============ */

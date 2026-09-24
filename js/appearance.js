@@ -2,9 +2,13 @@
 // 数据契约：localStorage['appearance_v1'] = { mode: 'banner'|'cover', bgOpacity: 0..1, cardOpacity: 0.2..1 }
 //   mode        'banner' = 贴顶通栏横幅（默认）；'cover' = 轮播整幅变为全视口固定背景层
 //   bgOpacity   轮播图片层不透明度，1 = 图片清晰，0 = 只剩品牌渐变底
-//   cardOpacity 玻璃面不透明度（写入 :root 的 --glass-alpha），0.5 = 改造前原样
+//   cardOpacity 覆盖模式下的玻璃面不透明度（写入 :root 的 --glass-alpha）；
+//               BANNER_ALPHA = 0.5 = 改造前原样，CARD_DEFAULT = 0.7 = 首页卡片的厚膜默认
 //   面板契约：两个透明度滑块只在覆盖模式下提供（横幅模式整组 hidden，但数值不丢）；
 //             隐藏的是控件，不是设置 —— 切回覆盖模式时按 state 原样回灌。
+//   渲染契约：横幅模式一律用 BANNER_ALPHA 渲染，**不**应用存储的 cardOpacity。
+//             横幅背后是纯渐变底，没有「透过卡片看照片」这回事，改造前的外观就是 0.5；
+//             若把覆盖模式调低的 α 带到横幅模式，卡片与导航会一起变透、露出页面底色。
 //
 // 为什么这个文件在 <head> 里同步加载（而不是 defer）：
 //   覆盖模式会把 .blog-carousel 从流内横幅改为 fixed 背景层，内容起始位置随之从「横幅之下」
@@ -19,7 +23,13 @@
 
   var KEY = 'appearance_v1';
   var MODES = ['banner', 'cover'];
-  var DEFAULTS = { mode: 'banner', bgOpacity: 1, cardOpacity: 0.5 };
+  // 横幅模式的玻璃不透明度：恒定值，不读 state（见文件头「渲染契约」）
+  var BANNER_ALPHA = 0.5;
+  // 覆盖模式的卡片透明度默认值：首页卡片用「厚膜 + 少模糊」（模糊见 css/src/pages/home.css）。
+  // 必须落在滑块的 step 网格上（min 20 / step 5），否则 syncControls 回灌时
+  // input.value 会被浏览器吸附到邻档，与右侧百分比文字对不上。
+  var CARD_DEFAULT = 0.7;
+  var DEFAULTS = { mode: 'banner', bgOpacity: 1, cardOpacity: CARD_DEFAULT };
   // 卡片透明度下限：覆盖模式下卡片背后是照片，再低正文对比度就不达标了。
   // 图片层可以调到 0（此时露出的是品牌渐变底，正文仍在浅色背景上）。
   var CARD_MIN = 0.2;
@@ -51,7 +61,9 @@
   function apply() {
     root.classList.toggle('app-cover', state.mode === 'cover');
     root.style.setProperty('--bg-image-opacity', String(state.bgOpacity));
-    root.style.setProperty('--glass-alpha', String(state.cardOpacity));
+    // 横幅模式强制回默认厚度（见文件头「渲染契约」），覆盖模式才用用户设定值
+    root.style.setProperty('--glass-alpha',
+      String(state.mode === 'banner' ? BANNER_ALPHA : state.cardOpacity));
     // 覆盖模式下整层是纯装饰背景：对读屏隐藏，避免把无交互的图片当内容播报
     var carousel = document.getElementById('blogCarousel');
     if (carousel) carousel.setAttribute('aria-hidden', state.mode === 'cover' ? 'true' : 'false');
@@ -102,7 +114,8 @@
       // 两个滑块只在覆盖模式下提供：横幅模式背后是纯渐变底，图片层不透明度看不出差别，
       // 卡片透明度也不是这个模式要解决的问题。用原生 hidden 整组收起（同时移出 tab 序与
       // 可访问性树，读屏与键盘都不会再碰到它们）。注意隐藏的只是控件：state 里的数值照旧
-      // 持久化并在切回覆盖模式时原样回灌，不重置、不丢弃。
+      // 持久化并在切回覆盖模式时原样回灌，不重置、不丢弃 —— 横幅模式的渲染另有契约，
+      // apply() 一律用 BANNER_ALPHA，压根不读这个值（见文件头「渲染契约」）。
       if (sliders) sliders.hidden = state.mode !== 'cover';
       var bgPct = Math.round(state.bgOpacity * 100);
       var cardPct = Math.round(state.cardOpacity * 100);

@@ -14,11 +14,19 @@
   /* 玻璃 */
   /* --glass-alpha 是「卡片透明度」的唯一开关（首页外观调节，见 js/appearance.js）：
      所有用 --glass-bg 的玻璃面（导航 / 面板 / 卡片 / feed 条目）一并跟随。
-     默认 0.5 与改造前逐像素等价，未调节时视觉零变化。 */
+     这里是「非首页」的取值：其余 6 页不加载 appearance.js，恒为 0.5（与改造前逐像素等价）。
+     首页由 appearance.js 在 :root 上覆盖它 —— 横幅模式强制 0.5，覆盖模式用用户设定值
+     （默认 0.7，见该文件的 CARD_DEFAULT；两条渲染契约都写在那个文件头部）。 */
   --glass-alpha: 0.5;
   --glass-bg: rgba(220, 240, 248, var(--glass-alpha));
   --glass-border: rgba(190, 225, 240, 0.65);
+  /* 玻璃模糊半径，两档：
+     --glass-blur      导航（.glass-nav）与其余 6 页的玻璃卡片；
+     --glass-blur-card 只供首页卡片（.blog-wrap .glass-panel 与 .feed-link，见 pages/home.css）。
+     首页卡片的膜更厚（α 默认 0.7），厚膜再叠强模糊会糊成一片奶白、看不出背后的层次，
+     所以把模糊收到 4px，换「看得见背景、又不失玻璃感」。 */
   --glass-blur: 18px;
+  --glass-blur-card: 4px;
   --shadow: 0 18px 40px rgba(110, 160, 190, 0.18);
   --radius: 22px;
 

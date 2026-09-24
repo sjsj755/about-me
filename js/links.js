@@ -18,7 +18,7 @@ const CAROUSEL = [
 // ============ 社交链接集中配置 ============
 // 首页头像下方的图标使用；键名对应 index.html 中 data-social 的值。改成你的真实主页地址即可。
 const SOCIAL = {
-  bilibili: 'https://space.bilibili.com/0',  // 替换为你的 B 站主页
+  bilibili: 'https://space.bilibili.com/1411946323',  // 替换为你的 B 站主页
   github: 'https://github.com/your-name',    // 替换为你的 GitHub 主页
 };
 

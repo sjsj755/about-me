@@ -1,6 +1,6 @@
 // ============ 门禁校验（本地唯一入口） ============
 // `npm run check` = JS 语法校验 + CSS 结构/产物一致性校验 + 缓存版本一致性校验
-//                  + 白色面刻度契约校验。
+//                  + 白色面刻度契约校验 + 玻璃模糊契约校验 + 外观面板初值契约校验。
 // 只读校验，不修改任何文件；任一项失败即以退出码 1 结束。
 //
 // 为什么要收口成一个入口：这几项校验各自依赖不同工具（node --check / css-graph），
@@ -11,6 +11,9 @@
 //   - 本脚本不跑 Playwright —— 那是 `npm test`，耗时且需要浏览器，属于另一道门。
 //   - 白色面刻度契约是纯文本断言，所以放在这里而非 Playwright：不需要浏览器，
 //     且必须与「dist 是否新鲜」同时成立才有意义（见 checkWhiteScale）。
+//   - 玻璃模糊契约与外观面板初值契约同理（纯文本断言、不需要浏览器）。它们补的是
+//     Playwright 侧的两类结构性盲区：视觉基线对首页卡片的 backdrop-filter 无分辨力
+//     （实测注入 none 仍能通过），而 computed 断言又盖不到 HTML 初值 —— 详见各自函数头。
 'use strict';
 
 const fs = require('fs');
@@ -177,6 +180,164 @@ function checkWhiteScale() {
   console.log(`白色面刻度契约通过（${declared.length} 档刻度全部有消费者，src+dist 零白色字面量）`);
 }
 
+// ---- 玻璃模糊契约（tokens.css 声明、perf.css 降级档兜底）----
+//
+// 契约一 · --glass-blur-card 必须存在且是合法 <length>。
+//   它没有 CSS fallback：变量名写错或声明被删时，blur(var(--glass-blur-card)) 会让整条
+//   backdrop-filter 在 computed-value 阶段作废、退回 none，首页卡片静默失去模糊。
+//   而视觉基线对这个属性没有分辨力（实测注入 backdrop-filter:none 仍能通过
+//   index-desktop.png，见开发文档第十二节第 6 条），所以只能静态拦。
+//   注意：写成 blur(var(--glass-blur-card, 4px)) 的 CSS fallback 并不解决问题 ——
+//   它只防「变量被删除」，防不了「值写错」（值写错时 var() 解析成功、fallback 不触发）。
+//
+// 契约二 · --glass-blur-card 必须严格小于 perf.css 降级档的模糊半径。
+//   前提：pages/home.css 的 .blog-wrap .glass-panel（特异性 0,2,0）会盖过 perf.css 的
+//   .glass-panel（0,1,0），首页卡片在任何条件下都固定走 --glass-blur-card、拿不到降级档。
+//   若该 token 被调到降级档之上，reduced-motion / 窄屏用户反而比降级档更贵。
+//   为什么用严格小于而非小于等于：等于降级档时首页卡片不再「比降级档更省」，
+//   这个 token 的存在意义（厚膜要配少模糊）就没了。
+//   若哪天降级档提高特异性（例如写成 .glass-panel.glass-panel），级联前提失效，
+//   本契约需要重新设计，而不是改数字。
+//
+// 为什么只认 backdrop-filter 行内的 blur：perf.css 里 backdrop-filter 只出现在降级档，
+// 所以这等价于「作用域化解析」但正则简单得多。不要用 /blur\(([\d.]+)px\)/ 扫全文件 ——
+// 将来任何人加一条装饰性的 filter: blur(2px) 都会把上界压到 2px，让合法的 token 无故报红。
+// 若降级档之外也出现 backdrop-filter 的 blur，再把解析收窄到媒体查询块内。
+const BLUR_CARD_DECL = /--glass-blur-card\s*:\s*([\d.]+)px\s*;/;
+const BLUR_DEGRADE = /backdrop-filter:\s*blur\(\s*([\d.]+)px\s*\)/g;
+
+function checkGlassBlur() {
+  const tokens = stripCssComments(fs.readFileSync(path.join(ROOT, 'css', 'src', 'tokens.css'), 'utf8'));
+  const perf = stripCssComments(fs.readFileSync(path.join(ROOT, 'css', 'src', 'components', 'perf.css'), 'utf8'));
+
+  const errors = [];
+  const decl = tokens.match(BLUR_CARD_DECL);
+  if (!decl) {
+    errors.push({
+      code: 'BLUR_CARD_MISSING',
+      message: 'css/src/tokens.css 里没有 `--glass-blur-card: <n>px;` 的合法声明'
+        + '（写错或删除都会让首页卡片的 backdrop-filter 退化为 none）',
+    });
+  }
+
+  const degraded = [...perf.matchAll(BLUR_DEGRADE)].map((m) => parseFloat(m[1]));
+  if (!degraded.length) {
+    errors.push({
+      code: 'BLUR_DEGRADE_MISSING',
+      message: 'css/src/components/perf.css 里找不到 backdrop-filter 的 blur(Npx) 降级档，降级契约已失效',
+    });
+  } else if (decl) {
+    const limit = Math.min(...degraded);
+    const card = parseFloat(decl[1]);
+    if (!(card < limit)) {
+      errors.push({
+        code: 'BLUR_CARD_TOO_LARGE',
+        message: `--glass-blur-card=${card}px 不小于 perf.css 降级档 ${limit}px，`
+          + '首页卡片会比降级档更贵（契约要求严格小于）',
+      });
+    }
+  }
+
+  if (errors.length) {
+    errors.forEach((e) => console.error(`  x [${e.code}] ${e.message}`));
+    console.error(`\n玻璃模糊契约校验未通过（${errors.length} 项），已中止。`);
+    process.exit(1);
+  }
+  console.log(`玻璃模糊契约通过（--glass-blur-card ${parseFloat(decl[1])}px < 降级档 ${Math.min(...degraded)}px）`);
+}
+
+// ---- 首页外观面板初值契约（appearance.js 常量 ↔ index.html 控件属性）----
+//
+// 为什么重点是 min、而不是 value：
+//   syncControls() 只覆写 value / aria-valuetext / 标签文字，**从不写 min / max**。
+//   所以 min="20" 是下限的唯一来源，CARD_MIN = 0.2 是另一套 —— 两者一旦分叉
+//   （例如有人把 min 改成 10），用户能把滑块拖到 10%、标签显示 10%，
+//   而 apply() 会把 --glass-alpha 静默夹到 0.2，出现「显示 10% 实际 0.2」的可见不一致，
+//   且下次打开面板滑块又跳回 20。
+//   value 一侧（CARD_DEFAULT / DEFAULTS.bgOpacity）实际影响极低 —— 面板打开时会被
+//   syncControls 覆写 —— 但校验成本为零，一并钉住。
+//
+// 为什么不管 max：JS 侧对应的是 clampNum(..., 1) 里的字面量 1，没有命名常量；
+//   而 range 的 max 只能是 100、误改概率接近零，不值得为它引入 CARD_MAX / BG_MAX。
+//
+// 常量以 js/appearance.js 为准。CARD_MIN_PCT 是历史遗留的未引用常量，不参与本校验。
+const CARD_DEFAULT_DECL = /var\s+CARD_DEFAULT\s*=\s*([\d.]+)/;
+const CARD_MIN_DECL = /var\s+CARD_MIN\s*=\s*([\d.]+)/;
+const DEFAULTS_DECL = /var\s+DEFAULTS\s*=\s*\{([^}]*)\}/;
+const BG_DEFAULT_IN_OBJ = /bgOpacity:\s*([\d.]+)/;
+
+// 取某个 <input> 的整个标签文本。两个易错点都已避开：
+//   1) id="appearanceBg" 是 id="appearanceBgVal" 的前缀 —— 两处正则都带收尾引号，
+//      所以 id="appearanceBg" 不会命中 id="appearanceBgVal"；
+//   2) [^>]* 不跨 '>'，所以从上一个 <input 起算的匹配不会越界到下一个 input。
+function inputTag(html, id) {
+  const m = html.match(new RegExp(`<input[^>]*id="${id}"[^>]*>`));
+  return m ? m[0] : null;
+}
+function attrOf(tag, name) {
+  const m = tag.match(new RegExp(`${name}="([^"]*)"`));
+  return m ? m[1] : null;
+}
+
+function checkAppearanceDefaults() {
+  const js = fs.readFileSync(path.join(ROOT, 'js', 'appearance.js'), 'utf8');
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+
+  const errors = [];
+  // 注意：正则都要求 `var ` 前缀或对象键形态，所以不会命中文件头注释里的
+  // 「CARD_DEFAULT = 0.7 = 首页卡片的厚膜默认」这类说明文字。
+  const cardDefault = js.match(CARD_DEFAULT_DECL);
+  const cardMin = js.match(CARD_MIN_DECL);
+  const defaultsObj = js.match(DEFAULTS_DECL);
+  const bgDefault = defaultsObj ? defaultsObj[1].match(BG_DEFAULT_IN_OBJ) : null;
+
+  const require_ = (m, name) => {
+    if (!m) {
+      errors.push({
+        code: 'APPEARANCE_CONST_MISSING',
+        message: `js/appearance.js 里解析不出 ${name}，本契约无法校验`,
+      });
+    }
+    return m ? m[1] : null;
+  };
+  const cardDefaultVal = require_(cardDefault, 'CARD_DEFAULT');
+  const cardMinVal = require_(cardMin, 'CARD_MIN');
+  const bgDefaultVal = require_(bgDefault, 'DEFAULTS.bgOpacity');
+
+  const cardTag = inputTag(html, 'appearanceCard');
+  const bgTag = inputTag(html, 'appearanceBg');
+  if (!cardTag) errors.push({ code: 'APPEARANCE_INPUT_MISSING', message: 'index.html 里找不到 <input id="appearanceCard">' });
+  if (!bgTag) errors.push({ code: 'APPEARANCE_INPUT_MISSING', message: 'index.html 里找不到 <input id="appearanceBg">' });
+
+  // 百分比刻度与 js/appearance.js 的 syncControls 一致：Math.round(x * 100)。
+  // 必须取整 —— 0.2 * 100 在 IEEE754 下是 20.000000000000004，直接比会假红。
+  const compare = (jsVal, attrVal, where, label) => {
+    if (jsVal === null || attrVal === null) return;
+    const expect = Math.round(parseFloat(jsVal) * 100);
+    const actual = parseInt(attrVal, 10);
+    if (expect !== actual) {
+      errors.push({
+        code: 'APPEARANCE_DEFAULT_MISMATCH',
+        message: `${where} 与 js/appearance.js 的 ${label} 不一致：HTML 是 ${actual}，常量算出 ${expect}`,
+      });
+    }
+  };
+  if (cardTag) {
+    compare(cardMinVal, attrOf(cardTag, 'min'), '#appearanceCard 的 min', 'CARD_MIN × 100');
+    compare(cardDefaultVal, attrOf(cardTag, 'value'), '#appearanceCard 的 value', 'CARD_DEFAULT × 100');
+  }
+  if (bgTag) {
+    compare(bgDefaultVal, attrOf(bgTag, 'value'), '#appearanceBg 的 value', 'DEFAULTS.bgOpacity × 100');
+  }
+
+  if (errors.length) {
+    errors.forEach((e) => console.error(`  x [${e.code}] ${e.message}`));
+    console.error(`\n外观面板初值契约校验未通过（${errors.length} 项），已中止。`);
+    process.exit(1);
+  }
+  console.log('外观面板初值契约通过（3 处 HTML 初值 = js/appearance.js 常量）');
+}
+
 function main() {
   const files = listJs();
   const bad = checkJs(files);
@@ -196,6 +357,10 @@ function main() {
 
   // 必须排在上面 build-css.js --check 之后：dist 陈旧时扫 dist 得到的结论没有意义
   checkWhiteScale();
+  // 下面两个只读 css/src 与 js/、index.html，不依赖 dist 新鲜度，排序自由；
+  // 紧跟 checkWhiteScale 只为让「读源码的静态契约」聚在一起，便于阅读
+  checkGlassBlur();
+  checkAppearanceDefaults();
   checkCacheVersion();
   checkPageLinks();
 

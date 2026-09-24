@@ -1,8 +1,10 @@
 // ============ 首页外观调节（js/appearance.js）契约验证 ============
-// 三条主线：
-//   1) 默认状态必须与改造前逐像素等价（不调节 = 零变化）；
+// 四条主线：
+//   1) 默认状态必须稳定（横幅模式 + 卡片透明度强制 0.5 + 首页卡片 4px 薄膜）；
 //   2) 覆盖模式真的把轮播变成全视口固定背景层，且内容让出导航净空；
-//   3) 两个滑块只写 :root 变量、可键盘操作、能落盘并跨刷新保持，且只在覆盖模式下提供。
+//   3) 两个滑块只写 :root 变量、可键盘操作、能落盘并跨刷新保持，且只在覆盖模式下提供；
+//   4) 横幅模式一律按 BANNER_ALPHA 渲染，不读存储的 cardOpacity（见 appearance.js 文件头
+//      「渲染契约」）—— 同时守住「首页卡片的少模糊不外溢到别页」这条范围契约。
 // 另外守住「无闪烁」的结构前提：appearance.js 与它依赖的 ui.js 必须在 <head> 同步加载
 // （若退回 defer，覆盖模式会先按横幅排一次版再跳一次）。
 const { test, expect } = require('@playwright/test');
@@ -49,8 +51,17 @@ const probeDotsDisplay = (page) => page.evaluate(() => {
   return display;
 });
 
+// 读某个元素的 backdrop-filter 计算值（Chromium 归一化成 "blur(4px) saturate(150%)"）。
+// 只取 blur 那一段做断言：本用例关心的是「卡片薄膜比导航更少模糊」这条范围契约，
+// 不是 saturate 的具体数值。
+const blurOf = (page, sel) => page.evaluate((s) => {
+  const el = document.querySelector(s);
+  if (!el) throw new Error('选择器未命中：' + s);
+  return getComputedStyle(el).backdropFilter;
+}, sel);
+
 test.describe('首页外观调节', () => {
-  test('默认状态与改造前等价：横幅模式、变量取默认值', async ({ page }) => {
+  test('默认状态：横幅模式、卡片透明度强制 0.5、首页卡片模糊收到 4px', async ({ page }) => {
     await page.goto('index.html');
     const s = await snapshot(page);
 
@@ -58,9 +69,47 @@ test.describe('首页外观调节', () => {
     expect(s.position).toBe('relative');
     expect(s.wrapPaddingTop).toBe(34);        // 横幅在流内，内容只需 34px 间距
     expect(s.bgOpacity).toBe('1');
+    // 横幅模式的渲染契约：一律用 BANNER_ALPHA = 0.5 渲染，不读存储的 cardOpacity
+    //（默认是 0.7，见 js/appearance.js 的 CARD_DEFAULT）—— 见该文件头「渲染契约」。
     expect(s.glassAlpha).toBe('0.5');
-    // --glass-bg 的 alpha 由 --glass-alpha 派生，默认必须仍是改造前的 0.5
+    // --glass-bg 的 alpha 由 --glass-alpha 派生，横幅模式下必须仍是改造前的 0.5
     expect(s.panelBg).toBe('rgba(220, 240, 248, 0.5)');
+    // 首页卡片薄膜：模糊走 --glass-blur-card（4px），导航仍走 --glass-blur（18px）。
+    // 这条断言是「仅首页卡片」的范围契约 —— 若哪天误把 token 改成全局生效，
+    // 导航会跟着变成 4px，这里立刻红。
+    // 为什么必须逐个点名、不能只断言「某个 .glass-panel」：像素基线对这个属性没有分辨力
+    //（实测把 --glass-blur-card 改成非法值 → backdrop-filter: none，index-desktop.png 仍通过，
+    // 见开发文档第十二节第 6 条），computed 断言是唯一防线，漏一个选择器就是漏一处盲区。
+    // 逐个点名也让失败信息直接指认是哪张卡，而不是一句「某个 .glass-panel 不对」。
+    for (const sel of ['.blog-profile', '.clock', '.calendar']) {
+      expect(await blurOf(page, sel), `${sel} 应走 --glass-blur-card`).toContain('blur(4px)');
+    }
+    // .feed-link 不属于上面三张卡：它在 home.css 有自己的一条规则（L144），是基线覆盖不到、
+    // 上面的循环也覆盖不到的一处。这里按真实形态造一个条目（li.feed-item > a.feed-link）再读
+    // computed 值 —— 直接读现成条目会让断言随 feed 数据条数漂移，读不到时更会静默通过。
+    // 读完立刻移除：留着会让后面基于 :nth-child 或条数的断言失准。
+    const feedBlur = await page.evaluate(() => {
+      const list = document.getElementById('feedList');
+      if (!list) throw new Error('缺少 #feedList');
+      const li = document.createElement('li');
+      li.className = 'feed-item';
+      const a = document.createElement('a');
+      a.className = 'feed-link';
+      a.setAttribute('data-probe', 'blur');
+      li.appendChild(a);
+      list.appendChild(li);
+      const out = getComputedStyle(a).backdropFilter;
+      li.remove();
+      return out;
+    });
+    expect(feedBlur).toContain('blur(4px)');
+    // 兜底：.blog-wrap 内的每一张 .glass-panel 都必须走卡片档。上面是「点名的三张都在」，
+    // 这条是「没有第四张漏在外面」—— 将来新增卡片忘了改 CSS 会在这里红，而不是靠人记得加名字。
+    const escaped = await page.evaluate(() => [...document.querySelectorAll('.blog-wrap .glass-panel')]
+      .filter((el) => !getComputedStyle(el).backdropFilter.includes('blur(4px)'))
+      .map((el) => el.className));
+    expect(escaped).toEqual([]);
+    expect(await blurOf(page, '.glass-nav')).toContain('blur(18px)');
     expect(await probeDotsDisplay(page)).toBe('flex');
     // 无 localStorage 记录时不应写入任何键（apply 只读不写）
     expect(await page.evaluate(() => localStorage.getItem('appearance_v1'))).toBe(null);
@@ -145,6 +194,8 @@ test.describe('首页外观调节', () => {
     const s = await snapshot(page);
 
     expect(s.cover).toBe(true);
+    // 覆盖模式才应用存储的卡片透明度；无记录时 = CARD_DEFAULT（0.7）
+    expect(s.glassAlpha).toBe('0.7');
     expect(s.position).toBe('fixed');
     expect(s.carouselTop).toBe(0);
     expect(Math.abs(s.carouselHeight - viewport.height)).toBeLessThanOrEqual(1); // 铺满视口
@@ -246,15 +297,18 @@ test.describe('首页外观调节', () => {
       return raw ? JSON.parse(raw).cardOpacity : null;
     })).toBe(0.2);
 
-    // 切回横幅：滑块收起，但隐藏的是控件不是设置 —— --glass-alpha 仍是 0.2
+    // 切回横幅：滑块收起，但隐藏的是控件不是设置 —— 存储值仍是 0.2，
+    // 而渲染走「横幅模式强制 BANNER_ALPHA」，所以此刻 --glass-alpha 是 0.5。
     await page.locator('.appearance-mode[data-mode="banner"]').click();
     await expect(page.locator('#appearanceSliders')).toBeHidden();
-    expect((await snapshot(page)).glassAlpha).toBe('0.2');
+    expect((await snapshot(page)).glassAlpha).toBe('0.5');
+    expect(await page.evaluate(() => JSON.parse(localStorage.getItem('appearance_v1')).cardOpacity)).toBe(0.2);
 
-    // 再切回覆盖：原值原样回灌，用户不需要重调
+    // 再切回覆盖：原值原样回灌（控件文字与渲染的 α 都回到 0.2），用户不需要重调
     await page.locator('.appearance-mode[data-mode="cover"]').click();
     await expect(page.locator('#appearanceSliders')).toBeVisible();
     await expect(page.locator('#appearanceCardVal')).toHaveText('20%');
+    expect((await snapshot(page)).glassAlpha).toBe('0.2');
 
     // 焦点在滑块里时切到横幅：隐藏会把焦点抛回 body（Safari 点击按钮不移动焦点，
     // 这是真实可达的路径），必须交回刚点的模式按钮，键盘用户才不会掉出面板。
@@ -272,7 +326,7 @@ test.describe('首页外观调节', () => {
     expect(await page.evaluate(() => document.activeElement.id)).toBe('appearanceReset');
   });
 
-  test('恢复默认：一键回到改造前外观', async ({ page }) => {
+  test('恢复默认：一键回到默认外观（横幅 + 卡片 70%）', async ({ page }) => {
     await page.goto('index.html');
     await page.locator('#appearanceBtn').click();
     await page.locator('.appearance-mode[data-mode="cover"]').click();
@@ -286,21 +340,21 @@ test.describe('首页外观调节', () => {
     expect(s.position).toBe('relative');
     expect(s.wrapPaddingTop).toBe(34);
     expect(s.bgOpacity).toBe('1');
-    expect(s.glassAlpha).toBe('0.5');
+    expect(s.glassAlpha).toBe('0.5');   // 横幅模式强制回落，不读 cardOpacity
     expect(s.panelBg).toBe('rgba(220, 240, 248, 0.5)');
-    await expect(page.locator('#appearanceCardVal')).toHaveText('50%');
+    await expect(page.locator('#appearanceCardVal')).toHaveText('70%');
     await expect(page.locator('.appearance-mode[data-mode="banner"]')).toHaveAttribute('aria-pressed', 'true');
-    // 重置回横幅模式 → 滑块整组收起（值已回到默认 50%，见上一条断言）
+    // 重置回横幅模式 → 滑块整组收起（值已回到默认 70%，见上一条断言）
     await expect(page.locator('#appearanceSliders')).toBeHidden();
     expect(await page.evaluate(() => JSON.parse(localStorage.getItem('appearance_v1')))).toEqual({
-      mode: 'banner', bgOpacity: 1, cardOpacity: 0.5,
+      mode: 'banner', bgOpacity: 1, cardOpacity: 0.7,
     });
   });
 
   test('坏数据兜底：JSON 损坏回默认 / 数值越界夹取 / 非法字段回默认且不牵连合法字段', async ({ page }) => {
     await page.goto('index.html');
 
-    // 1) JSON 损坏 → 整体回默认
+    // 1) JSON 损坏 → 整体回默认（默认模式是横幅，故 α 强制 0.5）
     await page.evaluate(() => localStorage.setItem('appearance_v1', '{not json'));
     await page.reload();
     let s = await snapshot(page);
@@ -315,8 +369,18 @@ test.describe('首页外观调节', () => {
     ));
     await page.reload();
     s = await snapshot(page);
-    expect(s.cover).toBe(false);
+    expect(s.cover).toBe(false);       // 'weird' → 回默认 banner
     expect(s.bgOpacity).toBe('0');     // -2 夹到下限 0
+    // 横幅模式强制回落：存储里被夹到 1 的 cardOpacity 不参与渲染，这里读到的是 0.5
+    expect(s.glassAlpha).toBe('0.5');
+
+    // 同一份越界数值 + 合法模式（cover）→ 夹取后的 1 才真正落到 --glass-alpha 上
+    await page.evaluate(() => localStorage.setItem(
+      'appearance_v1', JSON.stringify({ mode: 'cover', bgOpacity: -2, cardOpacity: 99 })
+    ));
+    await page.reload();
+    s = await snapshot(page);
+    expect(s.cover).toBe(true);
     expect(s.glassAlpha).toBe('1');    // 99 夹到上限 1
 
     // 3) 非法数值 + 合法模式 → 数值回默认，合法字段不被牵连
@@ -327,7 +391,7 @@ test.describe('首页外观调节', () => {
     s = await snapshot(page);
     expect(s.cover).toBe(true);        // 合法模式保留
     expect(s.bgOpacity).toBe('1');     // 'abc' → NaN → 回默认
-    expect(s.glassAlpha).toBe('0.5');  // null → NaN → 回默认
+    expect(s.glassAlpha).toBe('0.7');  // null → NaN → 回默认 CARD_DEFAULT(0.7)
   });
 
   test('遮罩点击关闭并归还焦点；窄屏下覆盖模式同样铺满视口', async ({ page }) => {
@@ -352,7 +416,7 @@ test.describe('首页外观调节', () => {
     expect(await page.evaluate(() => document.activeElement.id)).toBe('appearanceBtn');
   });
 
-  test('其它页面不受影响：无触发器、变量取默认值', async ({ page }) => {
+  test('其它页面不受影响：无触发器、变量取默认值、卡片仍是 18px 模糊', async ({ page }) => {
     await page.goto('works.html');
     expect(await page.locator('#appearanceBtn').count()).toBe(0);
     const r = await page.evaluate(() => ({
@@ -361,5 +425,9 @@ test.describe('首页外观调节', () => {
     }));
     expect(r.cover).toBe(false);
     expect(r.navBg).toBe('rgba(220, 240, 248, 0.5)');
+    // 首页卡片的「薄膜更少模糊」是页面级覆盖（.blog-wrap .glass-panel），不得外溢到别页：
+    // 作品页卡片仍走 --glass-blur（18px）。卡片由 JS 渲染，先等它进 DOM 再读。
+    await expect(page.locator('#worksGrid .work-card').first()).toBeAttached();
+    expect(await blurOf(page, '#worksGrid .work-card')).toContain('blur(18px)');
   });
 });
