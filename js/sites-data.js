@@ -47,8 +47,6 @@ window.SITES_DATA = {
     { cat: 'news',   title: '掘金',           desc: '中文技术社区，前端文章质量高、更新快。', link: 'https://juejin.cn' },
     { cat: 'news',   title: 'Hacker News',    desc: '科技圈热点聚合，看看大家都在讨论什么新技术。', link: 'https://news.ycombinator.com' },
     { cat: 'news',   title: '少数派',         desc: '效率工具与数字生活评测，发现好用的软件。', link: 'https://sspai.com' },
-    { cat: 'ai',     title: 'ChatGPT',        desc: 'OpenAI 对话助手，写代码、查资料、改文案都用得上。', link: 'https://chatgpt.com' },
-    { cat: 'ai',     title: 'Perplexity',     desc: 'AI 搜索引擎，答案带来源引用，查证资料很放心。', link: 'https://www.perplexity.ai' },
     { cat: 'ai',     title: 'Hugging Face',   desc: '最大的 AI 模型社区，模型、数据集、在线 Demo 都能找。', link: 'https://huggingface.co' },
     { cat: 'ai',     title: 'v0',             desc: '用一句话生成前端界面代码，出原型、找布局灵感很快。', link: 'https://v0.dev' },
     { cat: 'ai',     title: 'MCP',            desc: 'Model Context Protocol 官方站，AI 连接工具与数据的开放标准。', link: 'https://modelcontextprotocol.io' },

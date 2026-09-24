@@ -16,4 +16,5 @@ window.NOTES_BUILTIN = [
   { id: 'n1', title: 'vibe coding', date: '2026-08-10', desc: '编程学习与 AI 协作的方法论知识库，共 7 篇文档，覆盖问题求解、vibe coding 分工与工程门禁。', link: 'https://vcnb6bik6pl4.feishu.cn/wiki/space/7687865654786952488?ccm_open_type=lark_wiki_spaceLink&open_tab_from=wiki_home', user: false },
   { id: 'n2', title: 'skill设计', date: '2026-08-12', desc: 'Skill 是给 AI 写指令而非给人：三级分层架构、自由度光谱、六步流程，用最少 token 给最精准约束。', link: 'https://blog.ahzoo.cn/p/7382919/', user: false },
   { id: 'n3', title: 'mcp讲解', date: '2026-08-14', desc: '展示了 MCP 最核心的价值：标准化 AI 与外部工具的连接方式', link: 'https://vcnb6bik6pl4.feishu.cn/docx/XNIRdZPCcofu0uxadiicq8gRnwh?from=from_copylink', user: false },
+  { id: 'n4', title: '提示词工程', date: '2026-09-01', desc: '介绍了提示词工程到harness的演化', link: 'https://vcnb6bik6pl4.feishu.cn/file/ChxZbiKUOoha6lxfUYZcxCCJnmf?from=from_copylink', user: false },
 ];
