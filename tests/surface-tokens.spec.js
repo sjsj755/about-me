@@ -9,8 +9,8 @@
 //   但那是因为气泡尾巴的 ::after 在 left:-12px 溢出 mask 盒外 —— 气泡本体仍未被保护）：
 //     1) mask 盒内的面：.cal-grid 整格（跨天的「今天」高亮会漂）、.encourage-bubble 本体；
 //     2) 常态不可见的面：.mascot-shine 常态 opacity: 0，只有 .is-active 才显示；
-//     3) 尚未生成的面：.carousel-art 只在首帧图片加载失败时才进 DOM
-//        （.carousel-dots 不在此列：CAROUSEL 有 2 帧，指示点在基线里是可见且被保护的）；
+//     3) 尚未生成的面：.carousel-art 只在帧图片加载失败时才进 DOM
+//        （.carousel-dots 不在此列：指示点在基线里是可见且被保护的）；
 //     4) 交互态：基线只拍初始静态态，所有 :hover 与 [aria-expanded="true"] 从未生效过。
 //   这些面若把 token 名写错（var(--w_55) 之类），声明会在 computed-value 阶段整条失效、
 //   属性退回初始值 —— 视觉上「白没了」，而基线因为面不可见 / 不存在而永远保持绿。
@@ -133,12 +133,17 @@ test.describe('白色面刻度 token 接线', () => {
   test('尚未生成的面：轮播占位帧的白没接错', async ({ page }) => {
     await openIndex(page);
 
-    // .carousel-art 只在帧图片缺失 / 加载失败时才进 DOM（当前两张图都正常，所以恒不存在）。
+    // .carousel-art 只在帧图片缺失 / 加载失败时才进 DOM（当前各帧图片都能正常加载，所以恒不存在）。
     // 这是「活的但没 DOM」的样式，只能用探针激活后再读。
-    // 指示点不在此列：CAROUSEL 有 2 帧，.carousel-dots 真实存在于 DOM 且被基线保护，
+    // 指示点不在此列：.carousel-dots 真实存在于 DOM 且被基线保护，
     // 下面直接读真元素，不造探针（否则探针会与真元素在同一个 right/bottom 位置重叠）。
+    // 帧数不写死：js/links.js 是纯内容文件，增删一帧就会让写死的数字飘红。
+    // CAROUSEL 是 links.js 的顶层 const（classic script → 全局词法绑定，window.CAROUSEL 取不到，
+    // 但在 evaluate 里可按标识符直接引用）。
+    const frames = await page.evaluate(() => (typeof CAROUSEL === 'undefined' ? -1 : CAROUSEL.length));
+    expect(frames).toBeGreaterThan(0);
     const dots = page.locator('.carousel-dot');
-    await expect(dots).toHaveCount(2);
+    await expect(dots).toHaveCount(frames);
 
     // 探针是 inset:0 的全幅绝对定位层，读完后必须立刻移除：它排在指示点之后，
     // 留在 DOM 里会把 .carousel-dot 整个盖住，下面的 hover 会因为「被拦截」而超时。
@@ -192,6 +197,13 @@ test.describe('白色面刻度 token 接线', () => {
     await hoverSettled(page, '#feedList .feed-link[data-probe="feed"]');
     expect(await readCSS(page, '#feedList .feed-link[data-probe="feed"]:hover', 'backgroundColor'))
       .toBe('rgba(255, 255, 255, 0.75)');
+
+    // 外观按钮在导航里，而导航滚到下方会收起（见 tests/nav.spec.js）——
+    // 上面几步为了悬停社交图标、日历格已经把页面滚下去了。先回页首让导航重新落到视口内：
+    // 固定定位元素一旦被 transform 推出视口，Playwright 既滚不动它、也命中不到它，
+    // hover 会一路重试到超时。这与真实用户「把鼠标移回页面顶部唤出导航」是同一件事。
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(page.locator('.glass-nav')).not.toHaveClass(/is-hidden/);
 
     // 外观按钮两条规则特异性相同（.appearance-btn:hover 与 [aria-expanded="true"]），
     // 靠源顺序定胜负：先验未展开时的 :hover，再验展开态，顺序被调整这里立刻失败

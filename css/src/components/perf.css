@@ -7,6 +7,12 @@
   html { scroll-behavior: auto !important; }
   .bg-orb { animation: none !important; }
   .scroll-hint .mouse span { animation: none !important; }
+  /* 导航的滚动收起/唤出位移是纯装饰反馈：取消过渡，状态仍由 js/main.js 切换，
+     只是位移瞬间到位（不牺牲可用性，只去掉运动）。
+     必须连 .is-hidden 一起写：它在 nav-glass.css 里的特异性是 (0,2,0)，
+     高于本文件中的 .glass-nav (0,1,0)，只写后者会被它的 transition-duration 漏掉。
+     本文件在 manifest 中排在 nav-glass.css 之后，同特异性靠后生效。 */
+  .glass-nav, .glass-nav.is-hidden { transition: none; }
 }
 
 /* 2) 降低玻璃模糊强度：backdrop-filter 是最昂贵的渲染操作之一，

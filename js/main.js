@@ -27,12 +27,93 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
   });
 });
 
-// ============ 导航滚动高亮（若存在导航） ============
+// ============ 导航滚动收起 / 唤出（若存在导航） ============
+// 交互契约：
+//   收起 —— 页面向下滚过 HIDE_AT，且鼠标光标不在顶部热区；
+//   唤出 —— 鼠标移入顶部热区、键盘焦点进入导航、移动端菜单展开、或滚回页首。
+// 收起只做 transform 位移（样式见 nav-glass.css）：导航始终留在 tab 序与可访问性树里，
+// 键盘用户不会因为「元素被 visibility: hidden 摘掉」而彻底够不到导航。
 const nav = document.querySelector('.glass-nav');
 if (nav) {
+  const HIDE_AT = 40; // 滚动超过该距离才允许收起；页首附近始终可见
+  const navLinks = nav.querySelector('.nav-links');
+
+  // 顶部热区下沿 = 导航静止时的底边 + 14px 余量。
+  // 必须覆盖整个导航带（top 偏移 + 自身高度）：鼠标从唤出位置下移到导航链接上时，
+  // 若半路离开热区，导航会在指针底下收起、链接点不到。
+  // 用 top + offsetHeight 计算而不用 getBoundingClientRect：后者含 transform，
+  // 导航已收起时读到的是负值；这两者都不随 transform 变化，任何时刻量取都成立。
+  let topZone = 0;
+  function measureTopZone() {
+    topZone = parseFloat(getComputedStyle(nav).top) + nav.offsetHeight + 14;
+  }
+  measureTopZone();
+
+  // 精指针（鼠标 / 触控板）判定做成动态求值 + 监听 change：二合一设备拔掉鼠标后
+  // 「顶部热区」这条唤出路径就再也走不到，必须能切到触屏的「向上滚动唤出」兜底，
+  // 否则导航收起后无法唤回。
+  const fineQuery = typeof window.matchMedia === 'function'
+    ? window.matchMedia('(hover: hover) and (pointer: fine)') : null;
+  const hasFinePointer = () => !!(fineQuery && fineQuery.matches);
+
+  let pointerNearTop = false; // 光标是否落在顶部热区内（仅精指针设备维护）
+  let scrollDir = 0;          // 最近一次有效滚动方向：1 向下、-1 向上
+  let lastY = window.scrollY; // Lenis 平滑滚动的亚像素位移不作方向依据，累积到 ≥1px 再采信
+
+  // 三条「必须可见」的约束优先于收起：滚回页首 / 键盘焦点在导航内 / 移动端菜单展开。
+  function wantsHidden() {
+    if (window.scrollY <= HIDE_AT) return false;
+    // 键盘用户滚到下方后按 Tab 进来，焦点若落在视口外就看不到当前位置，导航必须现身。
+    // 只认 :focus-visible：鼠标点过的按钮同样持有 activeElement，但不该把导航钉住不放。
+    const active = document.activeElement;
+    if (active && nav.contains(active) && active.matches(':focus-visible')) return false;
+    // .nav-links 在移动端是独立浮层（见 nav-mobile.css），导航收起会把汉堡按钮和菜单分离开。
+    if (navLinks && navLinks.classList.contains('open')) return false;
+    // 鼠标设备只认「光标进入顶部热区」；触屏没有光标，退化为「向上滚动唤出」。
+    return hasFinePointer() ? !pointerNearTop : scrollDir > 0;
+  }
+
+  let scheduled = false;
+  function render() {
+    scheduled = false;
+    nav.classList.toggle('scrolled', window.scrollY > HIDE_AT);
+    nav.classList.toggle('is-hidden', wantsHidden());
+  }
+  // scroll / mousemove / click 的触发频率远高于渲染需要，统一用 rAF 合并到每帧一次。
+  function schedule() {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(render);
+  }
+
   window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 40);
-  });
+    const y = window.scrollY;
+    const dy = y - lastY;
+    if (Math.abs(dy) >= 1) { scrollDir = dy > 0 ? 1 : -1; lastY = y; }
+    schedule();
+  }, { passive: true });
+
+  // 只关心「是否跨过热区边界」这一位翻转；光标在热区内继续移动不再触发渲染。
+  window.addEventListener('mousemove', (e) => {
+    if (!hasFinePointer()) return;
+    const near = e.clientY <= topZone;
+    if (near === pointerNearTop) return;
+    pointerNearTop = near;
+    schedule();
+  }, { passive: true });
+
+  // 焦点进出导航：render() 在下一帧读 activeElement，那时焦点迁移已完成。
+  nav.addEventListener('focusin', schedule);
+  nav.addEventListener('focusout', schedule);
+  // 汉堡按钮的 click 冒泡到这里（祖先节点晚于目标节点触发），render() 又晚一帧执行，
+  // 两种时序都保证读到的是切换后的 .open，因此无需改动下方移动端菜单的代码。
+  nav.addEventListener('click', schedule);
+
+  // 导航高度/字号改动后热区下沿要跟着走，否则唤出判定会悄悄失准。
+  window.addEventListener('resize', () => { measureTopZone(); schedule(); }, { passive: true });
+  if (fineQuery && fineQuery.addEventListener) fineQuery.addEventListener('change', schedule);
+
+  render();
 }
 
 // ============ 自定义光标 ============

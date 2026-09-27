@@ -161,8 +161,11 @@ a { text-decoration: none; color: inherit; }
 
 /* ============ 导航玻璃 ============ */
 .glass-nav {
-  /* env() 在支持沉浸式（鸿蒙 ArkWeb / iOS）时避让挖孔，桌面与常规安卓为 0 */
-  position: fixed; top: calc(18px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%);
+  /* 顶部偏移：env() 在支持沉浸式（鸿蒙 ArkWeb / iOS）时避让挖孔，桌面与常规安卓为 0。
+     抽成变量是因为「收起态要位移多少」取决于它 —— 只写 translateY(-100%)
+     会让导航在 18px（或含安全区的更多）处残留一条可见边。 */
+  --nav-gap: calc(18px + env(safe-area-inset-top, 0px));
+  position: fixed; top: var(--nav-gap); left: 50%; transform: translate(-50%, 0);
   width: min(1080px, 92%); z-index: 100;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -171,6 +174,20 @@ a { text-decoration: none; color: inherit; }
   border-radius: 60px;
   padding: 12px 26px;
   box-shadow: var(--shadow);
+  /* 只过渡 transform（合成器属性，不触发布局/重绘）。
+     唤出用 .26s：用户刚做完「把鼠标甩到顶部」这个动作，需要立刻得到反馈；
+     收起更快（.2s，见 .is-hidden）—— 退出比进入快，避免遮挡内容。 */
+  transition: transform .26s var(--ease-out);
+}
+
+/* 向下滚动后的收起态（类名由 js/main.js 维护）。
+   刻意不用 visibility: hidden / display: none：
+   那会把导航移出 tab 序与可访问性树 —— 键盘用户滚到下方后再也够不到导航（死锁），
+   :focus-within 也永远不会触发。元素整体移出视口后本就不会被命中，
+   因此 pointer-events 也无需干预。 */
+.glass-nav.is-hidden {
+  transform: translate(-50%, calc(-1 * var(--nav-gap) - 100% - 12px));
+  transition-duration: .2s;
 }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; }
 .brand { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; }
@@ -706,6 +723,12 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
   html { scroll-behavior: auto !important; }
   .bg-orb { animation: none !important; }
   .scroll-hint .mouse span { animation: none !important; }
+  /* 导航的滚动收起/唤出位移是纯装饰反馈：取消过渡，状态仍由 js/main.js 切换，
+     只是位移瞬间到位（不牺牲可用性，只去掉运动）。
+     必须连 .is-hidden 一起写：它在 nav-glass.css 里的特异性是 (0,2,0)，
+     高于本文件中的 .glass-nav (0,1,0)，只写后者会被它的 transition-duration 漏掉。
+     本文件在 manifest 中排在 nav-glass.css 之后，同特异性靠后生效。 */
+  .glass-nav, .glass-nav.is-hidden { transition: none; }
 }
 
 /* 2) 降低玻璃模糊强度：backdrop-filter 是最昂贵的渲染操作之一，

@@ -16,6 +16,14 @@ async function readBuiltinCount(page) {
   return n;
 }
 
+// 按标题定位刚创建的那张便签。
+// 不能取 .note-card.first()：整墙按日期倒序，内置条目（js/notes-data.js）只要日期不早于今天
+// 就会排在新笔记前面 —— 此时 first() 命中的是内置条目（带外链、无 .note-del），
+// 「点击第一张」会跳外链而不是开详情弹窗、「删除第一张」会因为没有 .note-del 而超时。
+function cardByTitle(page, title) {
+  return page.locator('.note-card').filter({ hasText: title });
+}
+
 // 打开「写笔记」弹窗并等自动聚焦落定：openAdd 里有 60ms 的 focus 定时器，
 // 不等它结束就输入，会把后一个字段的内容敲进前一个字段（新增字段后必现）。
 async function openAddForm(page) {
@@ -72,7 +80,7 @@ test.describe('笔记本页', () => {
     await page.locator('#fDesc').fill('点击应新开窗口。');
     await page.locator('#addForm button[type="submit"]').click();
 
-    const card = page.locator('.note-card').first();
+    const card = cardByTitle(page, '带链接的笔记');
     const link = card.locator('.note-link');
     await expect(link).toHaveAttribute('href', 'https://xxx.feishu.cn/docx/abc123');
     await expect(link).toHaveAttribute('target', '_blank');
@@ -115,12 +123,12 @@ test.describe('笔记本页', () => {
 
     await expect(page.locator('#addModal')).not.toHaveClass(/open/);
     await expect(page.locator('.note-card')).toHaveCount(builtin + 1);
-    await expect(page.locator('.note-card').first()).toContainText('grid 断点测试');
+    await expect(cardByTitle(page, 'grid 断点测试')).toHaveCount(1);
 
     // 持久化：刷新后仍在
     await page.reload();
     await expect(page.locator('.note-card')).toHaveCount(builtin + 1);
-    await expect(page.locator('.note-card').first()).toContainText('grid 断点测试');
+    await expect(cardByTitle(page, 'grid 断点测试')).toHaveCount(1);
   });
 
   test('摘要字数受限，便签正面完整显示不被裁切', async ({ page }) => {
@@ -143,7 +151,7 @@ test.describe('笔记本页', () => {
     await page.locator('#addForm button[type="submit"]').click();
 
     // 写到上限的摘要，在便签上应一字不少地排进 3 行内（scrollHeight 不超过可视高度，容忍 1px 亚像素误差）
-    const body = page.locator('.note-card').first().locator('.note-body');
+    const body = cardByTitle(page, '字数约束').locator('.note-body');
     await expect(body).toHaveText('字'.repeat(60));
     expect(await body.evaluate((el) => el.scrollHeight - el.clientHeight)).toBeLessThanOrEqual(1);
 
@@ -169,7 +177,7 @@ test.describe('笔记本页', () => {
     await expect(page.locator('.note-card')).toHaveCount(builtin + 1);
 
     // 点击卡片本体打开详情
-    await page.locator('.note-card').first().click();
+    await cardByTitle(page, '本地笔记').click();
     await expect(page.locator('#detailModal')).toHaveClass(/open/);
     await expect(page.locator('#detailBody')).toContainText('本地笔记');
 
@@ -178,13 +186,13 @@ test.describe('笔记本页', () => {
     await expect(page.locator('#detailModal')).not.toHaveClass(/open/);
 
     // × 关闭
-    await page.locator('.note-card').first().click();
+    await cardByTitle(page, '本地笔记').click();
     await expect(page.locator('#detailModal')).toHaveClass(/open/);
     await page.locator('#detailModal [data-close]').click();
     await expect(page.locator('#detailModal')).not.toHaveClass(/open/);
 
     // 遮罩关闭
-    await page.locator('.note-card').first().click();
+    await cardByTitle(page, '本地笔记').click();
     await expect(page.locator('#detailModal')).toHaveClass(/open/);
     await page.locator('#detailModal').click({ position: { x: 5, y: 5 } });
     await expect(page.locator('#detailModal')).not.toHaveClass(/open/);
@@ -199,7 +207,7 @@ test.describe('笔记本页', () => {
     await expect(page.locator('.note-card')).toHaveCount(builtin + 1);
 
     page.once('dialog', (d) => d.accept());
-    await page.locator('.note-card').first().locator('.note-del').click();
+    await cardByTitle(page, '待删除').locator('.note-del').click();
 
     await expect(page.locator('.note-card')).toHaveCount(builtin);
   });

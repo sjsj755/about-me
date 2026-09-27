@@ -1,6 +1,9 @@
 // Playwright 配置：纯静态站点。
-// 用 Python 内置 http.server 提供 HTTP 服务（而非 file://）：
-// file:// 属于不透明源，localStorage 不可用，会让依赖本地存储的页面测试失真。
+// webServer 用 tools/dev-server.js（Node 静态服务器，含入参校验与保活保障）：
+// 此前用 python -m http.server，在 Python 3.14 下长时间运行会死亡，导致测试尾部
+// 用例批量 ERR_CONNECTION_REFUSED（2026-09-28 体检结论）。
+// 不设 reuseExistingServer：采用默认值（仅 CI 复用），本地总是启动全新服务器，
+// 避免复用遗留孤儿进程造成不可复现的假失败。
 // 浏览器用系统已装的 Edge/Chrome 通道（channel），避免下载 Playwright 自带 Chromium
 // （cdn.playwright.dev 在国内网络下常不可达）。可用 PW_CHANNEL=chrome 覆盖。
 const { defineConfig } = require('@playwright/test');
@@ -16,9 +19,8 @@ module.exports = defineConfig({
   workers: 1,
   reporter: [['list']],
   webServer: {
-    command: `python -m http.server ${PORT} --bind 127.0.0.1`,
+    command: `node tools/dev-server.js ${PORT}`,
     url: BASE + 'index.html',
-    reuseExistingServer: true,
     timeout: 60000,
   },
   use: {
