@@ -167,14 +167,41 @@ test.describe('白色面刻度 token 接线', () => {
       return { bg: s.backgroundColor, shadow: s.boxShadow };
     }, i);
 
-    const plain = await dotRead(1);                                 // 第 2 个点未选中
-    expect(plain.bg).toBe('rgba(255, 255, 255, 0.55)');             // 未选中点 → var(--w-55)
-    expect(plain.shadow).toContain('rgba(255, 255, 255, 0.18)');     // 点外圈   → var(--w-18)
-    expect((await dotRead(0)).bg).toBe('rgb(255, 255, 255)');       // 选中点   → var(--white)
+    // 活动帧索引不写死：轮播每 5s 自动切帧（js/blog-carousel.js 的 INTERVAL），
+    // openIndex() 的网络等待加上本用例前面的若干次 evaluate 足以跨过一轮，
+    // 写死「第 0 个点选中 / 第 1 个点未选中」会变成随机飘红。
+    // 索引与两个点的 computed 值必须在同一次 evaluate 里原子读出：分成多次的话，
+    // 中途跨过切帧时刻会让「未选中点」读到选中态的白。
+    const dotState = await page.evaluate(() => {
+      const els = Array.prototype.slice.call(document.querySelectorAll('.carousel-dot'));
+      const read = (el) => {
+        const s = getComputedStyle(el, '::before');
+        return { bg: s.backgroundColor, shadow: s.boxShadow };
+      };
+      const active = els.findIndex((el) => el.classList.contains('is-active'));
+      const idle = els.findIndex((el) => !el.classList.contains('is-active'));
+      return {
+        active: active,
+        idle: idle,
+        activeCSS: active < 0 ? null : read(els[active]),
+        idleCSS: idle < 0 ? null : read(els[idle]),
+      };
+    });
+    expect(dotState.active).toBeGreaterThanOrEqual(0);
+    expect(dotState.idle).toBeGreaterThanOrEqual(0);
+    expect(dotState.idleCSS.bg).toBe('rgba(255, 255, 255, 0.55)');         // 未选中点 → var(--w-55)
+    expect(dotState.idleCSS.shadow).toContain('rgba(255, 255, 255, 0.18)'); // 点外圈   → var(--w-18)
+    expect(dotState.activeCSS.bg).toBe('rgb(255, 255, 255)');               // 选中点   → var(--white)
 
-    // :hover 是基线唯一永远拍不到的态
+    // :hover 是基线唯一永远拍不到的态。悬停会让 #blogCarousel 收到 mouseenter 而停掉自动轮播，
+    // 此后帧不再切换；但 hoverSettled 悬的是「第一个未选中点」，未必是上面那个 idle，
+    // 因此按 :hover 实际命中者取索引。
     await hoverSettled(page, '.carousel-dot:not(.is-active)');
-    expect((await dotRead(1)).bg).toBe('rgba(255, 255, 255, 0.85)'); // :hover → var(--w-85)
+    const hovered = await page.evaluate(() => Array.prototype.slice
+      .call(document.querySelectorAll('.carousel-dot'))
+      .findIndex((d) => d.matches(':hover')));
+    expect(hovered).toBeGreaterThanOrEqual(0);
+    expect((await dotRead(hovered)).bg).toBe('rgba(255, 255, 255, 0.85)');  // :hover → var(--w-85)
   });
 
   test('交互态：悬停、展开与选中态的白都取自刻度', async ({ page }) => {

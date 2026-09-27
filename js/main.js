@@ -49,6 +49,12 @@ if (nav) {
   }
   measureTopZone();
 
+  // 热区滞回：进入用 topZone，退出要再往下多滑 20px 才认。
+  // 单阈值时，光标停在下沿附近的手抖（轨迹球、触控板的亚像素抖动）会让
+  // 「在热区内 / 在外」这一位反复翻转，导航跟着反复收起又滑出 —— 正是「突兀」的来源之一。
+  // 只给退出侧加余量（而不是把整个热区拉高）：唤出的判定点不变，响应依旧灵敏。
+  const HOT_EXIT_SLACK = 20;
+
   // 精指针（鼠标 / 触控板）判定做成动态求值 + 监听 change：二合一设备拔掉鼠标后
   // 「顶部热区」这条唤出路径就再也走不到，必须能切到触屏的「向上滚动唤出」兜底，
   // 否则导航收起后无法唤回。
@@ -94,9 +100,11 @@ if (nav) {
   }, { passive: true });
 
   // 只关心「是否跨过热区边界」这一位翻转；光标在热区内继续移动不再触发渲染。
+  // 边界值随当前状态切换（滞回）：已在热区内时用放宽的下沿，避免下沿附近的抖动反复触发。
   window.addEventListener('mousemove', (e) => {
     if (!hasFinePointer()) return;
-    const near = e.clientY <= topZone;
+    const limit = pointerNearTop ? topZone + HOT_EXIT_SLACK : topZone;
+    const near = e.clientY <= limit;
     if (near === pointerNearTop) return;
     pointerNearTop = near;
     schedule();

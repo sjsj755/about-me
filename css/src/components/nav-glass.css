@@ -14,9 +14,12 @@
   padding: 12px 26px;
   box-shadow: var(--shadow);
   /* 只过渡 transform（合成器属性，不触发布局/重绘）。
-     唤出用 .26s：用户刚做完「把鼠标甩到顶部」这个动作，需要立刻得到反馈；
-     收起更快（.2s，见 .is-hidden）—— 退出比进入快，避免遮挡内容。 */
-  transition: transform .26s var(--ease-out);
+     曲线用 --ease-drawer 而非 --ease-out：导航是整条横跨视口的 bar，
+     位移量大，--ease-out 起步过陡会让它在第一帧就「跳」出屏外，观感突兀；
+     抽屉曲线起步缓、末端贴合，同样时长下看起来更顺（理由见 tokens.css）。
+     时长 .4s：落在 skill 给「抽屉/浮层」的 200–500ms 带内。
+     收起稍快到 .3s（见 .is-hidden）—— 退出比进入快，避免收起的 bar 长时间压着内容。 */
+  transition: transform .4s var(--ease-drawer);
 }
 
 /* 向下滚动后的收起态（类名由 js/main.js 维护）。
@@ -26,7 +29,7 @@
    因此 pointer-events 也无需干预。 */
 .glass-nav.is-hidden {
   transform: translate(-50%, calc(-1 * var(--nav-gap) - 100% - 12px));
-  transition-duration: .2s;
+  transition-duration: .3s;
 }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; }
 .brand { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; }

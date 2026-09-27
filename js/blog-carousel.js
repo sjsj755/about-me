@@ -2,7 +2,7 @@
 // 数据源：js/links.js 的 CAROUSEL 数组，项格式 { src: '图片路径', caption: '图片说明' }。
 // 轮播内不渲染任何视觉文字：caption 只作为 img.alt 供读屏使用，不做标题叠层。
 // src 省略或图片加载失败时该帧降级为品牌渐变占位帧（纯视觉，同样无文案）。
-// 动效：0.8s ease-out 淡入；15s 自动轮播，悬停 / 切后台暂停；prefers-reduced-motion 不自动播。
+// 动效：0.8s ease-out 淡入；5s 自动轮播，悬停 / 切后台暂停；prefers-reduced-motion 不自动播。
 // 容错：#blogCarousel 不存在（非首页）静默退出。
 // 可达性：指示点为 button 可键盘操作；非活动帧 aria-hidden。
 (function () {
@@ -11,7 +11,11 @@
   var root = document.getElementById('blogCarousel');
   if (!root) return;
 
-  var INTERVAL = 15000;
+  // 自动切帧间隔。5s 是「一眼看清这一帧，又不至于干等」的档位；
+  // 交叉淡入本身占 0.8s，仍留有 4.2s 的静止观看窗口。
+  // 注意：改这个值会牵动测试 —— tests/visual.spec.js 会先把帧钉回第 0 帧再截图，
+  // tests/surface-tokens.spec.js 则运行时读活动点索引，两者都不写死帧号。
+  var INTERVAL = 5000;
   var reduceMotion = window.matchMedia
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

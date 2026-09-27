@@ -33,7 +33,7 @@ const navState = (page) => page.evaluate(() => {
   };
 });
 
-// 位移带 .26s（唤出）/.2s（收起）过渡：类名先落、位置后到，几何断言必须轮询等待。
+// 位移带 .4s（唤出）/.3s（收起）过渡：类名先落、位置后到，几何断言必须轮询等待。
 // 收起态的底边落在 -12px（见 nav-glass.css 的位移公式），所以「退净」等价于 bottom ≤ 0。
 const expectOffScreen = (page) => expect.poll(async () => (await navState(page)).bottom)
   .toBeLessThanOrEqual(0);

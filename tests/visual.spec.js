@@ -22,12 +22,25 @@ const VIEWPORTS = {
 const DYNAMIC = '.clock, .encourage-bubble, .cal-grid';
 
 // 页面稳定化：网络空闲 → 滚到底触发 IntersectionObserver 懒加载 → 回顶 → 留出入场动画时间
+// → 轮播钉回第 0 帧。
 async function settle(page) {
   await page.waitForLoadState('networkidle');
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(500);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(800);
+  // 首页轮播每 5s 自动切帧（js/blog-carousel.js 的 INTERVAL），而本函数到这里已耗掉近 2s ——
+  // 慢机上截图时刻可能落到第 2/3 帧，与基线一比就是整幅假差异。
+  // 点一下第 0 个指示点把帧钉回第一帧：处理函数内部 stop() → goTo(0) → start()，
+  // 顺带把计时器重置，等于给截图重新留出完整的 5s 窗口。
+  // 必须用合成 click（evaluate 里的 el.click()）而不能用 locator.click()：
+  // 后者会把真实鼠标移到点上，把 .carousel-dot:hover 的提亮态永久烤进基线。
+  // 非首页没有 #blogCarousel，querySelector 取不到点，跳过即可。
+  await page.evaluate(() => {
+    const dot = document.querySelector('.carousel-dot');
+    if (dot) dot.click();
+  });
+  await page.waitForTimeout(900); // 0.8s 交叉淡入 + 余量
 }
 
 test.describe('视觉基线', () => {
