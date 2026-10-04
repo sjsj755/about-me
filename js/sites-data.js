@@ -14,7 +14,7 @@ window.SITES_DATA = {
     dev:    { name: '开发', grad: 'g1' },
     design: { name: '设计', grad: 'g2' },
     tool:   { name: '工具', grad: 'g6' },
-    learn:  { name: '学习', grad: 'g5' },
+    algorithm:  { name: '算法', grad: 'g5' },
     news:   { name: '资讯', grad: 'g4' },
     ai:     { name: 'AI',   grad: 'g3' },
     other:  { name: '其他', grad: 'g3' },
@@ -39,7 +39,7 @@ window.SITES_DATA = {
     { cat: 'tool',   title: 'Squoosh',        desc: '浏览器里直接压缩图片，支持 WebP / AVIF。', link: 'https://squoosh.app' },
     { cat: 'tool',   title: 'CodePen',        desc: '在线写 HTML/CSS/JS 小demo，随手试验样式效果。', link: 'https://codepen.io' },
      
-    // 学习
+    // 算法
     { cat: 'learn',  title: 'freeCodeCamp',   desc: '免费编程课程 + 练习，跟着做项目学得最扎实。', link: 'https://www.freecodecamp.org' },
     { cat: 'learn',  title: 'LeetCode 力扣',  desc: '算法题库与题解，按标签和难度刷题很顺手。', link: 'https://leetcode.cn' },
     
@@ -51,7 +51,7 @@ window.SITES_DATA = {
     { cat: 'ai',     title: 'v0',             desc: '用一句话生成前端界面代码，出原型、找布局灵感很快。', link: 'https://v0.dev' },
     { cat: 'ai',     title: 'MCP',            desc: 'Model Context Protocol 官方站，AI 连接工具与数据的开放标准。', link: 'https://modelcontextprotocol.io' },
     { cat: 'ai',     title: 'Skills.sh',      desc: 'Agent 技能注册表，浏览并一键安装社区共享的 AI 技能包。', link: 'https://skills.sh' },
-
+   
     // 其他
     { cat: 'other',  title: '中国国家图书馆',  desc: '全世界中文文献收藏最多的图书馆，也是国内最大的外文文献收藏馆。', link: 'http://read.nlc.cn' },
   ],

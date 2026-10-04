@@ -2,7 +2,12 @@
 // 数据源：js/links.js 的 CAROUSEL 数组，项格式 { src: '图片路径', caption: '图片说明' }。
 // 轮播内不渲染任何视觉文字：caption 只作为 img.alt 供读屏使用，不做标题叠层。
 // src 省略或图片加载失败时该帧降级为品牌渐变占位帧（纯视觉，同样无文案）。
-// 动效：0.8s ease-out 淡入；5s 自动轮播，悬停 / 切后台暂停；prefers-reduced-motion 不自动播。
+// 动效：0.8s ease-out 淡入；5s 自动轮播，悬停 / 切后台暂停。
+//   prefers-reduced-motion 只去掉淡入 —— home.css 已把 .carousel-slide 的 transition 置为 none，
+//   自动切帧照常进行。切帧是「内容更新」而非装饰性运动，不能因该偏好把功能一并关掉
+//   （skill 口径：只去运动、不去功能；项目里 perf.css 的导航收起 / 唤出同理）。
+//   ⚠ 历史教训：这里曾写成「reduce-motion 不自动播」，导致系统开了「减少动画」的访客
+//   永远只看到第一张图，且因为 Playwright 默认 no-preference 而长期没有测试发现。
 // 容错：#blogCarousel 不存在（非首页）静默退出。
 // 可达性：指示点为 button 可键盘操作；非活动帧 aria-hidden。
 (function () {
@@ -16,8 +21,6 @@
   // 注意：改这个值会牵动测试 —— tests/visual.spec.js 会先把帧钉回第 0 帧再截图，
   // tests/surface-tokens.spec.js 则运行时读活动点索引，两者都不写死帧号。
   var INTERVAL = 5000;
-  var reduceMotion = window.matchMedia
-    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var site = (typeof SITE !== 'undefined') ? SITE : { name: '' };
   var conf = (typeof CAROUSEL !== 'undefined' && CAROUSEL.length) ? CAROUSEL : [{}];
@@ -101,8 +104,10 @@
     dotEls.forEach(function (el, i) { el.classList.toggle('is-active', i === idx); });
   }
 
+  // 刻意不在这里判 prefers-reduced-motion：它只该去掉淡入（CSS 层已处理），
+  // 不该让轮播停播 —— 一旦停播，开了该偏好的访客就只剩一张静止图，等于功能缺失。
   function start() {
-    if (reduceMotion || timer || slideEls.length < 2) return;
+    if (timer || slideEls.length < 2) return;
     timer = setInterval(function () { goTo(idx + 1); }, INTERVAL);
   }
 
