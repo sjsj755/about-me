@@ -453,9 +453,16 @@ if (burger && links) {
     if (about.skills) {
       const skills = document.createElement('div');
       skills.className = 'glass-panel skills reveal';
-      skills.innerHTML = `<h3>${about.skills.title}</h3><div class="skill-list">`
-        + (about.skills.items || []).map((s) => `<span class="skill">${s}</span>`).join('')
+      const chips = (arr) => `<div class="skill-list">`
+        + (arr || []).map((s) => `<span class="skill">${s}</span>`).join('')
         + `</div>`;
+      // 分组格式（groups：label + items）优先；否则回退平铺 items
+      const body = Array.isArray(about.skills.groups) && about.skills.groups.length
+        ? about.skills.groups.map((g) =>
+            `<div class="skill-group"><div class="skill-group-label">${g.label}</div>${chips(g.items)}</div>`
+          ).join('')
+        : chips(about.skills.items);
+      skills.innerHTML = `<h3>${about.skills.title}</h3>` + body;
       grid.appendChild(skills);
     }
   }
@@ -638,9 +645,24 @@ FX.all('.work-card').forEach(FX.bind3D);
 
   const INTERVAL = 15000; // 自动轮换间隔
   const SWAP_MS = 240;    // 与 CSS 过渡时长保持一致
+  const TYPE_MS = 45;     // 打字机逐字间隔
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let idx = 0;
   let timer = null;
   let swapping = false;
+  let typeTimer = null;
+
+  // 打字机进场：逐字写入（减弱动效偏好下直接整句显示）
+  function typeText(text, done) {
+    if (typeTimer) { clearInterval(typeTimer); typeTimer = null; }
+    if (reduceMotion || !text) { bubble.textContent = text; if (done) done(); return; }
+    bubble.textContent = '';
+    let i = 0;
+    typeTimer = setInterval(() => {
+      bubble.textContent = text.slice(0, ++i);
+      if (i >= text.length) { clearInterval(typeTimer); typeTimer = null; if (done) done(); }
+    }, TYPE_MS);
+  }
 
   function next() {
     if (swapping) return;
@@ -648,9 +670,8 @@ FX.all('.work-card').forEach(FX.bind3D);
     idx = (idx + 1) % quotes.length;
     bubble.classList.add('is-swapping');
     setTimeout(() => {
-      bubble.textContent = quotes[idx];
       bubble.classList.remove('is-swapping');
-      swapping = false;
+      typeText(quotes[idx], () => { swapping = false; });
     }, SWAP_MS);
   }
 
@@ -665,6 +686,8 @@ FX.all('.work-card').forEach(FX.bind3D);
   const frame = document.getElementById('mascotFrame');
   if (frame) frame.addEventListener('click', onManual);
 
+  // 首次进场同样打字机（defer 脚本在首帧渲染前执行，无闪烁）；JS 失效时保留 HTML 静态文案
+  typeText(quotes[0]);
   start();
 })();
 

@@ -422,6 +422,15 @@
   min-height: calc(2.55rem + 18px);
   transition: opacity .24s var(--ease-out), filter .24s var(--ease-out);
 }
+/* 拟态升级：左侧引号线（竖向渐变短线，强化"语录"语义） */
+.encourage-bubble::before {
+  content: ""; position: absolute;
+  left: 8px; top: 8px; bottom: 8px; width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent-blue), transparent);
+  opacity: .55;
+  pointer-events: none;
+}
 /* 退场：轻模糊交叉淡化（blur 让两句话融为一次变形而非两个物体交叠） */
 .encourage-bubble.is-swapping {
   opacity: 0;
