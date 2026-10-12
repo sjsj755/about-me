@@ -72,8 +72,10 @@
   }
 
   function scrollTo(target, vars) {
-    if (!target) return;
+    // 0 是合法滚动目标（回顶）：falsy 防护必须放行显式的 0
+    if (!target && target !== 0) return;
     if (lenis) lenis.scrollTo(target, vars);
+    else if (typeof target === 'number') window.scrollTo(0, target);
     else if (target.scrollIntoView) target.scrollIntoView({ block: 'start' });
   }
 

@@ -120,6 +120,50 @@
     } catch (e) { return false; }
   }
 
+  // ---- 阅读进度绳 + 悬浮操作组 ----
+  // 绳子常驻右缘（<1240px 隐藏，避免与目录重叠）；不足一屏（空态/短文）时整体缺席。
+  // 悬浮组滚过 0.6 屏才浮现：顶部时「回顶/返回」动作无意义。
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const progressEl = document.getElementById('noteProgress');
+  const fillEl = document.getElementById('npFill');
+  const knotEl = document.getElementById('npKnot');
+  const fabsEl = document.getElementById('noteFabs');
+  const badgeEl = document.getElementById('npBadge');
+  const topBtn = document.getElementById('npTop');
+  let trackH = 0;
+  let progTicking = false;
+
+  function measureTrack() {
+    const track = progressEl && progressEl.querySelector('.np-track');
+    trackH = track ? track.offsetHeight : 0;
+  }
+  function updateProgress() {
+    progTicking = false;
+    const y = window.scrollY || 0;
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    const hasRoom = maxScroll > 0;
+    if (progressEl) progressEl.hidden = !hasRoom;
+    if (!hasRoom) { if (fabsEl) fabsEl.classList.remove('is-on'); return; }
+    const p = Math.min(1, Math.max(0, y / maxScroll));
+    fillEl.style.transform = 'scaleY(' + p + ')';
+    knotEl.style.transform = 'translateY(' + (trackH * p).toFixed(1) + 'px)';
+    badgeEl.textContent = Math.round(p * 100) + '%';
+    fabsEl.classList.toggle('is-on', y > window.innerHeight * 0.6);
+  }
+  function onScrollRaf() {
+    if (!progTicking) { progTicking = true; requestAnimationFrame(updateProgress); }
+  }
+  if (progressEl && fabsEl && fillEl && knotEl && badgeEl && topBtn) {
+    measureTrack();
+    window.addEventListener('scroll', onScrollRaf, { passive: true });
+    window.addEventListener('resize', () => { measureTrack(); updateProgress(); });
+    // 正文 fetch 注入、图片/字体加载都会改变页高，且不伴随 scroll 事件：
+    // 用 ResizeObserver 兜底重算（transform/textContent 写入不改布局，无回调循环）
+    if (window.ResizeObserver) new ResizeObserver(updateProgress).observe(document.body);
+    topBtn.addEventListener('click', () => FX.scrollTo(0, { immediate: reduced }));
+    updateProgress();
+  }
+
   // ---- 主流程 ----
   const id = new URLSearchParams(location.search).get('id') || '';
   const list = Array.isArray(window.NOTES_BUILTIN) ? window.NOTES_BUILTIN : [];

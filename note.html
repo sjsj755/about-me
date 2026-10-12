@@ -82,6 +82,29 @@
     </footer>
   </section>
 
+  <!-- 阅读进度绳（右缘常驻）+ 悬浮操作组（滚过 0.6 屏浮现） -->
+  <div class="note-progress" id="noteProgress" aria-hidden="true">
+    <div class="np-track">
+      <span class="np-fill" id="npFill"></span>
+      <!-- 顺绳下滑的卡通小人：双手抓绳处即当前进度点 -->
+      <span class="np-climber" id="npKnot" aria-hidden="true">
+        <svg width="36" height="45" viewBox="0 0 32 40" fill="none">
+          <path d="M16 2 L11.5 14 M16 6 L20 14.5" stroke="var(--accent-blue)" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="15.5" cy="19" r="6" fill="var(--w-95)" stroke="var(--accent-blue)" stroke-width="2"/>
+          <circle cx="13.5" cy="18.5" r="1" fill="var(--accent-blue)"/>
+          <circle cx="18" cy="18.5" r="1" fill="var(--accent-blue)"/>
+          <path d="M13.5 21.5 Q15.5 23 17.5 21.5" stroke="var(--accent-blue)" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M15.5 25 L14.5 31 M14.5 31 L10.5 36.5 M14.5 31 L18.5 36" stroke="var(--accent-blue)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </span>
+    </div>
+  </div>
+  <div class="note-fabs" id="noteFabs">
+    <span class="np-badge" id="npBadge" aria-hidden="true">0%</span>
+    <button class="np-fab" id="npTop" type="button" aria-label="回到顶部" title="回到顶部">↑</button>
+    <a class="np-fab" href="notes.html" aria-label="返回笔记本" title="返回笔记本">←</a>
+  </div>
+
   <!-- GSAP + Lenis + Markdown 渲染（marked / DOMPurify，缺失时 note.js 降级为纯文本） -->
   <script src="js/vendor/gsap.min.js?v=20261013" defer></script>
   <script src="js/vendor/ScrollTrigger.min.js?v=20261013" defer></script>

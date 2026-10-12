@@ -148,4 +148,46 @@ test.describe('笔记详情页', () => {
     await expect(page.locator('#noteBody h2').first()).toBeVisible(); // 正文已渲染
     await expect(page.locator('#noteToc')).toBeHidden();
   });
+
+  test('阅读进度绳跟随滚动，悬浮组滚过阈值浮现并可回顶', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('note.html?id=n6');
+    await expect(page.locator('#noteBody h2').first()).toBeVisible(); // 正文已渲染
+    await expect(page.locator('#noteProgress')).toBeVisible(); // 长文：绳常驻右缘
+    await expect(page.locator('#npBadge')).toHaveText('0%');
+    await expect(page.locator('#noteFabs')).not.toHaveClass(/is-on/); // 顶部不浮现
+
+    // 直达底部（immediate 绕过平滑滚动）：结点滑至绳尾、百分比到 100、悬浮组浮现
+    await page.evaluate(() => window.FX.scrollTo(document.documentElement.scrollHeight, { immediate: true }));
+    await expect.poll(async () => page.locator('#npBadge').textContent(), { timeout: 3000 }).toBe('100%');
+    const trackH = await page.locator('.np-track').evaluate((el) => el.offsetHeight);
+    await expect.poll(async () => page.locator('#npKnot').evaluate(
+      (el) => { const m = getComputedStyle(el).transform.split(','); return parseFloat(m[m.length - 1]) || 0; }
+    ), { timeout: 3000 }).toBeCloseTo(trackH, 0);
+    await expect(page.locator('#noteFabs')).toHaveClass(/is-on/);
+    await expect(page.locator('#npTop')).toBeVisible();
+
+    // 回顶：滚动归零、百分比归 0、悬浮组淡出
+    await page.locator('#npTop').click();
+    await expect.poll(async () => page.evaluate(() => window.scrollY), { timeout: 3000 }).toBe(0);
+    await expect(page.locator('#npBadge')).toHaveText('0%');
+    await expect(page.locator('#noteFabs')).not.toHaveClass(/is-on/);
+  });
+
+  test('空态页面不足一屏时进度绳缺席；窄屏隐藏绳子（悬浮组保留）', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('note.html?id=ghost');
+    await expect(page.locator('#noteEmpty')).toBeVisible();
+    await expect(page.locator('#noteProgress')).toBeHidden(); // 无进度可言
+    await expect(page.locator('#noteFabs')).not.toHaveClass(/is-on/);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('note.html?id=n6');
+    await expect(page.locator('#noteBody h2').first()).toBeVisible();
+    await expect(page.locator('#noteProgress')).toBeHidden(); // <900px 隐藏绳
+    await expect(page.locator('#noteFabs a[href="notes.html"]')).toBeAttached(); // 返回路径仍在
+
+    await page.setViewportSize({ width: 1000, height: 800 });
+    await expect(page.locator('#noteProgress')).toBeVisible(); // 900~1180：无目录，绳子可显示
+  });
 });

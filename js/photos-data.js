@@ -8,6 +8,7 @@
 // 卡片尺寸由 style.css 的 #photos 区段统一规范（3/4 竖版、contain 完整展示），无需逐条配置。
 const PHOTOS_DATA = [
   { title: '春日花影', desc: '镜头里的一朵花', img: 'images/photos/flower.webp', grad: 'g1' },
+  { title: '滚滚干饭', desc: '两只干饭熊的悠闲日常', img: 'images/photos/panda.webp', grad: 'g2' },
   { title: '相片一号', desc: '晴朗的一天', grad: 'g1' },
   { title: '相片二号', desc: '海边的风', grad: 'g2' },
   { title: '相片三号', desc: '傍晚的云', grad: 'g3' },
