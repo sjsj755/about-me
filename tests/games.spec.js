@@ -87,6 +87,8 @@ test.describe('游戏室 · 架子', () => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
 
+    // 数据文件已含真实游戏（见 games-2048.spec.js）；本用例验证空清单行为，须显式注入空清单
+    await stubData(page, [], RUNNERS_SRC);
     await page.goto('games.html');
 
     await expect(page.locator('#games')).toBeVisible();

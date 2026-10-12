@@ -10,6 +10,15 @@
   --accent-sand: #f3d78a;   /* 浅沙黄，作点缀 */
   --accent-pink: #f6b8c8;
   --accent-lav: #c9b8f0;
+  /* 拼豆调色板扩充色（游戏室，见 pages/games.css 的 .pd 色板映射），同饱和度清新系 */
+  --accent-coral: #f08d7e;  /* 珊瑚红 */
+  --accent-berry: #d98aa8;  /* 莓红 */
+  --accent-orange: #f5b26b; /* 杏橙 */
+  --accent-lemon: #f5e07a;  /* 柠檬黄 */
+  --accent-leaf: #9cd69c;   /* 嫩草绿 */
+  --accent-plum: #a98fd8;   /* 紫罗兰 */
+  --accent-brown: #b98e6e;  /* 咖啡棕 */
+  --accent-stone: #a9b2be;  /* 岩灰 */
 
   /* 玻璃 */
   /* --glass-alpha 是「卡片透明度」的唯一开关（首页外观调节，见 js/appearance.js）：

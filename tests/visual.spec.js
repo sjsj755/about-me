@@ -5,6 +5,9 @@
 // 快照不入库（见 .gitignore）：基线只是迁移窗口内的一次性验收产物。
 // 动态区域处理：时钟每秒刷新、鼓励语定时轮换、日历网格的「今天」高亮随真实日期漂移、
 //   首页水波 canvas 跟随鼠标，统一 mask 避免假差异；入场动画靠 settle() 的等待兜底。
+// games 页例外：2048 的开局两块随机（值与位置都会变），整块 mask 会把盘面全让出去，
+//   所以走 js/games-2048.js 的测试锚点固定开局盘面，保持全页像素覆盖。
+const GAMES_SEED = [2, 4, 0, 0, 0, 2, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0];
 const { test, expect } = require('@playwright/test');
 
 const PAGES = ['index', 'works', 'collect', 'sites', 'notes', 'photos', 'about', 'games'];
@@ -48,6 +51,9 @@ test.describe('视觉基线', () => {
     for (const stem of PAGES) {
       test(`${stem} @ ${vp}`, async ({ page }) => {
         await page.setViewportSize(VIEWPORTS[vp]);
+        if (stem === 'games') {
+          await page.addInitScript((v) => { window.__G2048_SEED__ = v; }, GAMES_SEED);
+        }
         await page.goto(`${stem}.html`);
         await settle(page);
         await expect(page).toHaveScreenshot(`${stem}-${vp}.png`, {
