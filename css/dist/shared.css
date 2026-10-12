@@ -227,28 +227,8 @@ section { position: relative; z-index: 2; padding: 64px 6%; max-width: 1280px; m
 }
 .section-title { font-family: var(--font-display); font-size: clamp(2rem, 4.5vw, 3rem); margin-top: 8px; }
 
-/* ============ 作品标题 + 关于我小方格 ============ */
+/* ============ 作品标题（about-chip/chip-avatar/chip-text 全链无消费者，死代码已清理） ============ */
 .works-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
-.about-chip {
-  display: inline-flex; align-items: center; gap: 12px;
-  padding: 8px 18px 8px 8px; border-radius: 50px; cursor: pointer;
-  background: var(--glass-bg); border: 1px solid var(--glass-border);
-  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  box-shadow: var(--shadow);
-  transition: transform .3s, box-shadow .3s;
-}
-.about-chip:hover { transform: translateY(-3px); box-shadow: 0 18px 34px rgba(120,150,165,.3); }
-.chip-avatar {
-  width: 34px; height: 34px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
-  position: relative;
-}
-.chip-avatar::after {
-  content: ""; position: absolute; inset: 4px; border-radius: 50%;
-  background: var(--w-35);
-}
-.chip-text { font-family: var(--font-display); font-weight: 600; font-size: 0.95rem; color: var(--text); }
 
 /* 页面 section 首屏让位（works/photos 共用；各页 id 选择器覆盖见 pages/*.css） */
 .works-page-section { padding-top: 40px; }
@@ -352,23 +332,15 @@ section { position: relative; z-index: 2; padding: 64px 6%; max-width: 1280px; m
 html.no-gsap .reveal { opacity: 1; transform: none; }
 
 /* ============ 悬停动画门控（skill：触屏误触，仅在精指针设备启用 transform 悬停） ============ */
+/* 页面特定类的 hover 已迁回各自页面/组件文件：
+   .note-item → pages/notes.css；.work-card → pages/works.css；
+   .skill/.filter-chip → components/chips.css（跨页组件类）；
+   .cal-nav/.cal-day、.about-chip 系与 pages 层重复，已删除。 */
 @media (hover: hover) and (pointer: fine) {
-  .about-chip:hover { transform: translateY(-3px); box-shadow: 0 18px 34px rgba(120,150,165,.3); }
-  .skill:hover { background: var(--accent-mint); color: var(--white); transform: translateY(-3px); }
-  .work-card:hover { transform: rotate(0deg) translateY(-8px); box-shadow: 0 28px 46px rgba(120,150,165,.3); }
-  .portal-link:hover { background: var(--w-50); }
-  .portal-icon:hover { transform: scale(1.12); }
-  .cal-nav:hover { background: var(--w-85); transform: scale(1.08); }
-  .cal-day:hover { background: var(--w-70); transform: scale(1.08); }
   .nav-links a:hover { color: var(--text); }
   .nav-links a:hover::after { width: 100%; }
   .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(140,190,220,.5); }
   .btn-ghost:hover { transform: translateY(-3px); background: var(--w-60); }
-  .filter-chip:hover { background: var(--w-70); color: var(--text); }
-  /* 便签：悬停时“被捏直”并微微提起，纸张投影随之加深（倾斜在 .note-item，投影在 .note-card） */
-  .note-item:hover { transform: rotate(0deg) translateY(-3px); }
-  .note-item:hover .note-card { box-shadow: 0 26px 44px rgba(120,150,165,.3); }
-  .note-item:hover .note-link { color: var(--accent-blue); }
 }
 
 /* ============ 作品集筛选胶囊（方案三） ============ */
@@ -390,6 +362,13 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
 }
 /* 作品计数 */
 .works-count { margin-top: 8px; color: var(--text-soft); font-size: 0.9rem; }
+
+/* ============ 悬停门控（自 motion.css 迁入：.skill 跨 about/works 灯箱复用，.filter-chip 跨 works/collect/sites 复用） ============ */
+/* 触屏无 hover 语义且易误触，仅在精指针设备启用 transform 悬停 */
+@media (hover: hover) and (pointer: fine) {
+  .skill:hover { background: var(--accent-mint); color: var(--white); transform: translateY(-3px); }
+  .filter-chip:hover { background: var(--w-70); color: var(--text); }
+}
 
 /* ============ 收集本骨架（collect/sites/notes/about 跨页消费的页头·按钮·标签·空态件） ============ */
 .collect-page-section { padding-top: 66px; }
@@ -505,6 +484,8 @@ html.no-gsap .reveal { opacity: 1; transform: none; }
   transition: opacity .35s;
 }
 @media (hover: hover) and (pointer: fine) {
+  /* 整卡悬停（自 motion.css 迁入）：捏直倾斜并提起，投影加深（photos 页由 #photos 前缀覆写接管） */
+  .work-card:hover { transform: rotate(0deg) translateY(-8px); box-shadow: 0 28px 46px rgba(120,150,165,.3); }
   .work-card:hover .work-overlay { opacity: 1; }
   .work-card:hover .work-overlay .wo-view { transform: translateY(0); }
   .work-card:hover::after { opacity: 1; }

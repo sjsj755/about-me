@@ -97,6 +97,15 @@
   }
   .note-clip { top: 20px; left: -19px; transform: none; }
 }
+
+/* ============ 便签悬停动效（自 components/motion.css 迁入：组件层不得包含页面特定类名） ============ */
+/* 悬停动画门控：触屏无 hover 语义且易误触，仅在精指针设备启用 transform 悬停 */
+@media (hover: hover) and (pointer: fine) {
+  /* 悬停时"被捏直"并微微提起，纸张投影随之加深（倾斜在 .note-item，投影在 .note-card） */
+  .note-item:hover { transform: rotate(0deg) translateY(-3px); }
+  .note-item:hover .note-card { box-shadow: 0 26px 44px rgba(120,150,165,.3); }
+  .note-item:hover .note-link { color: var(--accent-blue); }
+}
 /* ============ 移动端补充适配（安卓 / 鸿蒙） ============ */
 /* 小屏手机（<381px）：弹窗收紧，避免贴边 */
 @media (max-width: 380px) {

@@ -10,6 +10,8 @@
 //         超过 60 字会被裁掉半截（-webkit-line-clamp），配摘要时请自己数一下长度。
 //   link  文档链接，不限来源（飞书文档 / 博客 / GitHub 仓库都可以，便签上不标来源）；
 //         下面是占位示例，换成自己的文档地址即可；留空则点击便签打开本地详情弹窗
+//   content 本地 Markdown 正文文件路径（如 content/notes/xxx.md），配置后点击便签
+//         跳转 note.html?id=<id> 渲染详情页（优先级高于 link）；留空则按 link 分流
 //   user  内置条目固定 false（不可删除），用户笔记为 true
 // ============================================================
 window.NOTES_BUILTIN = [
@@ -18,4 +20,5 @@ window.NOTES_BUILTIN = [
   { id: 'n3', title: 'mcp讲解', date: '2026-08-14', desc: '展示了 MCP 最核心的价值：标准化 AI 与外部工具的连接方式', link: 'https://vcnb6bik6pl4.feishu.cn/docx/XNIRdZPCcofu0uxadiicq8gRnwh?from=from_copylink', user: false },
   { id: 'n4', title: '提示词工程', date: '2026-09-01', desc: '介绍了提示词工程到harness的演化', link: 'https://vcnb6bik6pl4.feishu.cn/file/ChxZbiKUOoha6lxfUYZcxCCJnmf?from=from_copylink', user: false },
   { id: 'n5', title: '互联网架构演进', date: '2026-09-05', desc:'简单介绍互联网架构演进：被问题逼着演进，以复杂度换性能与规模', link: 'https://vcnb6bik6pl4.feishu.cn/file/ADKibpD0Jo1d7hx2vPJc4VrOnVe?from=from_copylink', user: false },
+  { id: 'n6', title: 'AI 工具平台调研', date: '2026-10-12', desc: '调研游戏开发、视频制作、语音/音频、查资料四大类 AI 平台，并梳理平台组合方式与选型要点。', content: 'content/notes/ai-tools-survey.md', user: false },
 ];

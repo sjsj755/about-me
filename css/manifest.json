@@ -1,5 +1,5 @@
 {
-  "version": "20261011",
+  "version": "20261013",
   "shared": [
     "tokens.css",
     "base.css",
@@ -29,7 +29,8 @@
     "photos": ["pages/photos.css"],
     "about": ["pages/about.css"],
     "sites": ["pages/sites.css"],
-    "notes": ["pages/notes.css"]
+    "notes": ["pages/notes.css"],
+    "note": ["pages/note.css"]
   },
   "overrides": ["overrides.css"]
 }

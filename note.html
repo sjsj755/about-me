@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#dceef5">
+  <title>笔记详情 · Notes</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <!-- 笔记详情页：正文由 js/note.js 从 content/notes/*.md 拉取 Markdown 渲染（marked + DOMPurify 消毒） -->
+  <link rel="stylesheet" href="css/dist/shared.css?v=20261013">
+  <link rel="stylesheet" href="css/dist/note.css?v=20261013">
+</head>
+<body class="works-page">
+
+  <!-- 漂浮光斑背景 -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <div class="bg-orb orb-4"></div>
+  <div class="bg-grain"></div>
+
+  <!-- 自定义光标 -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- 顶部胶囊导航（与全站一致；高亮由 js/main.js 按 href 自动标记） -->
+  <header class="glass-nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">真名有寻</a>
+      <nav class="nav-links" aria-label="站内导航">
+        <a href="index.html">首页</a>
+        <a href="works.html">作品集</a>
+        <a href="collect.html">芸香集</a>
+        <a href="sites.html">站点集</a>
+        <a href="photos.html">相片</a>
+        <a href="notes.html">笔记本</a>
+        <a href="about.html">关于我</a>
+      </nav>
+      <button class="hamburger" id="hamburger" aria-label="打开菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 笔记详情：头部与正文由 js/note.js 按 URL 参数填充；id 无效时显示空态 -->
+  <!-- 宽屏（≥1181px）右侧出现粘性目录（note.js 渲染后从 h2/h3 提取），窄屏自动隐藏 -->
+  <section id="note" class="works collect-page-section">
+    <div class="note-wrap">
+      <div class="note-layout">
+        <div class="note-main">
+          <a class="note-back reveal" href="notes.html">← 返回笔记本</a>
+
+          <header class="note-head reveal" id="noteHead">
+            <span class="section-tag">Note</span>
+            <h1 class="note-title" id="noteTitle"></h1>
+            <div class="note-head-meta">
+              <span class="note-date" id="noteDate"></span>
+              <a class="note-source" id="noteSource" href="#" target="_blank" rel="noopener noreferrer" hidden>查看原文 ↗</a>
+            </div>
+          </header>
+
+          <article class="note-article glass-card reveal" id="noteBody"></article>
+
+          <!-- 空态 / 加载失败（js/note.js 三条非正常路径共用） -->
+          <div class="collect-empty" id="noteEmpty" hidden>
+            <span id="noteEmptyMsg"></span>
+            <span class="collect-empty-hint">去<a href="notes.html">笔记本</a>看看其他便签</span>
+          </div>
+        </div>
+
+        <!-- 文章目录：js/note.js 渲染正文后填充；无 h2/h3（如纯文本降级）则保持隐藏 -->
+        <!-- data-lenis-prevent：目录是内部滚动容器，悬停其上滚轮时 Lenis 不得劫持（否则只能滚整页） -->
+        <nav class="note-toc" id="noteToc" hidden data-lenis-prevent aria-label="文章目录">
+          <p class="note-toc-title">目录</p>
+          <ol class="note-toc-list" id="noteTocList"></ol>
+        </nav>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <p>© 2026 你的名字 · 用清新与玻璃，收拢每一处值得留下的痕迹</p>
+    </footer>
+  </section>
+
+  <!-- GSAP + Lenis + Markdown 渲染（marked / DOMPurify，缺失时 note.js 降级为纯文本） -->
+  <script src="js/vendor/gsap.min.js?v=20261013" defer></script>
+  <script src="js/vendor/ScrollTrigger.min.js?v=20261013" defer></script>
+  <script src="js/vendor/lenis.min.js?v=20261013" defer></script>
+  <script src="js/vendor/marked.min.js?v=20261013" defer></script>
+  <script src="js/vendor/purify.min.js?v=20261013" defer></script>
+  <!-- 页面逻辑：适配层（fx）→ 公共工具（ui）→ 共享脚本（main）→ 数据（notes-data）→ 页面模块（note），defer 保证按序执行 -->
+  <!-- ui.js 必须早于 main.js：main.js 内的 UI.* 调用依赖它 -->
+  <script src="js/fx.js?v=20261013" defer></script>
+  <script src="js/links.js?v=20261013" defer></script>
+  <script src="js/ui.js?v=20261013" defer></script>
+  <script src="js/main.js?v=20261013" defer></script>
+  <script src="js/notes-data.js?v=20261013" defer></script>
+  <script src="js/note.js?v=20261013" defer></script>
+</body>
+</html>

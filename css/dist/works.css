@@ -3,6 +3,9 @@
 #works { padding-top: 96px; }
 /* .works-grid 基础布局已上移 components/works-grid.css（跨页消费） */
 /* .work-card/.work-thumb/.work-info/.g1~.g6 已上移 components/work-card.css（photos/collect 跨页消费） */
+/* .work-card:hover 拆分说明：transform/box-shadow 在 components/cards.css 的
+   (hover:hover) 门控块（自 motion.css 迁入，触屏不触发）；
+   z-index:5 与缩略图 scale(1.06) 仍由 components/work-card.css 提供（与门控版本属性互补，值等价）。 */
 /* ============ 杂志画廊瀑布流（方案 B：仅 works 页 .magazine，隔离自 photos/collect 复用样式） ============ */
 .works-grid.magazine {
   display: block;

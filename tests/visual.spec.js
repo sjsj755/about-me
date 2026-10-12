@@ -102,4 +102,20 @@ test.describe('视觉基线', () => {
       mask: [page.locator(DYNAMIC)],
     });
   });
+
+  // 笔记详情页：正文由 fetch + marked 动态渲染，settle() 的 networkidle 会等 md 请求完成；
+  // 直接带 ?id=n6 截详情态（无参访问是空态，正文为空没有截图价值）。
+  // 时钟等动态区域与详情页无关，mask 沿用同一套口径。
+  for (const vp of Object.keys(VIEWPORTS)) {
+    test(`note 详情页 @ ${vp}`, async ({ page }) => {
+      await page.setViewportSize(VIEWPORTS[vp]);
+      await page.goto('note.html?id=n6');
+      await settle(page);
+      await expect(page).toHaveScreenshot(`note-${vp}.png`, {
+        fullPage: true,
+        animations: 'disabled',
+        mask: [page.locator(DYNAMIC)],
+      });
+    });
+  }
 });

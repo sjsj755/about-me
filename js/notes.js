@@ -58,14 +58,20 @@
     item.className = 'note-item';
     item.style.setProperty('--tilt', TILTS[i % PER_GROUP]);
 
+    // 跳转地址分流：本地 Markdown 正文（note.html 详情页）优先于外链；都为空则标题不渲染为锚点。
+    // 锚点写进 DOM 而不是只靠 click 委托：键盘 Enter / 中键 / 复制链接等浏览器原生能力全部免费获得。
+    const href = d.content
+      ? 'note.html?id=' + encodeURIComponent(d.id)
+      : (d.link || '');
+
     const card = document.createElement('article');
     card.className = 'glass-card note-card';
     card.style.setProperty('--note-tint', TINTS[i % TINTS.length]);
     card.dataset.id = d.id;
     card.innerHTML = `
       <span class="note-clip" aria-hidden="true"></span>
-      <h3 class="note-title">${d.link
-        ? `<a class="note-link" href="${esc(d.link)}" target="_blank" rel="noopener noreferrer">${esc(d.title)}</a>`
+      <h3 class="note-title">${href
+        ? `<a class="note-link" href="${esc(href)}"${d.content ? '' : ' target="_blank" rel="noopener noreferrer"'}>${esc(d.title)}</a>`
         : esc(d.title)}</h3>
       <p class="note-body">${esc(d.desc)}</p>
       <div class="note-meta">
@@ -75,8 +81,9 @@
     card.addEventListener('click', (e) => {
       if (e.target.closest('.note-del')) { e.stopPropagation(); return; }
       if (e.target.closest('.note-link')) return; // 命中真锚点：交还浏览器默认行为，避免开两个窗口
-      if (d.link) window.open(d.link, '_blank', 'noopener');
-      else openDetail(d); // 无链接的历史笔记：沿用原来的详情弹窗
+      if (d.content) window.location.href = 'note.html?id=' + encodeURIComponent(d.id);
+      else if (d.link) window.open(d.link, '_blank', 'noopener');
+      else openDetail(d); // 无正文无链接的历史笔记：沿用原来的详情弹窗
     });
     const delBtn = card.querySelector('.note-del');
     if (delBtn) delBtn.addEventListener('click', (e) => { e.stopPropagation(); removeItem(d.id); });
@@ -88,7 +95,7 @@
   function renderGrid() {
     const list = all();
     grid.innerHTML = '';
-    document.getElementById('notesHint').innerHTML = `共 ${list.length} 篇笔记 · 点击便签打开对应文档`;
+    document.getElementById('notesHint').innerHTML = `共 ${list.length} 篇笔记 · 点击便签查看内容`;
 
     if (!list.length) {
       grid.innerHTML = `<div class="collect-empty">这里还没有笔记<span class="collect-empty-hint">点右上「写笔记」记下第一篇 ✨</span></div>`;

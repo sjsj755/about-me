@@ -25,6 +25,8 @@
   transition: opacity .35s;
 }
 @media (hover: hover) and (pointer: fine) {
+  /* 整卡悬停（自 motion.css 迁入）：捏直倾斜并提起，投影加深（photos 页由 #photos 前缀覆写接管） */
+  .work-card:hover { transform: rotate(0deg) translateY(-8px); box-shadow: 0 28px 46px rgba(120,150,165,.3); }
   .work-card:hover .work-overlay { opacity: 1; }
   .work-card:hover .work-overlay .wo-view { transform: translateY(0); }
   .work-card:hover::after { opacity: 1; }

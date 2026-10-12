@@ -72,6 +72,20 @@ test.describe('笔记本页', () => {
     }
   });
 
+  test('便签悬停：捏直提起、标题变强调色（hover 规则迁移自 motion.css 的行为回归线）', async ({ page }) => {
+    const item = page.locator('.note-item').first();
+    const link = item.locator('.note-link').first();
+    const before = await item.evaluate((el) => getComputedStyle(el).transform);
+    const colorBefore = await link.evaluate((el) => getComputedStyle(el).color);
+    await item.hover();
+    // 轮询至过渡结束（transform/color 均有 transition，立即读取会拿到过渡起点插值）
+    await expect.poll(async () => item.evaluate((el) => getComputedStyle(el).transform), { timeout: 3000 })
+      .toBe('matrix(1, 0, 0, 1, 0, -3)'); // rotate(0deg) translateY(-3px)
+    await expect.poll(async () => link.evaluate((el) => getComputedStyle(el).color), { timeout: 3000 })
+      .not.toBe(colorBefore);
+    expect(before).not.toBe('matrix(1, 0, 0, 1, 0, -3)'); // 常态确有倾斜，hover 才被捏直
+  });
+
   test('带链接的便签点击后新窗口打开文档', async ({ page }) => {
     await page.context().route('**/*feishu*', (route) => route.abort()); // 拦截外部跳转，避免真实请求
     await openAddForm(page);

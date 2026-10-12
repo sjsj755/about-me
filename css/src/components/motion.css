@@ -5,22 +5,14 @@
 html.no-gsap .reveal { opacity: 1; transform: none; }
 
 /* ============ 悬停动画门控（skill：触屏误触，仅在精指针设备启用 transform 悬停） ============ */
+/* 页面特定类的 hover 已迁回各自页面/组件文件：
+   .note-item → pages/notes.css；.work-card → pages/works.css；
+   .skill/.filter-chip → components/chips.css（跨页组件类）；
+   .cal-nav/.cal-day、.about-chip 系与 pages 层重复，已删除。 */
 @media (hover: hover) and (pointer: fine) {
-  .about-chip:hover { transform: translateY(-3px); box-shadow: 0 18px 34px rgba(120,150,165,.3); }
-  .skill:hover { background: var(--accent-mint); color: var(--white); transform: translateY(-3px); }
-  .work-card:hover { transform: rotate(0deg) translateY(-8px); box-shadow: 0 28px 46px rgba(120,150,165,.3); }
-  .portal-link:hover { background: var(--w-50); }
-  .portal-icon:hover { transform: scale(1.12); }
-  .cal-nav:hover { background: var(--w-85); transform: scale(1.08); }
-  .cal-day:hover { background: var(--w-70); transform: scale(1.08); }
   .nav-links a:hover { color: var(--text); }
   .nav-links a:hover::after { width: 100%; }
   .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(140,190,220,.5); }
   .btn-ghost:hover { transform: translateY(-3px); background: var(--w-60); }
-  .filter-chip:hover { background: var(--w-70); color: var(--text); }
-  /* 便签：悬停时“被捏直”并微微提起，纸张投影随之加深（倾斜在 .note-item，投影在 .note-card） */
-  .note-item:hover { transform: rotate(0deg) translateY(-3px); }
-  .note-item:hover .note-card { box-shadow: 0 26px 44px rgba(120,150,165,.3); }
-  .note-item:hover .note-link { color: var(--accent-blue); }
 }
 

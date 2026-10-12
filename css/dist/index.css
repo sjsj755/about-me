@@ -170,15 +170,21 @@
   background: var(--glass-bg); border: 1px dashed var(--glass-border); border-radius: 16px;
 }
 
-/* 右栏：时钟 + 日历 */
+/* 右栏：日历 + 时钟（竖排，DOM 顺序即视觉顺序，见 index.html） */
 /* 注意：此栏承载日历点击交互，禁止加 floatY 等常驻位移动画——
    点击时目标位移会让 click 落到相邻格/空隙上（弹层不开、标记错位）。 */
 .blog-side {
   position: sticky; top: 108px;
   display: flex; flex-direction: column; align-items: center; gap: 12px;
+  /* 两张卡片的统一宽度，也是全站唯一的调整入口：日历收窄、时钟与之等宽且左右边缘对齐。
+     日历基础层 .calendar 为 300px（格子 aspect-ratio 流式，随容器等比缩小），这里收到 248px。
+     各断点只重定义这一个变量（见下方媒体查询），两卡永远同步 ——
+     分别写死两个 min() 会随时间漂成不等宽。 */
+  --side-card-w: min(248px, 100%);
 }
-/* 桌面端日历收窄（基础层 .calendar 为 300px；格子 aspect-ratio 流式，随容器等比缩小） */
-.blog-side .calendar { width: min(248px, 100%); padding: 10px 11px; }
+.blog-side .calendar { width: var(--side-card-w); padding: 10px 11px; }
+/* 时钟与日历同宽：原先按内容宽度居中，比日历窄一截、两侧不齐 */
+.blog-side .clock { width: var(--side-card-w); }
 
 /* 响应式：≤1024px 两栏（侧栏横排置底）；≤768px 单栏（头像横排置顶） */
 @media (max-width: 1024px) {
@@ -187,8 +193,14 @@
     grid-column: 1 / -1;
     position: static;
     flex-direction: row; justify-content: center; align-items: center;
+    /* 横排的卡片宽度：日历放宽到 420px（时钟见下方 width: auto）；
+       手机断点会把这个变量连同排布方向一起改回「同宽竖排」。 */
+    --side-card-w: min(420px, 100%);
   }
-  .blog-side .calendar { width: min(420px, 100%); }
+  /* 横排下时钟回到内容宽度：上面那条等宽规则只服务竖排对齐，横排套用会让窄屏
+     凭空多分走一份宽度、把日历挤窄（390px 视口实测：时钟由 126.9px 涨到 145.5px，
+     日历由 220px 被压到 201.3px，格子随之变小）。平板空间充裕，横排更省纵向高度。 */
+  .blog-side .clock { width: auto; }
 }
 @media (max-width: 768px) {
   .blog-layout { grid-template-columns: 1fr; }
@@ -200,6 +212,11 @@
     padding: 18px 12px;
   }
   .blog-profile .mascot-frame { width: 120px; height: 120px; }
+  /* 手机改为竖排（日历在上、时钟在下、两卡同宽），与桌面同一套视觉秩序。
+     横排在这里是纯亏：390px 视口下日历被挤到 220px、格子偏小，竖排后日历拿满 358.8px；
+     代价只是右栏多约 60px 纵向高度，而它本就在页尾。平板（769–1024px）不受影响。 */
+  .blog-side { flex-direction: column; }
+  .blog-side .clock { width: var(--side-card-w); }
 }
 @media (prefers-reduced-motion: reduce) {
   .carousel-slide { transition: none; }

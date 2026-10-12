@@ -18,3 +18,10 @@
 /* 作品计数 */
 .works-count { margin-top: 8px; color: var(--text-soft); font-size: 0.9rem; }
 
+/* ============ 悬停门控（自 motion.css 迁入：.skill 跨 about/works 灯箱复用，.filter-chip 跨 works/collect/sites 复用） ============ */
+/* 触屏无 hover 语义且易误触，仅在精指针设备启用 transform 悬停 */
+@media (hover: hover) and (pointer: fine) {
+  .skill:hover { background: var(--accent-mint); color: var(--white); transform: translateY(-3px); }
+  .filter-chip:hover { background: var(--w-70); color: var(--text); }
+}
+
