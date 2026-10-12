@@ -86,9 +86,15 @@
 .carousel-dot:hover::before { background: var(--w-85); }
 .carousel-dot.is-active::before { background: var(--white); transform: scale(1.25); }
 
-/* 左栏：头像 + 社交链接 */
-.blog-profile {
+/* 左栏：资料卡（头像 + 社交）+ 游戏室入口，两卡竖排 */
+/* sticky 挂在外层容器而非单张卡：两卡必须一起吸顶（挂在资料卡上时，滚动到一定位置
+   入口卡就会先滑出视口，而资料卡还钉在原处）。容器不设背景，只做排布与吸附。 */
+.blog-left {
   position: sticky; top: 108px;
+  display: flex; flex-direction: column; gap: 14px;
+  min-width: 0; /* 网格项默认 min-width:auto，长文本会把 220px 栏撑宽 */
+}
+.blog-profile {
   display: flex; flex-direction: column;
   align-items: center; gap: 20px;
   padding: 26px 14px;
@@ -108,6 +114,52 @@
 .social-link:hover { color: var(--text); background: var(--w-80); transform: translateY(-3px); }
 .social-link:active { transform: scale(.94); }
 .social-link svg { width: 22px; height: 22px; fill: currentColor; display: block; }
+
+/* 游戏室入口卡：整卡即链接（图标 + 标题/描述 + 箭头），与右栏两卡同一套玻璃面。
+   用 .glass-panel 而非 .glass-card —— 只有它命中下方「首页卡片薄膜」那条 4px 模糊规则，
+   与同页另外三张卡保持同一档材质（appearance.spec.js 也据此兜底断言）。 */
+.blog-entry {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px;
+  min-height: 44px; /* 触控目标下限 */
+  text-decoration: none; color: inherit;
+  transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out), border-color .25s var(--ease-out);
+}
+.blog-entry:active { transform: scale(.98); }
+.blog-entry-icon {
+  flex: none; width: 36px; height: 36px; border-radius: 12px;
+  display: grid; place-items: center;
+  color: var(--accent-blue);
+  background: var(--w-60);
+  border: 1px solid var(--glass-border);
+  transition: color .25s var(--ease-out), background .25s var(--ease-out), border-color .25s var(--ease-out);
+}
+.blog-entry-icon svg { width: 20px; height: 20px; display: block; }
+.blog-entry-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.blog-entry-title {
+  font-family: var(--font-display); font-weight: 700; font-size: .92rem; line-height: 1.3;
+  color: var(--text); transition: color .25s var(--ease-out);
+}
+/* 单行省略：≤1024px 断点下栏宽收到 200px，描述列只剩 ~100px，换行会把卡撑高 */
+.blog-entry-desc {
+  font-size: .76rem; color: var(--text-soft); line-height: 1.4;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.blog-entry-go {
+  flex: none; color: var(--text-soft); font-size: .95rem;
+  transition: transform .2s var(--ease-out), color .2s var(--ease-out);
+}
+/* hover 只在精确指针设备启用（与站点集卡片同一惯例）；只动 transform / shadow / border-color，无布局位移 */
+@media (hover: hover) and (pointer: fine) {
+  .blog-entry:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--w-95); }
+  .blog-entry:hover .blog-entry-icon {
+    color: var(--white); border-color: transparent;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-mint));
+  }
+  .blog-entry:hover .blog-entry-title { color: var(--accent-blue); }
+  .blog-entry:hover .blog-entry-go { transform: translateX(3px); color: var(--accent-blue); }
+}
+.blog-entry:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
 
 /* 中栏：问候区 + 最近更新 */
 /* 还原基础层 section 通栏规则（components/section.css：max-width:1280 + margin:auto +
@@ -206,8 +258,9 @@
   .blog-layout { grid-template-columns: 1fr; }
   .blog-wrap { padding-top: 28px; }
   .blog-carousel { height: clamp(220px, 44vh, 360px); }
+  /* 单栏后左栏不再是侧栏，吸附一并取消（sticky 挂在 .blog-left 上，故改这里） */
+  .blog-left { position: static; }
   .blog-profile {
-    position: static;
     flex-direction: row; justify-content: center;
     padding: 18px 12px;
   }
@@ -220,16 +273,20 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .carousel-slide { transition: none; }
+  /* 入口卡只有悬停/按下的微过渡，reduce 时全部关掉（保留颜色反馈） */
+  .blog-entry, .blog-entry-icon, .blog-entry-title, .blog-entry-go { transition: none; }
+  .blog-entry:hover, .blog-entry:active { transform: none; }
+  .blog-entry:hover .blog-entry-go { transform: none; }
 }
 
 /* ============ 首页卡片薄膜：更厚 + 更少模糊（仅首页） ============ */
-/* 首页的玻璃卡片 —— .blog-profile / .clock / .calendar，三者都是 .glass-panel —— 背后是
+/* 首页的玻璃卡片 —— .blog-profile / .blog-entry / .clock / .calendar，都是 .glass-panel —— 背后是
    会滚动的渐变、水波与光斑，模糊半径大时整片糊成奶白，看不出背后的层次。这里把模糊收到
    --glass-blur-card（4px），配合更厚的膜（α 默认 0.7，见 js/appearance.js 的 CARD_DEFAULT），
    换「看得见背景、又不失玻璃感」。.feed-link 同属首页玻璃面，已在上面的规则里按同一 token 处理。
-   为什么用 .blog-wrap 作用域而不是直接改 --glass-blur：后者同时被 .glass-nav 与其余 6 页的
+   为什么用 .blog-wrap 作用域而不是直接改 --glass-blur：后者同时被 .glass-nav 与其余页面的
    卡片消费，改它等于全站换材质。首页的 .glass-panel 恰好全部落在 .blog-wrap 内（index.html 实测：
-   .blog-profile / .clock / .calendar 三处，无例外），因此这条选择器只命中首页卡片。
+   .blog-profile / .blog-entry / .clock / .calendar 四处，无例外），因此这条选择器只命中首页卡片。
    为什么不做 prefers-reduced-motion / 窄屏降级：本规则（0,2,0）会盖过 perf.css 的降级档（0,1,0），
    首页卡片在任何条件下都固定走这一档。代价可接受 —— blur 半径减半（4px < 降级档的 8px）是实打实的
    采样量下降，saturate 从 140% 升到 150% 只是色彩矩阵的系数、不增加采样成本。 */

@@ -7,6 +7,11 @@
 // 入参校验清单：端口（1-65535 整数）、HTTP 方法（GET/HEAD 白名单）、
 // URL 解码（畸形百分号 400）、空字节与反斜杠（400）、
 // 点开头的隐藏段（404）、相对路径越界（根前缀校验，404）。
+//
+// 热重载：`node tools/dev-server.js 4173 --reload`（或 HOT_RELOAD=1）时启用。
+// 原理：fs.watch 递归监听根目录（忽略点开头目录与 node_modules）→ 变更去抖后经
+// SSE 端点 /__reload 广播；HTML 响应注入 EventSource 客户端脚本，收到事件即刷新。
+// Playwright webServer 不带 --reload 启动，测试环境保持纯净、行为不受影响。
 
 'use strict';
 
@@ -24,6 +29,14 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
 
 // 服务根目录固定为项目根（tools/ 的上一级），与进程 cwd 无关
 const ROOT = path.resolve(__dirname, '..');
+
+// ---- 热重载开关 ----
+const HOT = process.argv.includes('--reload') || process.env.HOT_RELOAD === '1';
+const SSE_PATH = '/__reload';
+// 注入到 HTML 的客户端脚本：收到 SSE 消息即整页刷新
+const RELOAD_SNIPPET =
+  '<script>(function(){try{var e=new EventSource("' + SSE_PATH + '");' +
+  'e.onmessage=function(){location.reload()}}catch(x){}})()</script>';
 
 // ---- MIME 表（覆盖站点全部资源类型，未识别类型按二进制流处理）----
 const MIME = {
@@ -60,8 +73,45 @@ function notFound(res) {
   fail(res, 404, '404 Not Found');
 }
 
+// ---- 热重载：SSE 客户端登记与广播 ----
+const sseClients = new Set();
+
+function broadcastReload(reason) {
+  for (const res of sseClients) {
+    try {
+      res.write('data: ' + (reason || 'reload') + '\n\n');
+    } catch {
+      sseClients.delete(res);
+    }
+  }
+}
+
+// 热重载模式下 HTML 整体读取并注入刷新脚本（HTML 文件都很小，整读无压力）
+function serveHtml(res, method, filePath) {
+  fs.readFile(filePath, (err, buf) => {
+    if (err) return fail(res, 500, '500 Internal Server Error');
+    const html = buf.toString('utf8');
+    const lower = html.toLowerCase();
+    let idx = lower.lastIndexOf('</body>');
+    if (idx === -1) idx = lower.lastIndexOf('</html>');
+    const out = idx === -1
+      ? html + RELOAD_SNIPPET
+      : html.slice(0, idx) + RELOAD_SNIPPET + html.slice(idx);
+    const body = Buffer.from(out, 'utf8');
+    res.writeHead(200, {
+      'Content-Type': MIME['.html'],
+      'Content-Length': body.length,
+      'Cache-Control': 'no-store',
+    });
+    if (method === 'HEAD') return res.end();
+    res.end(body);
+  });
+}
+
 function serveFile(res, method, filePath, size) {
-  const type = MIME[path.extname(filePath).toLowerCase()] || 'application/octet-stream';
+  const ext = path.extname(filePath).toLowerCase();
+  if (HOT && (ext === '.html' || ext === '.htm')) return serveHtml(res, method, filePath);
+  const type = MIME[ext] || 'application/octet-stream';
   res.writeHead(200, {
     'Content-Type': type,
     'Content-Length': size,
@@ -102,6 +152,19 @@ const server = http.createServer((req, res) => {
     return notFound(res);
   }
 
+  // 热重载 SSE 端点：长连接，文件变更时广播触发浏览器刷新
+  if (HOT && pathname === SSE_PATH) {
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-store',
+      Connection: 'keep-alive',
+    });
+    res.write('retry: 1000\n\n');
+    sseClients.add(res);
+    res.on('close', () => sseClients.delete(res));
+    return;
+  }
+
   // 越界双保险第二层：解析后必须仍位于根目录内
   const filePath = path.resolve(ROOT, '.' + pathname);
   if (filePath !== ROOT && !filePath.startsWith(ROOT + path.sep)) {
@@ -139,5 +202,38 @@ process.on('uncaughtException', (e) => console.error('[dev-server] uncaught:', e
 process.on('unhandledRejection', (e) => console.error('[dev-server] unhandledRejection:', e && e.message));
 
 server.listen(port, '127.0.0.1', () => {
-  console.log(`[dev-server] http://127.0.0.1:${port}  root=${ROOT}`);
+  console.log(`[dev-server] http://127.0.0.1:${port}  root=${ROOT}${HOT ? '  热重载=开' : ''}`);
 });
+
+// ---- 热重载：递归监听根目录，变更去抖后广播 ----
+if (HOT) {
+  let debounce = null;
+  try {
+    fs.watch(ROOT, { recursive: true }, (_event, filename) => {
+      if (filename) {
+        // 忽略点开头目录（.git/.trae 等）与 node_modules，避免无关刷新
+        const segs = String(filename).split(/[\\/]/);
+        if (segs.some((s) => s.startsWith('.') || s === 'node_modules')) return;
+      }
+      if (debounce) clearTimeout(debounce);
+      debounce = setTimeout(() => {
+        debounce = null;
+        broadcastReload('reload');
+        console.log('[dev-server] 文件变更，已通知', sseClients.size, '个客户端刷新');
+      }, 120);
+    });
+    console.log('[dev-server] 热重载已启用：监听根目录文件变更，SSE 端点 ' + SSE_PATH);
+  } catch (e) {
+    console.error('[dev-server] 文件监听不可用（热重载降级为手动刷新）:', e.message);
+  }
+  // SSE 心跳：定期写注释行，防止连接被超时掐断；unref 不阻止进程退出
+  setInterval(() => {
+    for (const res of sseClients) {
+      try {
+        res.write(': ping\n\n');
+      } catch {
+        sseClients.delete(res);
+      }
+    }
+  }, 25000).unref();
+}

@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "node tools/dev-server.js 4173 --reload",
     "build:css": "node tools/build-css.js",
     "check": "node tools/check.js",
     "check:css": "node tools/build-css.js --check",

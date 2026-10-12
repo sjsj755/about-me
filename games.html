@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#dceef5">
+  <title>游戏室 · Games</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <!-- 字体统一走系统栈（声明见 css/src/tokens.css 的 --font-display / --font-body）。
+       原 Google Fonts 外链是渲染阻塞资源：实测 4 个页面共发起 115 个字体请求，
+       首页 load 因此增加约 6.9s（A/B 实测 7554ms → 679ms），且阻塞全部 defer 脚本执行，故移除。 -->
+  <link rel="stylesheet" href="css/dist/shared.css?v=20261014">
+  <link rel="stylesheet" href="css/dist/games.css?v=20261014">
+</head>
+<body class="works-page">
+
+  <!-- 漂浮光斑背景 -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  <div class="bg-orb orb-4"></div>
+  <div class="bg-grain"></div>
+
+  <!-- 自定义光标 -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
+  <!-- 顶部胶囊导航（与首页一致；高亮由 js/main.js 按 href 自动标记）。
+       本页不进导航栏（入口是首页左栏那张卡），这里只提供返回其它页面的路径。 -->
+  <header class="glass-nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">真名有寻</a>
+      <nav class="nav-links" aria-label="站内导航">
+        <a href="index.html">首页</a>
+        <a href="works.html">作品集</a>
+        <a href="collect.html">芸香集</a>
+        <a href="sites.html">站点集</a>
+        <a href="photos.html">相片</a>
+        <a href="notes.html">笔记本</a>
+        <a href="about.html">关于我</a>
+      </nav>
+      <button class="hamburger" id="hamburger" aria-label="打开菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 游戏室：单一舞台 + 游戏切换 -->
+  <section id="games" class="works collect-page-section">
+    <div class="section-head collect-head">
+      <div class="collect-head-text">
+        <span class="section-tag reveal">Games</span>
+        <h2 class="section-title reveal">游戏室</h2>
+        <p class="collect-desc reveal">几款简单的小游戏，用来换换脑子。</p>
+      </div>
+    </div>
+
+    <!-- 游戏切换（WAI-ARIA tabs）：由 js/games.js 按 window.GAMES 渲染；没有游戏时保持 hidden -->
+    <div class="games-tabs" id="gamesTabs" role="tablist" aria-label="选择游戏" hidden></div>
+
+    <!-- 单一舞台（role=tabpanel，tabindex=-1 供切换后程序化聚焦）：
+         游戏本体、空态、未实现态、加载失败态都由 js/games.js 注入到这块卡里 -->
+    <div class="games-stage glass-card" id="gamesStage" role="tabpanel" tabindex="-1"></div>
+
+    <!-- 当前游戏的补充说明（由 js/games.js 写入；没有游戏时保持为空） -->
+    <p class="collect-hint reveal" id="gamesHint"></p>
+
+    <footer class="site-footer">
+      <p>© 2026 你的名字 · 用清新与玻璃，收拢每一处值得留下的痕迹</p>
+    </footer>
+  </section>
+
+  <!-- GSAP + Lenis -->
+  <script src="js/vendor/gsap.min.js?v=20261014" defer></script>
+  <script src="js/vendor/ScrollTrigger.min.js?v=20261014" defer></script>
+  <script src="js/vendor/lenis.min.js?v=20261014" defer></script>
+  <!-- SDK 适配层：必须在 main.js 与各页面模块之前 -->
+  <script src="js/fx.js?v=20261014" defer></script>
+  <script src="js/links.js?v=20261014" defer></script>
+  <!-- 共享工具层：必须早于 main.js，main.js 内的 UI.* 调用依赖它 -->
+  <script src="js/ui.js?v=20261014" defer></script>
+  <script src="js/main.js?v=20261014" defer></script>
+  <!-- 游戏清单（纯数据）：加游戏请编辑 js/games-data.js -->
+  <script src="js/games-data.js?v=20261014" defer></script>
+  <!-- 游戏室页面模块（架子）：按 GAMES 渲染切换条、维护挂载/销毁生命周期 -->
+  <script src="js/games.js?v=20261014" defer></script>
+</body>
+</html>

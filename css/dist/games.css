@@ -1,0 +1,79 @@
+/* ============ 游戏室 · 单一舞台 + 游戏切换 ============ */
+/* 首屏让位：顶部悬浮胶囊导航（fixed，底缘约 70px），与站点集同一口径 */
+#games { padding-top: 96px; }
+
+/* 游戏切换条：排布只在这里定义，按钮本体直接复用共享组件类 .filter-chip（components/chips.css），
+   不新造一套 chip 样式 —— 激活态也用同一个 .active 类（由 js/games.js 与 aria-selected 同步切换）。 */
+.games-tabs { display: flex; flex-wrap: wrap; gap: 10px; }
+/* 空清单时由 JS 置 hidden；display:flex 会盖过 [hidden]，所以必须显式还原 */
+.games-tabs[hidden] { display: none; }
+/* chip 上的小标签（GAMES 条目里的 tag，可选） */
+.games-tab-tag {
+  display: inline-block; margin-right: 6px; padding: 1px 7px; border-radius: 999px;
+  font-size: .68rem; font-weight: 600; vertical-align: 1px;
+  color: var(--text-soft); background: var(--w-70);
+}
+
+/* 单一舞台：所有游戏共用这一块玻璃卡，切游戏时只换里面的挂载容器。
+   高度用 clamp 而不是固定值：矮视口下不至于把页脚顶出屏幕，宽屏下也不至于空成一片。 */
+.games-stage {
+  position: relative;
+  margin-top: 16px;
+  min-height: clamp(320px, 48vh, 520px);
+  padding: 18px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px;
+}
+/* tabpanel 只在切换后程序化聚焦，故焦点环用 :focus-visible（鼠标点击不出现） */
+.games-stage:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 3px; }
+
+/* 挂载容器：每次切换都新建一个干净节点，游戏只管往这里画自己的 DOM */
+.games-mount {
+  position: relative;
+  width: 100%; max-width: 640px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+/* 只有真正挂上游戏后才禁掉手势拖拽（空态/未实现态下页面必须能正常滚动） */
+.games-stage.is-playing { touch-action: none; }
+
+/* 状态行：aria-live="polite" 的播报位，也是游戏展示计分的地方。
+   等宽数字避免分数变化时整行抖动；min-height 保证空状态下舞台不会塌一截。 */
+.games-hud {
+  min-height: 1.5em;
+  font-size: .9rem; color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+/* 空态 / 未实现态 / 加载失败态共用同一套居中排版（文案面向访客，中性、不暴露实现细节） */
+.games-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 28px 12px; text-align: center; color: var(--text-soft);
+}
+.games-empty-title { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: var(--text); }
+.games-empty-hint { font-size: .85rem; line-height: 1.7; max-width: 32em; }
+
+/* 窄屏：收紧舞台内边距与最小高度，减少无效留白（切换按钮沿用共享组件 .filter-chip 的尺寸，各页一致） */
+@media (max-width: 480px) {
+  .games-stage { min-height: clamp(260px, 44vh, 420px); padding: 14px; }
+  .games-tabs { gap: 8px; }
+}
+
+/* 动效降级：本页只有 chip 与舞台的微过渡，reduce 时关掉（颜色反馈保留） */
+@media (prefers-reduced-motion: reduce) {
+  .games-tabs .filter-chip { transition: none; }
+  .games-tabs .filter-chip:active { transform: none; }
+}
+/* ============ 移动端补充适配（安卓 / 鸿蒙） ============ */
+/* 小屏手机（<381px）：弹窗收紧，避免贴边 */
+@media (max-width: 380px) {
+  .collect-modal { padding: 12px; }
+  .collect-modal-inner,
+  .collect-modal-inner.cal-modal { padding: 18px 16px; }
+}
+
+/* 折叠屏展开态 / 窄窗口（鸿蒙 Mate X 展开约 720-900px）：两列档位 */
+@media (min-width: 769px) and (max-width: 1100px) {
+  .works-grid { grid-template-columns: repeat(2, 1fr); }
+}
+

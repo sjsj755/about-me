@@ -7,7 +7,7 @@
 //   首页水波 canvas 跟随鼠标，统一 mask 避免假差异；入场动画靠 settle() 的等待兜底。
 const { test, expect } = require('@playwright/test');
 
-const PAGES = ['index', 'works', 'collect', 'sites', 'notes', 'photos', 'about'];
+const PAGES = ['index', 'works', 'collect', 'sites', 'notes', 'photos', 'about', 'games'];
 const VIEWPORTS = {
   desktop: { width: 1440, height: 900 },
   mobile: { width: 390, height: 844 },

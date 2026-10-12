@@ -3,7 +3,7 @@
 // 文件损坏、被误删或部署漏传时同样是「全局变量不存在」——
 // 原实现在 main.js 顶层直接 new Lenis(...)，抛错会导致整个 main.js 不执行，
 // 且 .reveal 的 CSS 初始态（opacity:0）无人解除 —— 页面呈现为空白。
-// 本用例拦截本地 vendor 的 SDK 请求，断言 7 个页面在无 SDK 时依然可见、可读。
+// 本用例拦截本地 vendor 的 SDK 请求，断言 8 个页面在无 SDK 时依然可见、可读。
 const { test, expect } = require('@playwright/test');
 
 const PAGES = [
@@ -14,6 +14,7 @@ const PAGES = [
   'collect.html',
   'sites.html',
   'notes.html',
+  'games.html',
 ];
 
 // 各页均存在的容器：section（index 的 #home、子页的 #works/#photos/...）
