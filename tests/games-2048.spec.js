@@ -49,11 +49,12 @@ test.describe('游戏室 · 2048', () => {
     page.on('pageerror', (e) => errors.push(String(e)));
 
     await setup(page, seedRow([[0, 2], [1, 4], [5, 2]]));
-    // 清单现含两款（2048 + 拼豆），2048 默认激活；拼豆侧用例见 games-pindou.spec.js
+    // 清单现含三款（2048 + 拼豆 + 七巧板），2048 默认激活；另两款见各自的 spec
     const tab = page.locator('#gamesTabs [role="tab"]');
-    await expect(tab).toHaveCount(2);
+    await expect(tab).toHaveCount(3);
     await expect(tab.nth(0)).toHaveText('益智2048');
     await expect(tab.nth(1)).toHaveText('创作拼豆');
+    await expect(tab.nth(2)).toHaveText('益智七巧板');
 
     await expect(page.locator('.g2048-cell')).toHaveCount(16);
     expect(await tilesOf(page)).toEqual([

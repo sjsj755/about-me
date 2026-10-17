@@ -65,6 +65,24 @@ test.describe('视觉基线', () => {
     }
   }
 
+  // 七巧板盘面完全确定（不像 2048 有随机开局），值得单独留一张基线。
+  // 切 tab 用合成 click（evaluate 里的 el.click()）：避免真实鼠标停在 chip 上，
+  // 把 .filter-chip:hover 的提亮态烤进基线（与 settle() 里点轮播指示点同一口径）。
+  for (const vp of Object.keys(VIEWPORTS)) {
+    test(`games · 七巧板 @ ${vp}`, async ({ page }) => {
+      await page.setViewportSize(VIEWPORTS[vp]);
+      await page.goto('games.html');
+      await settle(page);
+      await page.evaluate(() => document.getElementById('gamesTab-tangram').click());
+      await page.waitForTimeout(400); // 换游戏后舞台重排 + FX.refresh 的滚动复位
+      await expect(page).toHaveScreenshot(`games-tangram-${vp}.png`, {
+        fullPage: true,
+        animations: 'disabled',
+        mask: [page.locator(DYNAMIC)],
+      });
+    });
+  }
+
   test('index 日历弹窗 @ desktop', async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.desktop);
     await page.goto('index.html');

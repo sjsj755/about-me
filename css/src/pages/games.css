@@ -266,3 +266,109 @@
 @media (prefers-reduced-motion: reduce) {
   .pd-cell::before { transition: none; }
 }
+
+/* ============ 七巧板（js/games-tangram.js） ============ */
+/* 布局：主区 = 板面（6 列 CSS Grid 自适应，无需 JS 算尺寸）+ 右侧托盘/控制栏。
+   板面剪影来自 js 的 SHAPE 常量，这里只负责「剪影格亮、空白格淡」的视觉区分。 */
+.tg { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+
+/* 色板映射（唯一数据源）：data-piece 出现在积木格与托盘小样两类元素上，
+   统一翻译成 --tg-fill（填充色）/ --tg-shine（面高光），消费点只认变量 —— 加色只改这一段。
+   刻意避开 --accent-mint / --accent-coral：这两个留给落点预览环（可放 / 放不下），
+   否则「预览环的颜色」会和「某块积木的颜色」撞在一起，分不清是提示还是已落子。 */
+.tg [data-piece="i4"] { --tg-fill: var(--accent-blue); }
+.tg [data-piece="o"]  { --tg-fill: var(--accent-lav); }
+.tg [data-piece="s"]  { --tg-fill: var(--accent-sand); --tg-shine: var(--w-90); }
+.tg [data-piece="t"]  { --tg-fill: var(--accent-orange); }
+.tg [data-piece="i3"] { --tg-fill: var(--accent-plum); }
+.tg [data-piece="l3"] { --tg-fill: var(--accent-stone); }
+
+.tg-main { display: flex; align-items: flex-start; gap: 16px; width: 100%; }
+
+/* 板面：position: relative 是通关叠加层的定位基准（叠加层绝对定位，不占 Grid 格） */
+.tg-board {
+  position: relative;
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;
+  width: 100%; max-width: 340px; aspect-ratio: 1;
+  padding: 8px; border-radius: 14px;
+  background: var(--w-35); border: 1px solid var(--w-70);
+  touch-action: none; /* 拖动放块不得触发页面滚动（与舞台 .is-playing 双保险） */
+}
+.tg-cell {
+  position: relative; aspect-ratio: 1; border-radius: 5px;
+  /* 剪影格：要填的「坑」。板底是半透明的 --w-35，这里用高白度把剪影从板底上跳出来，
+     否则两档半透明白叠在一起肉眼分不出轮廓（0.45 与 0.35 的差在玻璃上不可辨）。 */
+  background: var(--w-80);
+  transition: background-color .12s var(--ease-out), box-shadow .12s var(--ease-out);
+}
+/* 空白格（不属于机器人）：完全透出板底，只留一圈极淡的描边维持 6×6 的格子感 */
+.tg-cell.is-blank { background: transparent; box-shadow: inset 0 0 0 1px var(--w-45); }
+/* 已放置的积木格：按 data-piece 取色，带内高光 */
+.tg-cell[data-piece] {
+  background-color: var(--tg-fill, var(--w-60));
+  box-shadow: inset 0 2px 3px var(--tg-shine, var(--w-80));
+}
+/* 落点预览：绿框 = 放得下，红框 = 越界或重叠（只在空格上出现） */
+.tg-cell.is-preview.is-ok { box-shadow: inset 0 0 0 2px var(--accent-mint); }
+.tg-cell.is-preview.is-bad { box-shadow: inset 0 0 0 2px var(--accent-coral); }
+/* 通关：板面描一圈薄荷色，不阻断「重置」 */
+.tg-board.is-done { border-color: var(--accent-mint); box-shadow: 0 0 0 2px var(--accent-mint), 0 0 18px var(--w-45); }
+
+/* 通关叠加层：复用站点玻璃态变量（与 .g2048-overlay / .collect-modal 同一口径） */
+.tg-overlay {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  padding: 16px; border-radius: 14px; text-align: center;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+}
+/* 作者样式给了 display:flex，必须显式还原 [hidden]，否则 hidden 属性失效 */
+.tg-overlay[hidden] { display: none; }
+.tg-overlay-title { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: var(--text); }
+.tg-overlay-text { font-size: .85rem; color: var(--text-soft); }
+.tg-overlay-btn { min-height: 44px; } /* 触摸目标下限 */
+
+/* 侧栏：托盘（3 列）+ 控制按钮 */
+.tg-side { display: flex; flex-direction: column; gap: 12px; width: 216px; flex: none; }
+.tg-tray { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tg-piece {
+  min-height: 56px; border-radius: 12px; cursor: pointer; padding: 6px 4px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--w-40); border: 2px solid var(--w-70);
+  transition: border-color .2s var(--ease-out), background-color .2s var(--ease-out), opacity .2s var(--ease-out);
+}
+.tg-piece.is-selected { border-color: var(--text); background: var(--w-70); }
+.tg-piece.is-placed { opacity: .4; } /* 已放置的块留在托盘里，点它可取回 */
+.tg-piece:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
+
+/* 托盘小样：按积木当前朝向画成小格子；带点的是「锚点格」（落子时对准目标格） */
+.tg { --tg-mini-cell: 10px; }
+.tg-mini { display: grid; gap: 2px; }
+.tg-mini-cell {
+  display: flex; align-items: center; justify-content: center;
+  width: var(--tg-mini-cell); height: var(--tg-mini-cell); border-radius: 3px;
+  background: var(--w-25);
+}
+.tg-mini-cell.on { background-color: var(--tg-fill, var(--w-60)); }
+.tg-mini-cell.is-anchor::after { content: ''; width: 3px; height: 3px; border-radius: 50%; background: var(--text); }
+
+.tg-controls { display: flex; gap: 8px; }
+.tg-controls .filter-chip { flex: 1 1 0; min-height: 44px; } /* 触摸目标下限 */
+
+@media (hover: hover) and (pointer: fine) {
+  .tg-piece:hover { background: var(--w-55); }
+}
+
+/* 窄屏：主区改竖排，托盘铺满整行（板面取满可用宽度） */
+@media (max-width: 640px) {
+  .tg-main { flex-direction: column; align-items: center; }
+  .tg-board { max-width: 100%; }
+  .tg-side { width: 100%; }
+}
+
+/* 动效降级：七巧板只有落子/预览的面色过渡，reduce 时关闭 */
+@media (prefers-reduced-motion: reduce) {
+  .tg-cell { transition: none; }
+}

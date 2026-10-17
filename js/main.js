@@ -576,6 +576,21 @@ FX.all('.works-grid .work-card').forEach((card, i) => {
   );
 });
 
+// 页尾兜底：'top 88%' 的含义是「元素顶边滚到视口 88% 处」，而元素顶边能到达的最上面受最大
+// 滚动量限制（文档高 − 视口高）。本页文档会在浮现创建之后继续长高（轮播 / 最近更新由后续 defer
+// 脚本 blog-carousel.js、blog-feed.js 渲染，实测从 1204px 涨到 2476px），start 随之被刷新到
+// 可达范围之外 → once 永不触发 → 元素永久停在 opacity:0 上，用户完全看不到。
+// 实测：手机竖屏首页 .clock start=1658 而 maxScroll=1632，差 26px；photos / about 的 .site-footer
+// 同理（既存问题，页脚距页底仅约 24px）。故在每次 refresh（布局变化后 ScrollTrigger 会自行触发）
+// 自查一次：够不到浮现线就把动画直接补完 —— 浮现可以少一次，内容绝不能因为动画而永远消失。
+const revealVars = (el) => ({
+  trigger: el, start: 'top 88%', once: true,
+  onRefresh(self) {
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    if (self.start > maxScroll + 1 && self.animation) self.animation.progress(1);
+  },
+});
+
 FX.all('.glass-panel, .contact-panel, .site-footer, .section-head').forEach((el) => {
   // 首页门户大块与日历由入场动画处理，跳过滚动触发
   if (el.classList.contains('portal-merged') || el.classList.contains('calendar') || el.classList.contains('mascot-frame')) return;
@@ -583,7 +598,7 @@ FX.all('.glass-panel, .contact-panel, .site-footer, .section-head').forEach((el)
     { opacity: 0, y: 40 },
     {
       opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
-      scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+      scrollTrigger: revealVars(el),
     }
   );
 });

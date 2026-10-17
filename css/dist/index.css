@@ -491,8 +491,9 @@
   font-size: 0.85rem; line-height: 1.5; color: var(--text);
   box-shadow: var(--shadow);
   cursor: pointer; user-select: none; text-align: center;
-  /* 固定尺寸：换句时文字在框内换行，三列布局零重排（防闪烁关键） */
-  width: min(280px, 100%);
+  /* 宽度跟列走：铺满所在列（首页中栏 .blog-main），与上下正文块左右对齐；
+     高度仍固定，换句时文字在框内换行，避免换句引起重排（防闪烁关键）。 */
+  width: 100%;
   min-height: calc(2.55rem + 18px);
   transition: opacity .24s var(--ease-out), filter .24s var(--ease-out);
 }
