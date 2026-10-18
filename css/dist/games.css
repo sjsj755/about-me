@@ -269,24 +269,59 @@
 
 /* ============ 七巧板（js/games-tangram.js） ============ */
 /* 布局：主区 = 板面（6 列 CSS Grid 自适应，无需 JS 算尺寸）+ 右侧托盘/控制栏。
-   板面剪影来自 js 的 SHAPE 常量，这里只负责「剪影格亮、空白格淡」的视觉区分。 */
-.tg { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+   板面外沿带一圈数字提示（上 = 每列、左 = 每行需要被覆盖的格数），提示值来自 js 的 LEVELS（每关一组），
+   这里只负责把「列提示 / 行提示 / 板面」摆成三条逐格对齐的轨道，以及提示对上号（薄荷）/ 超标（珊瑚）的染色。 */
+.tg { --tg-hint: 26px; width: 100%; display: flex; flex-direction: column; gap: 12px; }
 
-/* 色板映射（唯一数据源）：data-piece 出现在积木格与托盘小样两类元素上，
+/* 关卡切换条：排布只在这里定义，按钮本体复用共享组件类 .filter-chip（components/chips.css），
+   激活态也是同一个 .active —— 与页头的 .games-tabs 完全同一口径。 */
+.tg-levels { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* 色板映射（唯一数据源）：data-piece 出现在积木格、托盘小样、手持幽灵块三类元素上，
    统一翻译成 --tg-fill（填充色）/ --tg-shine（面高光），消费点只认变量 —— 加色只改这一段。
+   宿主写成 :is(.tg, .tg-ghost) 而不是 .tg：幽灵块为了拿到视口坐标必须挂在 body 上（见 js 里的说明），
+   不在 .tg 作用域内 —— 漏了 .tg-ghost 幽灵块就会掉回 --w-60 的兜底色，与托盘里的同一块对不上色。
    刻意避开 --accent-mint / --accent-coral：这两个留给落点预览环（可放 / 放不下），
    否则「预览环的颜色」会和「某块积木的颜色」撞在一起，分不清是提示还是已落子。 */
-.tg [data-piece="i4"] { --tg-fill: var(--accent-blue); }
-.tg [data-piece="o"]  { --tg-fill: var(--accent-lav); }
-.tg [data-piece="s"]  { --tg-fill: var(--accent-sand); --tg-shine: var(--w-90); }
-.tg [data-piece="t"]  { --tg-fill: var(--accent-orange); }
-.tg [data-piece="i3"] { --tg-fill: var(--accent-plum); }
-.tg [data-piece="l3"] { --tg-fill: var(--accent-stone); }
+:is(.tg, .tg-ghost) [data-piece="i4"] { --tg-fill: var(--accent-blue); }
+:is(.tg, .tg-ghost) [data-piece="o"]  { --tg-fill: var(--accent-lav); }
+:is(.tg, .tg-ghost) [data-piece="s"]  { --tg-fill: var(--accent-sand); --tg-shine: var(--w-90); }
+:is(.tg, .tg-ghost) [data-piece="t"]  { --tg-fill: var(--accent-orange); }
+:is(.tg, .tg-ghost) [data-piece="i3"] { --tg-fill: var(--accent-plum); }
+:is(.tg, .tg-ghost) [data-piece="l3"] { --tg-fill: var(--accent-stone); }
 
 .tg-main { display: flex; align-items: flex-start; gap: 16px; width: 100%; }
 
+/* 提示包层：把「列提示 / 行提示 / 板面」摆成三角（左上角留空），三条轨道必须与板面逐格对齐。
+   板面外侧有 1px 描边 + 8px 内边距，提示带补 9px 内边距（8 + 1）才能与板面内容盒的 1fr 轨道逐格对上。
+   列带/行带用与板面相同的 gap(4px) 与 repeat(6, 1fr)；行带高度由 1fr 行自动拉伸到板面高度。 */
+.tg-board-wrap {
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr;
+  gap: 6px; width: 100%; max-width: 372px; /* 26(提示) + 6(间隔) + 340(板面) */
+}
+.tg-col-hints {
+  grid-column: 2; grid-row: 1;
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; padding: 0 9px;
+}
+.tg-row-hints {
+  grid-column: 1; grid-row: 2;
+  display: grid; grid-template-rows: repeat(6, 1fr); gap: 4px; padding: 9px 0;
+}
+/* 提示数字：纯展示（该行/列当前被覆盖的格数），不可交互，故不适用 44×44 触摸目标规则。
+   等宽数字避免计数变化时宽度抖动；is-ok = 正好对上，is-over = 超了、得挪走。 */
+.tg-hint {
+  display: grid; place-items: center;
+  width: var(--tg-hint); height: var(--tg-hint);
+  font-size: .82rem; font-weight: 600; font-variant-numeric: tabular-nums;
+  color: var(--text-soft); background: var(--w-45); border-radius: 8px;
+  transition: background-color .12s var(--ease-out), color .12s var(--ease-out);
+}
+.tg-hint.is-ok { background: var(--accent-mint); color: var(--text); }
+.tg-hint.is-over { background: var(--accent-coral); color: var(--text); }
+
 /* 板面：position: relative 是通关叠加层的定位基准（叠加层绝对定位，不占 Grid 格） */
 .tg-board {
+  grid-column: 2; grid-row: 2;
   position: relative;
   display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;
   width: 100%; max-width: 340px; aspect-ratio: 1;
@@ -296,13 +331,12 @@
 }
 .tg-cell {
   position: relative; aspect-ratio: 1; border-radius: 5px;
-  /* 剪影格：要填的「坑」。板底是半透明的 --w-35，这里用高白度把剪影从板底上跳出来，
-     否则两档半透明白叠在一起肉眼分不出轮廓（0.45 与 0.35 的差在玻璃上不可辨）。 */
-  background: var(--w-80);
+  /* 纯网格：所有格子一视同仁（目标不是某个剪影形状，而是旁边标出的行列覆盖数）。
+     填充用 --w-45 与拼豆板一致，另加一圈 1px 内描边把 6×6 格线明确画出来。 */
+  background: var(--w-45);
+  box-shadow: inset 0 0 0 1px var(--w-60);
   transition: background-color .12s var(--ease-out), box-shadow .12s var(--ease-out);
 }
-/* 空白格（不属于机器人）：完全透出板底，只留一圈极淡的描边维持 6×6 的格子感 */
-.tg-cell.is-blank { background: transparent; box-shadow: inset 0 0 0 1px var(--w-45); }
 /* 已放置的积木格：按 data-piece 取色，带内高光 */
 .tg-cell[data-piece] {
   background-color: var(--tg-fill, var(--w-60));
@@ -313,6 +347,45 @@
 .tg-cell.is-preview.is-bad { box-shadow: inset 0 0 0 2px var(--accent-coral); }
 /* 通关：板面描一圈薄荷色，不阻断「重置」 */
 .tg-board.is-done { border-color: var(--accent-mint); box-shadow: 0 0 0 2px var(--accent-mint), 0 0 18px var(--w-45); }
+
+/* 提示（求助）：点「提示」按钮后，用柠檬色环指出「该放的格」或「该取回的块」。
+   色相取积木色与预览色（薄荷/珊瑚）之外的第三种 —— 三套反馈同时出现也不会互相误读。
+   写在 .tg-cell[data-piece] 之后，所以「取回某块」的提示能压在已放置格子上显示；
+   预览环（选择器多一节，优先级更高）仍会盖过提示环，悬停看落点时两个环不会打架。 */
+.tg-cell.is-hint { box-shadow: inset 0 0 0 2px var(--accent-lemon); }
+.tg-piece.is-hint { box-shadow: 0 0 0 2px var(--accent-lemon); animation: tg-hint-pulse 1.2s var(--ease-out) infinite; }
+@keyframes tg-hint-pulse { 50% { box-shadow: 0 0 0 6px var(--w-25); } }
+
+/* 手持幽灵块：点托盘选中后积木跟着指针走（节点由 js/games-tangram.js 建，挂在 body 上）。
+   position: fixed + transform 平移 —— 只走合成、不改布局，指针每帧移动都不触发布局重排；
+   内部格子用绝对定位按板面实测格距摆，吸附时能与目标格整格重合（所见即落点）。
+   pointer-events: none 是硬约束：否则 elementFromPoint 会先命中它，板面格判定与托盘全部失效。 */
+.tg-ghost {
+  position: fixed; left: 0; top: 0;
+  z-index: 1000; /* 高于导航(100)与背景噪点层(998)，低于 lightbox(3000)，不遮挡弹窗 */
+  pointer-events: none;
+  will-change: transform;
+  opacity: .92;
+  /* 整块一缕投影（而不是逐格投影）：多联骨牌才有一体的「被拿起来」感；
+     filter 只随 transform 平移，内部静态内容不会逐帧重栅格化 */
+  filter: drop-shadow(0 8px 16px rgba(40, 70, 90, .28));
+}
+/* 作者样式给了 position: fixed（已块化），必须显式还原 [hidden]，否则 hidden 属性失效 */
+.tg-ghost[hidden] { display: none; }
+.tg-ghost-cell {
+  position: absolute; border-radius: 5px; /* 与 .tg-cell 同圆角，吸附时逐格对齐 */
+  background-color: var(--tg-fill, var(--w-60));
+  box-shadow: inset 0 2px 3px var(--tg-shine, var(--w-80));
+}
+/* 锚点格上的定位点：与托盘小样同一套视觉语言 —— 这个点对准哪格，松手就落在哪格 */
+.tg-ghost-cell.is-anchor::after {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px;
+  border-radius: 50%; background: var(--text);
+}
+/* 落点状态环：绿 = 放得下，红 = 越界或重叠（与板面 .tg-cell.is-preview 同一对色，两处不会说岔） */
+.tg-ghost.is-ok .tg-ghost-cell { box-shadow: inset 0 0 0 2px var(--accent-mint); }
+.tg-ghost.is-bad .tg-ghost-cell { box-shadow: inset 0 0 0 2px var(--accent-coral); }
 
 /* 通关叠加层：复用站点玻璃态变量（与 .g2048-overlay / .collect-modal 同一口径） */
 .tg-overlay {
@@ -329,6 +402,10 @@
 .tg-overlay-title { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: var(--text); }
 .tg-overlay-text { font-size: .85rem; color: var(--text-soft); }
 .tg-overlay-btn { min-height: 44px; } /* 触摸目标下限 */
+/* 按钮行：还有下一关时是「下一关 + 再拼一次」，最后一关只剩「再拼一次」 */
+.tg-overlay-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+/* 作者样式没给 .filter-chip 设 display，但这里仍显式还原 [hidden] 作为守卫（hidden 控制「下一关」的显隐） */
+.tg-overlay-next[hidden] { display: none; }
 
 /* 侧栏：托盘（3 列）+ 控制按钮 */
 .tg-side { display: flex; flex-direction: column; gap: 12px; width: 216px; flex: none; }
@@ -361,16 +438,21 @@
   .tg-piece:hover { background: var(--w-55); }
 }
 
-/* 窄屏：主区改竖排，托盘铺满整行（板面取满可用宽度） */
+/* 窄屏：主区改竖排，托盘铺满整行（板面与提示条一起取满可用宽度） */
 @media (max-width: 640px) {
   .tg-main { flex-direction: column; align-items: center; }
+  .tg-board-wrap { max-width: 100%; }
   .tg-board { max-width: 100%; }
   .tg-side { width: 100%; }
 }
 
-/* 动效降级：七巧板只有落子/预览的面色过渡，reduce 时关闭 */
+/* 动效降级：七巧板只有落子/预览/提示的面色过渡与提示脉冲，reduce 时关闭 */
 @media (prefers-reduced-motion: reduce) {
   .tg-cell { transition: none; }
+  .tg-hint { transition: none; }
+  .tg-piece.is-hint { animation: none; }
+  .tg-levels .filter-chip { transition: none; }
+  .tg-levels .filter-chip:active { transform: none; }
 }
 /* ============ 移动端补充适配（安卓 / 鸿蒙） ============ */
 /* 小屏手机（<381px）：弹窗收紧，避免贴边 */

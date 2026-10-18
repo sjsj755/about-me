@@ -9,8 +9,8 @@
   <!-- 字体统一走系统栈（声明见 css/src/tokens.css 的 --font-display / --font-body）。
        原 Google Fonts 外链是渲染阻塞资源：实测 4 个页面共发起 115 个字体请求，
        首页 load 因此增加约 6.9s（A/B 实测 7554ms → 679ms），且阻塞全部 defer 脚本执行，故移除。 -->
-  <link rel="stylesheet" href="css/dist/shared.css?v=20261023">
-  <link rel="stylesheet" href="css/dist/games.css?v=20261023">
+  <link rel="stylesheet" href="css/dist/shared.css?v=20261027">
+  <link rel="stylesheet" href="css/dist/games.css?v=20261027">
 </head>
 <body class="works-page">
 
@@ -71,22 +71,22 @@
   </section>
 
   <!-- GSAP + Lenis -->
-  <script src="js/vendor/gsap.min.js?v=20261023" defer></script>
-  <script src="js/vendor/ScrollTrigger.min.js?v=20261023" defer></script>
-  <script src="js/vendor/lenis.min.js?v=20261023" defer></script>
+  <script src="js/vendor/gsap.min.js?v=20261027" defer></script>
+  <script src="js/vendor/ScrollTrigger.min.js?v=20261027" defer></script>
+  <script src="js/vendor/lenis.min.js?v=20261027" defer></script>
   <!-- SDK 适配层：必须在 main.js 与各页面模块之前 -->
-  <script src="js/fx.js?v=20261023" defer></script>
-  <script src="js/links.js?v=20261023" defer></script>
+  <script src="js/fx.js?v=20261027" defer></script>
+  <script src="js/links.js?v=20261027" defer></script>
   <!-- 共享工具层：必须早于 main.js，main.js 内的 UI.* 调用依赖它 -->
-  <script src="js/ui.js?v=20261023" defer></script>
-  <script src="js/main.js?v=20261023" defer></script>
+  <script src="js/ui.js?v=20261027" defer></script>
+  <script src="js/main.js?v=20261027" defer></script>
   <!-- 游戏清单（纯数据）：加游戏请编辑 js/games-data.js -->
-  <script src="js/games-data.js?v=20261023" defer></script>
+  <script src="js/games-data.js?v=20261027" defer></script>
   <!-- 各游戏实现：必须早于 games.js（games.js 启动时按清单挂载） -->
-  <script src="js/games-2048.js?v=20261023" defer></script>
-  <script src="js/games-pindou.js?v=20261023" defer></script>
-  <script src="js/games-tangram.js?v=20261023" defer></script>
+  <script src="js/games-2048.js?v=20261027" defer></script>
+  <script src="js/games-pindou.js?v=20261027" defer></script>
+  <script src="js/games-tangram.js?v=20261027" defer></script>
   <!-- 游戏室页面模块（架子）：按 GAMES 渲染切换条、维护挂载/销毁生命周期 -->
-  <script src="js/games.js?v=20261023" defer></script>
+  <script src="js/games.js?v=20261027" defer></script>
 </body>
 </html>
