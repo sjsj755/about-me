@@ -21,4 +21,5 @@ window.NOTES_BUILTIN = [
   { id: 'n4', title: '提示词工程', date: '2026-09-01', desc: '介绍了提示词工程到harness的演化', link: 'https://vcnb6bik6pl4.feishu.cn/file/ChxZbiKUOoha6lxfUYZcxCCJnmf?from=from_copylink', user: false },
   { id: 'n5', title: '互联网架构演进', date: '2026-09-05', desc:'简单介绍互联网架构演进：被问题逼着演进，以复杂度换性能与规模', link: 'https://vcnb6bik6pl4.feishu.cn/file/ADKibpD0Jo1d7hx2vPJc4VrOnVe?from=from_copylink', user: false },
   { id: 'n6', title: 'AI 工具平台调研', date: '2026-10-12', desc: '调研游戏开发、视频制作、语音/音频、查资料四大类 AI 平台，并梳理平台组合方式与选型要点。', content: 'content/notes/ai-tools-survey.md', user: false },
+  { id: 'n7', title: 'Meta 分析', date: '2026-10-23', desc: '把多个小样本研究合并成大样本：从选题、检索、质量评估到异质性与偏倚的八步流程。', content: 'content/notes/meta-analysis.md', user: false },
 ];
